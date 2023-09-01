@@ -23,7 +23,13 @@ public class ChattingRoom extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long chattingRoomId;
-
 	private Long expertResponseEstimateId;
+
+	private boolean isDeleted;
+
+	@Builder
+	public ChattingRoom(Long expertResponseEstimateId) {
+		this.expertResponseEstimateId = expertResponseEstimateId;
+		this.isDeleted = false;
+	}
 }

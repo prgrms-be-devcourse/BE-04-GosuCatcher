@@ -4,8 +4,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
 
 import lombok.AccessLevel;
@@ -22,11 +25,19 @@ public class ChattingMessage extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	//private Member member;
+	@ManyToOne
+	@JoinColumn(name = "member_id")
+	private Member sender;
 
-	//private ChattingRoom chattingRoom;
-
-	private String senderNickName;
+	@ManyToOne
+	@JoinColumn(name = "chatting_room_id")
+	private ChattingRoom chattingRoom;
 
 	private String message;
+
+	public ChattingMessage(Member sender, ChattingRoom chattingRoom, String message) {
+		this.sender = sender;
+		this.chattingRoom = chattingRoom;
+		this.message = message;
+	}
 }

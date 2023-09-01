@@ -26,4 +26,10 @@ public class MainItem extends BaseEntity {
 	private String name;
 
 	private String description;
+
+	@Builder
+	public MainItem(String name, String description) {
+		this.name = name;
+		this.description = description;
+	}
 }

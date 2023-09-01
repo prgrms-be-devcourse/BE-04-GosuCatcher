@@ -23,6 +23,8 @@ public class Member extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	private String name;
+
 	private String password;
 
 	private String email;
@@ -32,7 +34,8 @@ public class Member extends BaseEntity {
 	private boolean isDeleted;
 
 	@Builder
-	public Member(String password, String email, String phoneNumber) {
+	public Member(String name, String password, String email, String phoneNumber) {
+		this.name = name;
 		this.password = password;
 		this.email = email;
 		this.phoneNumber = phoneNumber;

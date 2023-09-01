@@ -4,6 +4,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.foo.gosucatcher.global.BaseEntity;
@@ -15,15 +17,25 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "profile_items")
+@Table(name = "expert_items")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProfileItem extends BaseEntity {
+public class ExpertItem extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long profileId;
+	@ManyToOne
+	@JoinColumn(name = "expert_id")
+	private Expert expert;
 
-	private Long subItemId;
+	@ManyToOne
+	@JoinColumn(name = "sub_item_id")
+	private SubItem subItem;
+
+	@Builder
+	public ExpertItem(Expert expert, SubItem subItem) {
+		this.expert = expert;
+		this.subItem = subItem;
+	}
 }
