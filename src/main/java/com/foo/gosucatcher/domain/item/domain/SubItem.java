@@ -4,11 +4,14 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.foo.gosucatcher.global.BaseEntity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,9 +25,18 @@ public class SubItem extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private Long mainItemId;
+	@ManyToOne
+	@JoinColumn(name = "main_item_id")
+	private MainItem mainItem;
 
 	private String name;
 
 	private String description;
+
+	@Builder
+	public SubItem(MainItem mainItem, String name, String description) {
+		this.mainItem = mainItem;
+		this.name = name;
+		this.description = description;
+	}
 }
