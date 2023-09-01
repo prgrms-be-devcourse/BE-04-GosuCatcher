@@ -6,8 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
-public class InvalidValueException extends RuntimeException {
+public class InvalidValueException extends BusinessException {
 
-	private final ErrorCode errorCode;
+	public InvalidValueException(ErrorCode errorCode) {
+		super(errorCode);
+	}
 }
