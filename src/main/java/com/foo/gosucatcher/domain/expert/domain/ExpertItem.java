@@ -8,6 +8,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.global.BaseEntity;
 
 import lombok.AccessLevel;
