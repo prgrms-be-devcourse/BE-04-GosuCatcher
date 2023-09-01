@@ -38,6 +38,8 @@ public class Expert extends BaseEntity {
 
 	private String description;
 
+	private boolean isBaroEstimate;
+
 	@Builder
 	public Expert(Member member, String storeName, String location, int distance, String description) {
 		this.member = member;
@@ -45,5 +47,6 @@ public class Expert extends BaseEntity {
 		this.location = location;
 		this.distance = distance;
 		this.description = description;
+		this.isBaroEstimate = false;
 	}
 }
