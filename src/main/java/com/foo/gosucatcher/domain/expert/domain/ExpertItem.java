@@ -9,6 +9,7 @@ import javax.persistence.Table;
 import com.foo.gosucatcher.global.BaseEntity;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
