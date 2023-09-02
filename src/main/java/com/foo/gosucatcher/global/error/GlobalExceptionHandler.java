@@ -14,21 +14,21 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ErrorResponse> entityNotFoundException(EntityNotFoundException e) {
+	public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(InvalidValueException.class)
-	public ResponseEntity<ErrorResponse> invalidValueException(InvalidValueException e) {
+	public ResponseEntity<ErrorResponse> handleInvalidValueException(InvalidValueException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(BusinessException.class)
-	public ResponseEntity<ErrorResponse> businessException(BusinessException e) {
+	public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
