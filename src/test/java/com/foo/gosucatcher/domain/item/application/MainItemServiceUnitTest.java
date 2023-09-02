@@ -202,4 +202,48 @@ class MainItemServiceUnitTest {
 		//when -> then
 		assertThrows(BusinessException.class, () -> mainItemService.update(request));
 	}
+
+	@Test
+	@DisplayName("메인 아이템 삭제")
+	void deleteMainItemSuccessTest() throws Exception {
+
+		//given
+		Long mainItemId = 1L;
+		when(mainItemRepository.findById(mainItemId)).thenReturn(Optional.of(mainItem));
+
+		//when
+		assertDoesNotThrow(() -> mainItemService.delete(mainItemId));
+
+		//then
+		verify(mainItemRepository, times(1)).delete(mainItem);
+	}
+
+	@Test
+	@DisplayName("메인 아이템 삭제 - 실패 (아이템을 찾을 수 없는 경우)")
+	void deleteMainItemFailTest_ItemNotFound() {
+
+		// given
+		Long itemId = 1L;
+
+		when(mainItemRepository.findById(itemId)).thenReturn(Optional.empty());
+
+		// when -> then
+		assertThrows(EntityNotFoundException.class, () -> mainItemService.delete(itemId));
+	}
+
+	@Test
+	@DisplayName("모든 메인 아이템 삭제 - 성공")
+	void deleteAllMainItemsSuccessTest() {
+
+		// given
+		doNothing().when(mainItemRepository).deleteAll();
+
+		//when
+		mainItemService.deleteAll();
+
+		//then
+		verify(mainItemRepository, times(1)).deleteAll();
+		List<MainItem> mainItems = mainItemRepository.findAll();
+		assertTrue(mainItems.isEmpty());
+	}
 }
