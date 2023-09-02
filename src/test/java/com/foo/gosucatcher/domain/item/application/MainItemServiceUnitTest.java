@@ -159,14 +159,14 @@ class MainItemServiceUnitTest {
 		//given
 		Long itemId = 1L;
 		String newName = "새로운 이름";
-		MainItemUpdateRequest request = new MainItemUpdateRequest(itemId, newName, "레슨을 받으세요.");
+		MainItemUpdateRequest request = new MainItemUpdateRequest(newName, "레슨을 받으세요.");
 
 		when(mainItemRepository.findById(itemId)).thenReturn(Optional.of(mainItem));
 
 		when(mainItemRepository.findByName(newName)).thenReturn(Optional.empty());
 
 		//when
-		mainItemService.update(request);
+		mainItemService.update(1L, request);
 
 		//then
 		assertThat(mainItem.getName()).isEqualTo(newName);
@@ -179,12 +179,12 @@ class MainItemServiceUnitTest {
 		//given
 		Long itemId = 1L;
 		String newName = "새로운 이름";
-		MainItemUpdateRequest request = new MainItemUpdateRequest(itemId, newName, "새로운 설명");
+		MainItemUpdateRequest request = new MainItemUpdateRequest(newName, "새로운 설명");
 
 		when(mainItemRepository.findById(itemId)).thenReturn(Optional.empty());
 
 		//when -> then
-		assertThrows(EntityNotFoundException.class, () -> mainItemService.update(request));
+		assertThrows(EntityNotFoundException.class, () -> mainItemService.update(itemId, request));
 	}
 
 	@Test
@@ -194,13 +194,13 @@ class MainItemServiceUnitTest {
 		//given
 		Long itemId = 1L;
 		String newName = "알바";
-		MainItemUpdateRequest request = new MainItemUpdateRequest(itemId, newName, "새로운 설명");
+		MainItemUpdateRequest request = new MainItemUpdateRequest(newName, "새로운 설명");
 
 		when(mainItemRepository.findById(itemId)).thenReturn(Optional.of(mainItem));
 		when(mainItemRepository.findByName(newName)).thenReturn(Optional.of(mainItem));
 
 		//when -> then
-		assertThrows(BusinessException.class, () -> mainItemService.update(request));
+		assertThrows(BusinessException.class, () -> mainItemService.update(itemId, request));
 	}
 
 	@Test

@@ -50,8 +50,8 @@ public class MainItemService {
 		return MainItemsResponse.from(mainItemList);
 	}
 
-	public Long update(MainItemUpdateRequest request) {
-		MainItem foundMainItem = mainItemRepository.findById(request.id())
+	public Long update(Long id, MainItemUpdateRequest request) {
+		MainItem foundMainItem = mainItemRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
 		duplicatedNameCheck(request.name());
