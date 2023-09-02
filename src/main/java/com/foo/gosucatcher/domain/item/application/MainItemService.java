@@ -62,6 +62,17 @@ public class MainItemService {
 		return foundMainItem.getId();
 	}
 
+	public void delete(Long id) {
+		MainItem mainItem = mainItemRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+
+		mainItemRepository.delete(mainItem);
+	}
+
+	public void deleteAll() {
+		mainItemRepository.deleteAll();
+	}
+
 	private void duplicatedNameCheck(String name) {
 		mainItemRepository.findByName(name).ifPresent(mainItem -> {
 			throw new BusinessException(ErrorCode.DUPLICATED_MAIN_ITEM_NAME);
