@@ -38,7 +38,7 @@ public class MainItemService {
 	public MainItemResponse findById(Long id) {
 
 		MainItem mainItem = mainItemRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.INVALID_INPUT_VALUE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
 		return MainItemResponse.from(mainItem);
 	}
