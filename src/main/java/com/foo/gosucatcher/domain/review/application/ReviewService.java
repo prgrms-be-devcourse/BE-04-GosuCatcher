@@ -41,4 +41,12 @@ public class ReviewService {
 
 		return ReviewResponse.from(review);
 	}
+
+	@Transactional(readOnly = true)
+	public ReviewResponse findByExpertId(Long expertId) {
+		Review review = reviewRepository.findReviewsByExpertId(expertId)
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+
+		return ReviewResponse.from(review);
+	}
 }
