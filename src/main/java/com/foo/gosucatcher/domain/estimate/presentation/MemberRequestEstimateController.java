@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.controller;
+package com.foo.gosucatcher.domain.estimate.presentation;
 
 import javax.validation.Valid;
 
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.foo.gosucatcher.domain.estimate.dto.request.MemberRequestEstimateRequest;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimatesResponse;
-import com.foo.gosucatcher.domain.estimate.service.MemberRequestEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.MemberRequestEstimateService;
 
 import lombok.RequiredArgsConstructor;
 

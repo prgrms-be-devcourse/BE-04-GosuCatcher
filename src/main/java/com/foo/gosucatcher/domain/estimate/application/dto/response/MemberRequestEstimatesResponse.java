@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.dto.response;
+package com.foo.gosucatcher.domain.estimate.application.dto.response;
 
 import java.util.List;
 

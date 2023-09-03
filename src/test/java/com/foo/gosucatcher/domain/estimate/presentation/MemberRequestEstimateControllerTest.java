@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.controller;
+package com.foo.gosucatcher.domain.estimate.presentation;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -18,10 +18,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
-import com.foo.gosucatcher.domain.estimate.dto.request.MemberRequestEstimateRequest;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimatesResponse;
-import com.foo.gosucatcher.domain.estimate.service.MemberRequestEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.MemberRequestEstimateService;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;

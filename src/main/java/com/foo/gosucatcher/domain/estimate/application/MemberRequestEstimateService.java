@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.service;
+package com.foo.gosucatcher.domain.estimate.application;
 
 import java.util.List;
 
@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimateRepository;
-import com.foo.gosucatcher.domain.estimate.dto.request.MemberRequestEstimateRequest;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimatesResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;

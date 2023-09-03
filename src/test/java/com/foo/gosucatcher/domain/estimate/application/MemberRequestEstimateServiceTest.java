@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.service;
+package com.foo.gosucatcher.domain.estimate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,11 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import com.foo.gosucatcher.domain.estimate.application.MemberRequestEstimateService;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimateRepository;
-import com.foo.gosucatcher.domain.estimate.dto.request.MemberRequestEstimateRequest;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.dto.response.MemberRequestEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimatesResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;

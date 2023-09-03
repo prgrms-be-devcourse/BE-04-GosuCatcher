@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.estimate.dto.request;
+package com.foo.gosucatcher.domain.estimate.application.dto.request;
 
 import java.time.LocalDateTime;
 
