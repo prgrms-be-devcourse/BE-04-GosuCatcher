@@ -2,13 +2,20 @@ package com.foo.gosucatcher.domain.estimate.dto.request;
 
 import java.time.LocalDateTime;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 
 public record MemberRequestEstimateRequest(
+	@NotBlank(message = "지역을 등록해주세요.")
 	String location,
+
+	@NotNull(message = "서비스 희망일을 등록해주세요.")
 	LocalDateTime startDate,
+
 	String detailedDescription) {
 
 	public static MemberRequestEstimate toMemberRequestEstimate(Member member, SubItem subItem,

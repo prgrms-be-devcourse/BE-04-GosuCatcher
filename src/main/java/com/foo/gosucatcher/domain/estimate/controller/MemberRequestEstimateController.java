@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.controller;
 
+import javax.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +30,7 @@ public class MemberRequestEstimateController {
 	@PostMapping
 	public ResponseEntity<MemberRequestEstimateResponse> create(@RequestParam("member") Long memberId,
 		@RequestParam("subItem") Long subItemId,
-		@RequestBody MemberRequestEstimateRequest memberRequestEstimateRequest) {
+		@RequestBody @Valid MemberRequestEstimateRequest memberRequestEstimateRequest) {
 		MemberRequestEstimateResponse memberRequestEstimateResponse = memberRequestEstimateService.create(memberId,
 			subItemId, memberRequestEstimateRequest);
 
@@ -50,7 +52,7 @@ public class MemberRequestEstimateController {
 
 	@PatchMapping("/{memberRequestEstimateId}")
 	public ResponseEntity<MemberRequestEstimateResponse> update(@PathVariable Long memberRequestEstimateId,
-		@RequestBody MemberRequestEstimateRequest memberRequestEstimateRequest) {
+		@RequestBody @Valid MemberRequestEstimateRequest memberRequestEstimateRequest) {
 		MemberRequestEstimateResponse memberRequestEstimateResponse = memberRequestEstimateService.update(
 			memberRequestEstimateId, memberRequestEstimateRequest);
 
