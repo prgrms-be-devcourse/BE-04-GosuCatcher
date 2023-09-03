@@ -47,8 +47,8 @@ class MemberRequestEstimateControllerTest {
 		Long memberId = 1L;
 		Long subItemId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "서울 강남구 개포1동",
-			LocalDateTime.now(), "추가 내용");
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId,
+			"서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
 			subItemId, "서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
@@ -128,8 +128,8 @@ class MemberRequestEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-request-estimates")
-				.contentType(MediaType.APPLICATION_JSON))
+		mockMvc.perform(
+				MockMvcRequestBuilders.get("/api/v1/member-request-estimates").contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberRequestEstimates").isArray())
 			.andExpect(jsonPath("$.memberRequestEstimates[0].location").value("서울 강남구 개포1동"))
@@ -235,9 +235,8 @@ class MemberRequestEstimateControllerTest {
 		//when
 		//then
 		mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/member-request-estimates/{id}", memberRequestEstimateId)
-				.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk());
+			.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
+			.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
 	@DisplayName("회원 요청 견적서 수정 실패 테스트")
