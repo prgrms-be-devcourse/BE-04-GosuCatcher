@@ -60,7 +60,7 @@ class ExpertControllerTest {
 	}
 
 	@Test
-	@DisplayName("전문가 등록 성공")
+	@DisplayName("고수 등록 성공")
 	void createExpertSuccessTest() throws Exception {
 		ExpertResponse expertResponse = new ExpertResponse(1L, "가게이름1", "위치1", 100, "부가설명1");
 		given(expertService.create(any(ExpertCreateRequest.class), eq(1L))).willReturn(expertResponse);
@@ -78,7 +78,7 @@ class ExpertControllerTest {
 	}
 
 	@Test
-	@DisplayName("전문가 ID로 조회 성공")
+	@DisplayName("고수 ID로 조회 성공")
 	void getExpertByIdSuccessTest() throws Exception {
 		ExpertResponse expertResponse = new ExpertResponse(1L, "가게이름1", "위치1", 100, "부가설명1");
 		given(expertService.findById(1L)).willReturn(expertResponse);
@@ -91,7 +91,7 @@ class ExpertControllerTest {
 	}
 
 	@Test
-	@DisplayName("전문가 전체 조회 성공")
+	@DisplayName("고수 전체 조회 성공")
 	void getAllExpertsSuccessTest() throws Exception {
 		List<Expert> expertList = List.of(new Expert(member1, "가게이름1", "위치1", 100, "부가설명1"),
 			new Expert(member2, "가게이름2", "위치2", 200, "부가설명2"));
@@ -105,7 +105,7 @@ class ExpertControllerTest {
 	}
 
 	@Test
-	@DisplayName("전문가 수정 성공")
+	@DisplayName("고수 수정 성공")
 	void updateExpertSuccessTest() throws Exception {
 		ExpertUpdateRequest updateRequest = new ExpertUpdateRequest("새로운 가게이름", "새로운 위치", 150, "새로운 부가설명");
 		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 가게이름", "새로운 위치", 150, "새로운 부가설명");
@@ -120,7 +120,7 @@ class ExpertControllerTest {
 	}
 
 	@Test
-	@DisplayName("전문가 삭제 성공")
+	@DisplayName("고수 삭제 성공")
 	void deleteExpertSuccessTest() throws Exception {
 		doNothing().when(expertService).delete(1L);
 
