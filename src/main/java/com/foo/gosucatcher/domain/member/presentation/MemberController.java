@@ -1,7 +1,11 @@
 package com.foo.gosucatcher.domain.member.presentation;
 
+import java.nio.charset.StandardCharsets;
+
 import javax.validation.constraints.Email;
 
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -12,7 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
@@ -74,10 +81,29 @@ public class MemberController {
 	}
 
 	@PostMapping("/{memberId}/profile")
-	public ResponseEntity<Boolean> uploadProfileImage(@PathVariable long memberId) {
+	public ResponseEntity<Boolean> uploadProfileImage(@PathVariable long memberId, @RequestParam MultipartFile file) {
+		memberService.uploadProfileImage(memberId, file);
 
 		return ResponseEntity.ok(true);
 	}
 
+	@GetMapping("/{memberId}/profile")
+	public ResponseEntity<Resource> findProfileImage(@PathVariable long memberId) {
+		Resource profileImage = memberService.findProfileImage(memberId);
 
+		String originalFileName = "profile.jpeg";
+		String encodedOriginalFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
+		String contentDisposition = "attachment; filename=\"" + encodedOriginalFileName + "\"";
+
+		return ResponseEntity.status(HttpStatus.OK)
+			.header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+			.body(profileImage);
+	}
+
+	@DeleteMapping("/{memberId}/profile")
+	public ResponseEntity<Boolean> deleteProfileImage(@PathVariable long memberId) {
+		memberService.removeProfileImage(memberId);
+
+		return ResponseEntity.ok(true);
+	}
 }

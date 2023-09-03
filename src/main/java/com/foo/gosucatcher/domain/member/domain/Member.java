@@ -63,4 +63,8 @@ public class Member extends BaseEntity {
 		this.password = memberInfoChangeRequest.password();
 		this.phoneNumber = memberInfoChangeRequest.phoneNumber();
 	}
+
+	public void changeProfileImagePath(String profileImagePath) {
+		this.profileImagePath = profileImagePath;
+	}
 }
