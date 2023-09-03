@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.item.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,5 +52,12 @@ public class MainItemController {
 		Long updatedId = mainItemService.update(id, request);
 
 		return ResponseEntity.ok(updatedId);
+	}
+
+	@DeleteMapping("{id}")
+	public ResponseEntity<Void> delete(@PathVariable Long id) {
+		mainItemService.delete(id);
+
+		return ResponseEntity.ok(null);
 	}
 }

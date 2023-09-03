@@ -69,10 +69,6 @@ public class MainItemService {
 		mainItemRepository.delete(mainItem);
 	}
 
-	public void deleteAll() {
-		mainItemRepository.deleteAll();
-	}
-
 	private void duplicatedNameCheck(String name) {
 		mainItemRepository.findByName(name).ifPresent(mainItem -> {
 			throw new BusinessException(ErrorCode.DUPLICATED_MAIN_ITEM_NAME);

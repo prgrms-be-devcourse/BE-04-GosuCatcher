@@ -1,8 +1,12 @@
 package com.foo.gosucatcher.domain.item.application;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
@@ -229,21 +233,5 @@ class MainItemServiceUnitTest {
 
 		// when -> then
 		assertThrows(EntityNotFoundException.class, () -> mainItemService.delete(itemId));
-	}
-
-	@Test
-	@DisplayName("모든 메인 아이템 삭제 - 성공")
-	void deleteAllMainItemsSuccessTest() {
-
-		// given
-		doNothing().when(mainItemRepository).deleteAll();
-
-		//when
-		mainItemService.deleteAll();
-
-		//then
-		verify(mainItemRepository, times(1)).deleteAll();
-		List<MainItem> mainItems = mainItemRepository.findAll();
-		assertTrue(mainItems.isEmpty());
 	}
 }

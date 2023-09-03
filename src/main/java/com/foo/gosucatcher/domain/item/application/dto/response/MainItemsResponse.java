@@ -10,6 +10,7 @@ public record MainItemsResponse(
 
 	public static MainItemsResponse from(List<MainItem> mainItemList) {
 		return new MainItemsResponse(mainItemList.stream()
-			.map(MainItemResponse::from).toList());
+			.map(MainItemResponse::from)
+			.toList());
 	}
 }
