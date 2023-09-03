@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -32,10 +33,12 @@ public class MemberRequestEstimate extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	@JsonIgnore
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
@@ -48,12 +51,6 @@ public class MemberRequestEstimate extends BaseEntity {
 
 	private String detailedDescription;
 
-	public void update(String location, LocalDateTime startDate, String detailedDescription) {
-		this.location = location;
-		this.startDate = startDate;
-		this.detailedDescription = detailedDescription;
-	}
-
 	@Builder
 	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime startDate,
 		String detailedDescription) {
@@ -62,5 +59,11 @@ public class MemberRequestEstimate extends BaseEntity {
 		this.location = location;
 		this.startDate = startDate;
 		this.detailedDescription = detailedDescription;
+	}
+
+	public void update(MemberRequestEstimate memberRequestEstimate) {
+		this.location = memberRequestEstimate.getLocation();
+		this.startDate = memberRequestEstimate.getStartDate();
+		this.detailedDescription = memberRequestEstimate.getDetailedDescription();
 	}
 }

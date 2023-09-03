@@ -11,11 +11,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.foo.gosucatcher.domain.estimate.application.MemberRequestEstimateService;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
@@ -27,6 +27,7 @@ import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 
+@ExtendWith(MockitoExtension.class)
 class MemberRequestEstimateServiceTest {
 
 	@Mock
@@ -48,8 +49,6 @@ class MemberRequestEstimateServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		MockitoAnnotations.openMocks(this);
-
 		member = Member.builder()
 			.name("성이름")
 			.password("abcd11@@")
@@ -78,7 +77,7 @@ class MemberRequestEstimateServiceTest {
 		Long subItemId = 1L;
 		Long memberRequestEstimateId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId,
 			memberRequestEstimate.getLocation(), memberRequestEstimate.getStartDate(),
 			memberRequestEstimate.getDetailedDescription());
 
@@ -90,7 +89,7 @@ class MemberRequestEstimateServiceTest {
 
 		//when
 		MemberRequestEstimateResponse memberRequestEstimateResponse = memberRequestEstimateService.create(memberId,
-			subItemId, memberRequestEstimateRequest);
+			memberRequestEstimateRequest);
 		MemberRequestEstimate result = memberRequestEstimateRepository.findById(memberRequestEstimateId).get();
 
 		//then
@@ -151,20 +150,21 @@ class MemberRequestEstimateServiceTest {
 	void update() {
 		//given
 		Long memberRequestEstimateId = 1L;
+		Long subItemId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest("수정 지역",
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
 			memberRequestEstimate.getStartDate(), "수정 내용");
 
 		when(memberRequestEstimateRepository.findById(memberRequestEstimateId)).thenReturn(
 			Optional.of(memberRequestEstimate));
 
 		//when
-		MemberRequestEstimateResponse memberRequestEstimateResponse = memberRequestEstimateService.update(
-			memberRequestEstimateId, memberRequestEstimateRequest);
+		memberRequestEstimateService.update(memberRequestEstimateId,
+			memberRequestEstimateRequest);
 
 		//then
-		assertThat(memberRequestEstimateResponse.location()).isEqualTo(memberRequestEstimateRequest.location());
-		assertThat(memberRequestEstimateResponse.detailedDescription()).isEqualTo(
-			memberRequestEstimateRequest.detailedDescription());
+		assertThat(memberRequestEstimateRequest.location()).isEqualTo(memberRequestEstimate.getLocation());
+		assertThat(memberRequestEstimateRequest.detailedDescription()).isEqualTo(
+			memberRequestEstimate.getDetailedDescription());
 	}
 }

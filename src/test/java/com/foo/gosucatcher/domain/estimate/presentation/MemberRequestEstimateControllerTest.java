@@ -47,20 +47,18 @@ class MemberRequestEstimateControllerTest {
 		Long memberId = 1L;
 		Long subItemId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest("서울 강남구 개포1동",
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "서울 강남구 개포1동",
 			LocalDateTime.now(), "추가 내용");
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
 			subItemId, "서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
 
-		when(memberRequestEstimateService.create(memberId, subItemId, memberRequestEstimateRequest)).thenReturn(
+		when(memberRequestEstimateService.create(memberId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-request-estimates")
-				.param("member", memberId.toString())
-				.param("subItem", subItemId.toString())
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-request-estimates/{memberRequestEstimateId}", 1L)
 				.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
@@ -77,20 +75,18 @@ class MemberRequestEstimateControllerTest {
 		//given
 		Long memberId = 1L;
 		Long subItemId = 1L;
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(" ",
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, " ",
 			LocalDateTime.now(), "추가 내용");
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
 			subItemId, " ", LocalDateTime.now(), "추가 내용");
 
-		when(memberRequestEstimateService.create(memberId, subItemId, memberRequestEstimateRequest)).thenReturn(
+		when(memberRequestEstimateService.create(memberId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-request-estimates")
-				.param("member", memberId.toString())
-				.param("subItem", subItemId.toString())
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-request-estimates/{memberRequestEstimateId}", 1L)
 				.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
@@ -105,6 +101,44 @@ class MemberRequestEstimateControllerTest {
 	@DisplayName("회원 요청 견적서 전체 조회 성공 테스트")
 	@Test
 	void findAll() throws Exception {
+		//given
+		Member member = Member.builder()
+			.name("성이름")
+			.password("abcd11@@")
+			.email("abcd123@abc.com")
+			.phoneNumber("010-0000-0000")
+			.build();
+
+		MainItem mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		SubItem subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimate.builder()
+			.member(member)
+			.subItem(subItem)
+			.location("서울 강남구 개포1동")
+			.startDate(LocalDateTime.now())
+			.detailedDescription("추가 내용")
+			.build();
+
+		List<MemberRequestEstimate> mockEstimates = List.of(memberRequestEstimate);
+		MemberRequestEstimatesResponse mockResponse = new MemberRequestEstimatesResponse(mockEstimates);
+
+		when(memberRequestEstimateService.findAll()).thenReturn(mockResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-request-estimates")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.memberRequestEstimates").isArray())
+			.andExpect(jsonPath("$.memberRequestEstimates[0].location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.memberRequestEstimates[0].detailedDescription").value("추가 내용"));
+	}
+
+	@DisplayName("회원 별 전체 요청 견적서 조회 성공 테스트")
+	@Test
+	void findAllByMember() throws Exception {
 		//given
 		Long memberId = 1L;
 
@@ -134,8 +168,7 @@ class MemberRequestEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-request-estimates")
-				.param("member", memberId.toString())
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-request-estimates/members/{memberId}", memberId)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberRequestEstimates").isArray())
@@ -191,30 +224,20 @@ class MemberRequestEstimateControllerTest {
 	void update() throws Exception {
 		//given
 		Long memberRequestEstimateId = 1L;
-		Long memberId = 1L;
 		Long subItemId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest("수정 지역",
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
 			LocalDateTime.now(), "수정 내용");
 
-		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(
-			memberRequestEstimateId, memberId, subItemId, "수정 지역", LocalDateTime.now(), "수정 내용");
-
 		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
-			memberRequestEstimateResponse);
+			memberRequestEstimateId);
 
 		//when
 		//then
 		mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/member-request-estimates/{id}", memberRequestEstimateId)
 				.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-			.andExpect(jsonPath("$.id").value(memberRequestEstimateId))
-			.andExpect(jsonPath("$.memberId").value(memberId))
-			.andExpect(jsonPath("$.subItemId").value(subItemId))
-			.andExpect(jsonPath("$.location").value("수정 지역"))
-			.andExpect(jsonPath("$.detailedDescription").value("수정 내용"));
+			.andExpect(status().isOk());
 	}
 
 	@DisplayName("회원 요청 견적서 수정 실패 테스트")
@@ -222,17 +245,13 @@ class MemberRequestEstimateControllerTest {
 	void updateFailed() throws Exception {
 		//given
 		Long memberRequestEstimateId = 1L;
-		Long memberId = 1L;
 		Long subItemId = 1L;
 
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(" ",
+		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, " ",
 			LocalDateTime.now(), "수정 내용");
 
-		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(
-			memberRequestEstimateId, memberId, subItemId, "수정 지역", LocalDateTime.now(), " ");
-
 		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
-			memberRequestEstimateResponse);
+			memberRequestEstimateId);
 
 		//when
 		//then
@@ -256,7 +275,8 @@ class MemberRequestEstimateControllerTest {
 
 		doNothing().when(memberRequestEstimateService).delete(memberRequestEstimateId);
 
-		// Act and Assert
+		//when
+		//then
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/member-request-estimates/{id}", memberRequestEstimateId)
 			.contentType(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
 	}
