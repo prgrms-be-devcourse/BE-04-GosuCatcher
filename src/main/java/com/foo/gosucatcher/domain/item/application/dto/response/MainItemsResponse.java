@@ -5,7 +5,7 @@ import java.util.List;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 
 public record MainItemsResponse(
-	List<MainItemResponse> mainItemResponses
+	List<MainItemResponse> mainItemsResponse
 ) {
 
 	public static MainItemsResponse from(List<MainItem> mainItemList) {

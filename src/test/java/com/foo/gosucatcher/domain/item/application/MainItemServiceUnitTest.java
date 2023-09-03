@@ -129,9 +129,9 @@ class MainItemServiceUnitTest {
 
 		//then
 		assertThat(mainItemsResponse).isNotNull();
-		assertThat(mainItemsResponse.mainItemResponses()).hasSize(1);
-		assertThat(mainItemsResponse.mainItemResponses().get(0).name()).isEqualTo(mainItem.getName());
-		assertThat(mainItemsResponse.mainItemResponses().get(0).description()).isEqualTo(mainItem.getDescription());
+		assertThat(mainItemsResponse.mainItemsResponse()).hasSize(1);
+		assertThat(mainItemsResponse.mainItemsResponse().get(0).name()).isEqualTo(mainItem.getName());
+		assertThat(mainItemsResponse.mainItemsResponse().get(0).description()).isEqualTo(mainItem.getDescription());
 	}
 
 	@Test
@@ -149,7 +149,7 @@ class MainItemServiceUnitTest {
 
 		//then
 		assertThat(mainItemsResponse).isNotNull();
-		assertThat(mainItemsResponse.mainItemResponses()).isEmpty();
+		assertThat(mainItemsResponse.mainItemsResponse()).isEmpty();
 	}
 
 	@Test
