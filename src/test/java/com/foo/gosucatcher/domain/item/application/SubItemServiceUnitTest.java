@@ -33,7 +33,7 @@ import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-class SubItemServiceTest {
+class SubItemServiceUnitTest {
 
 	@InjectMocks
 	private SubItemService subItemService;
