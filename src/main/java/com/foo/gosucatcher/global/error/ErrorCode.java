@@ -30,7 +30,8 @@ public enum ErrorCode {
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
 
 	//회원 요청 견적서
-	NOT_FOUND_MEMBER_REQUEST_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다.");
+	NOT_FOUND_MEMBER_REQUEST_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),
+	INVALID_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다.");
 
 	private final String code;
 	private final String message;

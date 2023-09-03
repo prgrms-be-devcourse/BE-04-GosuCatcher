@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +36,8 @@ public class MemberRequestEstimateService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(memberRequestEstimateRequest.subItemId())
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+
+		validateStartDate(memberRequestEstimateRequest.startDate());
 
 		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimateRequest.toMemberRequestEstimate(member,
 			subItem, memberRequestEstimateRequest);
@@ -73,6 +77,8 @@ public class MemberRequestEstimateService {
 				memberRequestEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
 
+		validateStartDate(memberRequestEstimateRequest.startDate());
+
 		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimateRequest.toMemberRequestEstimate(
 			foundMemberRequestEstimate.getMember(), foundMemberRequestEstimate.getSubItem(),
 			memberRequestEstimateRequest);
@@ -87,5 +93,11 @@ public class MemberRequestEstimateService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
 
 		memberRequestEstimateRepository.delete(memberRequestEstimate);
+	}
+
+	private void validateStartDate(LocalDateTime startDate) {
+		if (LocalDateTime.now().isAfter(startDate)) {
+			throw new BusinessException(ErrorCode.INVALID_START_DATE);
+		}
 	}
 }
