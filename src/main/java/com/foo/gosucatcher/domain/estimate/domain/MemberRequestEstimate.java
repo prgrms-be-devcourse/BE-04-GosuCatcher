@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.estimate.domain;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,11 +39,19 @@ public class MemberRequestEstimate extends BaseEntity {
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
+	@Column(nullable = false)
 	private String location;
 
+	@Column(nullable = false)
 	private LocalDateTime startDate;
 
 	private String detailedDescription;
+
+	public void update(String location, LocalDateTime startDate, String detailedDescription) {
+		this.location = location;
+		this.startDate = startDate;
+		this.detailedDescription = detailedDescription;
+	}
 
 	@Builder
 	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime startDate,
