@@ -39,4 +39,9 @@ public class SubItem extends BaseEntity {
 		this.name = name;
 		this.description = description;
 	}
+
+	public void update(SubItem subItem) {
+		this.name = subItem.getName();
+		this.description = subItem.getDescription();
+	}
 }
