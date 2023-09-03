@@ -4,7 +4,7 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public record SubItemResponse(
 	Long id,
-	String MainItemName,
+	String mainItemName,
 	String name,
 	String description
 ) {

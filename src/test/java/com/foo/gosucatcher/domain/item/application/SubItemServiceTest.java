@@ -137,7 +137,7 @@ class SubItemServiceTest {
 		assertThat(subItemsResponse.subItemsResponse()).hasSize(1);
 		assertThat(subItemsResponse.subItemsResponse().get(0).name()).isEqualTo(subItem.getName());
 		assertThat(subItemsResponse.subItemsResponse().get(0).description()).isEqualTo(subItem.getDescription());
-		assertThat(subItemsResponse.subItemsResponse().get(0).MainItemName()).isEqualTo(mainItem.getName());
+		assertThat(subItemsResponse.subItemsResponse().get(0).mainItemName()).isEqualTo(mainItem.getName());
 	}
 
 	@Test
@@ -155,7 +155,7 @@ class SubItemServiceTest {
 
 		//then
 		assertThat(subItemResponse.name()).isEqualTo(subItem.getName());
-		assertThat(subItemResponse.MainItemName()).isEqualTo(mainItem.getName());
+		assertThat(subItemResponse.mainItemName()).isEqualTo(mainItem.getName());
 	}
 
 	@Test
