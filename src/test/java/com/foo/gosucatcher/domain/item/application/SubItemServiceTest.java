@@ -61,7 +61,7 @@ class SubItemServiceTest {
 			.description("방 청소 설명")
 			.build();
 
-		subItemCreateRequest = new SubItemCreateRequest("방 청소", "방 청소 설명");
+		subItemCreateRequest = new SubItemCreateRequest(1L, "방 청소", "방 청소 설명");
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class SubItemServiceTest {
 			.thenReturn(Optional.of(mainItem));
 
 		//when
-		SubItemResponse subItemResponse = subItemService.create(0L, subItemCreateRequest);
+		SubItemResponse subItemResponse = subItemService.create(subItemCreateRequest);
 		SubItem foundSubItem = subItemRepository.findById(subItemResponse.id()).get();
 
 		//then
@@ -98,7 +98,7 @@ class SubItemServiceTest {
 
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
-			() -> subItemService.create(0L, subItemCreateRequest));
+			() -> subItemService.create(subItemCreateRequest));
 	}
 
 	@Test
@@ -116,7 +116,7 @@ class SubItemServiceTest {
 
 		//when -> then
 		assertThrows(BusinessException.class,
-			() -> subItemService.create(0L, subItemCreateRequest));
+			() -> subItemService.create(subItemCreateRequest));
 	}
 
 	@Test
@@ -197,14 +197,14 @@ class SubItemServiceTest {
 	@DisplayName("하위 서비스 업데이트 실패 - 존재하지 않는 하위 서비스")
 	void updateSubItemFailTest_subItemNotFound() throws Exception {
 
-	    //given
+		//given
 		String newName = "새로운 이름";
 		SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
 
 		when(subItemRepository.findById(null))
 			.thenReturn(Optional.empty());
 
-	    //when -> then
+		//when -> then
 		assertThrows(EntityNotFoundException.class,
 			() -> subItemService.update(mainItem.getId(), subItemUpdateRequest));
 	}
@@ -213,14 +213,14 @@ class SubItemServiceTest {
 	@DisplayName("하위 서비스 삭제 성공")
 	void deleteSubItemSuccessTest() throws Exception {
 
-	    //given
+		//given
 		when(subItemRepository.findById(null))
 			.thenReturn(Optional.of(subItem));
 
-	    //when
+		//when
 		assertDoesNotThrow(() -> subItemService.delete(subItem.getId()));
 
-	    //then
-	    verify(subItemRepository,times(1)).delete(subItem);
+		//then
+		verify(subItemRepository, times(1)).delete(subItem);
 	}
 }

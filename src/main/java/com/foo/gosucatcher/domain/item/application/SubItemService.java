@@ -27,8 +27,8 @@ public class SubItemService {
 	private final SubItemRepository subItemRepository;
 	private final MainItemRepository mainItemRepository;
 
-	public SubItemResponse create(Long mainItemId, SubItemCreateRequest request) {
-		MainItem mainItem = mainItemRepository.findById(mainItemId)
+	public SubItemResponse create(SubItemCreateRequest request) {
+		MainItem mainItem = mainItemRepository.findById(request.mainItemId())
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
 		duplicatedNameCheck(request.name());
