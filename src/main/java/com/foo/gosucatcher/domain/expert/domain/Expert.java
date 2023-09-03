@@ -49,4 +49,16 @@ public class Expert extends BaseEntity {
 		this.description = description;
 		this.isBaroEstimate = false;
 	}
+
+	public void update(boolean isBaroEstimate) {
+		this.isBaroEstimate = isBaroEstimate;
+	}
+
+	public void update(Expert updatedExpert) {
+		this.storeName = updatedExpert.getStoreName();
+		this.location = updatedExpert.getLocation();
+		this.distance = updatedExpert.getDistance();
+		this.description = updatedExpert.getDescription();
+		this.isBaroEstimate = updatedExpert.isBaroEstimate();
+	}
 }
