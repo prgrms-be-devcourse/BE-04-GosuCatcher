@@ -7,7 +7,6 @@ import javax.validation.constraints.Positive;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 
 public record ExpertUpdateRequest(
-
 	@NotBlank(message = "가게 이름은 필수 입력입니다.")
 	String storeName,
 	@NotBlank(message = "위치는 필수 입력입니다.")
@@ -17,7 +16,6 @@ public record ExpertUpdateRequest(
 	int distance,
 	@NotBlank(message = "부가 설명을 적어주세요.")
 	String description
-
 ) {
 	public static Expert toExpert(ExpertUpdateRequest request) {
 		return Expert.builder()
