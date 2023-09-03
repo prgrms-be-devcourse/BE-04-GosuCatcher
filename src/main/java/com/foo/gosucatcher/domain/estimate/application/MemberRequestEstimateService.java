@@ -19,15 +19,15 @@ import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
+@Transactional
 public class MemberRequestEstimateService {
 
 	private final MemberRequestEstimateRepository memberRequestEstimateRepository;
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
 
-	@Transactional
 	public MemberRequestEstimateResponse create(Long memberId, Long subItemId,
 		MemberRequestEstimateRequest memberRequestEstimateRequest) {
 		Member member = memberRepository.findById(memberId)
@@ -61,7 +61,6 @@ public class MemberRequestEstimateService {
 		return MemberRequestEstimateResponse.from(memberRequestEstimate);
 	}
 
-	@Transactional
 	public MemberRequestEstimateResponse update(Long memberRequestEstimateId,
 		MemberRequestEstimateRequest memberRequestEstimateRequest) {
 		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(memberRequestEstimateId)
@@ -73,7 +72,6 @@ public class MemberRequestEstimateService {
 		return MemberRequestEstimateResponse.from(memberRequestEstimate);
 	}
 
-	@Transactional
 	public void delete(Long memberRequestEstimateId) {
 		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(memberRequestEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));

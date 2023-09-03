@@ -16,7 +16,8 @@ public record MemberRequestEstimateRequest(
 	@NotNull(message = "서비스 희망일을 등록해주세요.")
 	LocalDateTime startDate,
 
-	String detailedDescription) {
+	String detailedDescription
+) {
 
 	public static MemberRequestEstimate toMemberRequestEstimate(Member member, SubItem subItem,
 		MemberRequestEstimateRequest memberRequestEstimateRequest) {
