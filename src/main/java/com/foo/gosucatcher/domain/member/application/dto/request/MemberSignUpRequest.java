@@ -11,7 +11,7 @@ public record MemberSignUpRequest(
 	@Email String email,
 	@NotEmpty @NotBlank String password
 ) {
-	public static Member of(MemberSignUpRequest memberSignUpRequest) {
+	public static Member to(MemberSignUpRequest memberSignUpRequest) {
 		return Member.builder()
 			.name(memberSignUpRequest.name)
 			.email(memberSignUpRequest.email)
