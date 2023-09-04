@@ -30,23 +30,22 @@ public class Member extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false)
+	@Column(length = 20, nullable = false)
 	private String name;
 
-	@Column(nullable = false)
+	@Column(length = 20, nullable = false)
 	private String password;
 
-	@Column(nullable = false, unique = true)
+	@Column(length = 50, nullable = false, unique = true)
 	private String email;
 
-	@Column(unique = true)
+	@Column(length = 12, unique = true)
 	private String phoneNumber;
 
 	@Embedded
 	@Column(nullable = false)
 	private ImageFile profileImageFile;
 
-	@Column(nullable = false)
 	private boolean isDeleted;
 
 	@Builder

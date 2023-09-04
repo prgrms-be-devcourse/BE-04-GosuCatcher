@@ -8,6 +8,7 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChang
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -19,9 +20,9 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
 @Transactional
+@Service
 public class MemberService {
 	private final MemberRepository memberRepository;
 	private final MemberProfileRepository memberProfileRepository;
@@ -37,12 +38,12 @@ public class MemberService {
 		String email = member.getEmail();
 		checkDuplicatedEmail(email);
 
-		memberRepository.save(member);
-		memberProfileRepository.initializeMemberProfile(member);
+		Member savedMember = memberRepository.save(member);
+		memberProfileRepository.initializeMemberProfile(savedMember);
 	}
 
 	@Transactional(readOnly = true)
-	public void logIn(MemberLogInRequest memberLogInRequest) {
+	public MemberLogInResponse logIn(MemberLogInRequest memberLogInRequest) {
 		String email = memberLogInRequest.email();
 		Member logInMember = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
@@ -52,6 +53,8 @@ public class MemberService {
 		if (!isSuccess) {
 			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
 		}
+
+		return MemberLogInResponse.from(logInMember);
 	}
 
 	@Transactional(readOnly = true)
@@ -59,7 +62,7 @@ public class MemberService {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
-		//todo: 추후에 유저인증된 이메일로 임시비밀번호 발급하는 걸로 바꿀 수 있을 듯요?!
+		//todo: 추후 유저 이메일로 임시 비밀번호 발급하는 걸로 바꿀 수 있을 듯
 		return MemberPasswordFoundResponse.to(member);
 	}
 

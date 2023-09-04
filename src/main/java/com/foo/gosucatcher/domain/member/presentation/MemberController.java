@@ -28,6 +28,7 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChang
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
@@ -56,11 +57,12 @@ public class MemberController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Void> logIn(
+	public ResponseEntity<MemberLogInResponse> logIn(
 		@RequestBody @Validated MemberLogInRequest memberLogInRequest) {
-		memberService.logIn(memberLogInRequest);
+		var response = memberService.logIn(memberLogInRequest);
 
-		return new ResponseEntity<>(HttpStatus.OK);
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(response);
 	}
 
 	@GetMapping("/signup")
