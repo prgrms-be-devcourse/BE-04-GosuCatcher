@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "reviews")
-@Where(clause = "isDeleted = false")
+@Where(clause = "is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE reviews SET is_deleted = true WHERE id = ?")
 public class Review extends BaseEntity {
