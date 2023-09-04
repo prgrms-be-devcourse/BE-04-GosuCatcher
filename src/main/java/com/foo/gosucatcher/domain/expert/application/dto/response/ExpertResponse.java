@@ -6,7 +6,7 @@ public record ExpertResponse(
 	Long id,
 	String storeName,
 	String location,
-	int distance,
+	int maxTravelDistance,
 	String description
 ) {
 	public static ExpertResponse from(Expert expert) {
@@ -14,7 +14,7 @@ public record ExpertResponse(
 			expert.getId(),
 			expert.getStoreName(),
 			expert.getLocation(),
-			expert.getDistance(),
+			expert.getMaxTravelDistance(),
 			expert.getDescription()
 		);
 	}

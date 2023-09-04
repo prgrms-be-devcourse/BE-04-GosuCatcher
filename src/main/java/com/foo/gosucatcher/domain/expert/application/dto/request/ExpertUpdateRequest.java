@@ -13,7 +13,7 @@ public record ExpertUpdateRequest(
 	String location,
 	@NotNull(message = "거리는 필수 입력입니다.")
 	@Positive(message = "거리는 양수만 가능합니다.")
-	int distance,
+	int maxTravelDistance,
 	@NotBlank(message = "부가 설명을 적어주세요.")
 	String description
 ) {
@@ -21,7 +21,7 @@ public record ExpertUpdateRequest(
 		return Expert.builder()
 			.storeName(request.storeName())
 			.location(request.location())
-			.distance(request.distance())
+			.maxTravelDistance(request.maxTravelDistance())
 			.description(request.description())
 			.build();
 	}
