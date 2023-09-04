@@ -12,13 +12,10 @@ import com.foo.gosucatcher.domain.member.domain.Member;
 public record MemberRequestEstimateRequest(
 	@NotNull(message = "세부 서비스 id를 등록해주세요.")
 	Long subItemId,
-
 	@NotBlank(message = "지역을 등록해주세요.")
 	String location,
-
 	@NotNull(message = "서비스 희망일을 등록해주세요.")
 	LocalDateTime preferredStartDate,
-
 	String detailedDescription
 ) {
 

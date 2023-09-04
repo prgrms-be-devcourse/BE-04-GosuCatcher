@@ -47,7 +47,7 @@ public class MemberRequestEstimateService {
 	public MemberRequestEstimatesResponse findAll() {
 		List<MemberRequestEstimate> memberRequestEstimates = memberRequestEstimateRepository.findAll();
 
-		return new MemberRequestEstimatesResponse(memberRequestEstimates);
+		return MemberRequestEstimatesResponse.from(memberRequestEstimates);
 	}
 
 	@Transactional(readOnly = true)
@@ -57,7 +57,7 @@ public class MemberRequestEstimateService {
 
 		List<MemberRequestEstimate> memberRequestEstimates = memberRequestEstimateRepository.findAllByMember(member);
 
-		return new MemberRequestEstimatesResponse(memberRequestEstimates);
+		return MemberRequestEstimatesResponse.from(memberRequestEstimates);
 	}
 
 	@Transactional(readOnly = true)

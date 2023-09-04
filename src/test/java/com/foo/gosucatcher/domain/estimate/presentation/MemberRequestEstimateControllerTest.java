@@ -122,7 +122,7 @@ class MemberRequestEstimateControllerTest {
 			.build();
 
 		List<MemberRequestEstimate> mockEstimates = List.of(memberRequestEstimate);
-		MemberRequestEstimatesResponse mockResponse = new MemberRequestEstimatesResponse(mockEstimates);
+		MemberRequestEstimatesResponse mockResponse = MemberRequestEstimatesResponse.from(mockEstimates);
 
 		when(memberRequestEstimateService.findAll()).thenReturn(mockResponse);
 
@@ -162,7 +162,7 @@ class MemberRequestEstimateControllerTest {
 			.build();
 
 		List<MemberRequestEstimate> mockEstimates = List.of(memberRequestEstimate);
-		MemberRequestEstimatesResponse mockResponse = new MemberRequestEstimatesResponse(mockEstimates);
+		MemberRequestEstimatesResponse mockResponse = MemberRequestEstimatesResponse.from(mockEstimates);
 
 		when(memberRequestEstimateService.findAllByMember(memberId)).thenReturn(mockResponse);
 
