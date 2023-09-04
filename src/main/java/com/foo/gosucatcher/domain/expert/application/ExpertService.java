@@ -3,6 +3,7 @@ package com.foo.gosucatcher.domain.expert.application;
 import static com.foo.gosucatcher.global.error.ErrorCode.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,10 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -45,8 +49,10 @@ public class ExpertService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<Expert> findAll() {
-		return expertRepository.findAll();
+	public ExpertsResponse findAll() {
+		List<Expert> experts = expertRepository.findAll();
+		ExpertsResponse expertsResponse = ExpertsResponse.from(experts);
+		return expertsResponse;
 	}
 
 	public Long update(Long id, ExpertUpdateRequest request) {

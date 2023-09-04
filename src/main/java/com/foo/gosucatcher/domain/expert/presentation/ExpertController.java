@@ -1,7 +1,5 @@
 package com.foo.gosucatcher.domain.expert.presentation;
 
-import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +17,6 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateReq
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
-import com.foo.gosucatcher.domain.expert.domain.Expert;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,8 +42,8 @@ public class ExpertController {
 
 	@GetMapping
 	public ResponseEntity<ExpertsResponse> findAll() {
-		List<Expert> experts = expertService.findAll();
-		return ResponseEntity.ok(ExpertsResponse.from(experts));
+		ExpertsResponse experts = expertService.findAll();
+		return ResponseEntity.ok(experts);
 	}
 
 	@PatchMapping("/{id}")
