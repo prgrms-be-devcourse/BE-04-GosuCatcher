@@ -1,8 +1,7 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
-import javax.validation.Valid;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -28,7 +27,7 @@ public class ReviewController {
 	private final ReviewService reviewService;
 
 	@PostMapping
-	public ResponseEntity<ReviewResponse> create(@Valid @RequestBody ReviewCreateRequest reviewCreateRequest) {
+	public ResponseEntity<ReviewResponse> create(@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
 		ReviewResponse reviewResponse = reviewService.create(reviewCreateRequest);
 
 		return ResponseEntity.ok(reviewResponse);
