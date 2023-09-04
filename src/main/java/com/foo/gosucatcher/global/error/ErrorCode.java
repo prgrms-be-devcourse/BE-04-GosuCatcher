@@ -29,6 +29,9 @@ public enum ErrorCode {
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
+	DUPLICATED_MEMBER_EMAIL("M002", "중복된 이메일입니다."),
+	NOT_FOUND_MEMBER_EMAIL("M003", "존재하지 않는 이메일입니다."),
+	LOG_IN_FAILURE("M004", "로그인에 실패했습니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),

@@ -28,7 +28,7 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChang
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -47,45 +47,50 @@ public class MemberController {
 		this.memberService = memberService;
 	}
 
-	//todo: 예외클래스 전부 리팩토링 필요
 	@PostMapping("/signup")
-	public ResponseEntity<MemberSignUpResponse> signUp(
+	public ResponseEntity<Void> signUp(
 		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
-		MemberSignUpResponse memberSignUpResponse = memberService.signUp(memberSignUpRequest);
+		memberService.signUp(memberSignUpRequest);
 
-		return ResponseEntity.status(HttpStatus.CREATED)
-			.body(memberSignUpResponse);
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Boolean> logIn(
+	public ResponseEntity<Void> logIn(
 		@RequestBody @Validated MemberLogInRequest memberLogInRequest) {
 		memberService.logIn(memberLogInRequest);
 
-		return ResponseEntity.ok(true);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@GetMapping("/signup")
+	public ResponseEntity<Void> checkDuplicatedEmail(@RequestParam @Validated @Email String email) {
+		memberService.checkDuplicatedEmail(email);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@GetMapping("/{email}")
-	public ResponseEntity<String> findPassword(@PathVariable @Validated @Email String email) {
-		String password = memberService.findPassword(email);
+	public ResponseEntity<MemberPasswordFoundResponse> findPassword(@PathVariable @Validated @Email String email) {
+		var response = memberService.findPassword(email);
 
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(password);
-	}
-
-	@DeleteMapping("/{memberId}")
-	public ResponseEntity<Boolean> deleteMember(@PathVariable long memberId) {
-		memberService.deleteMember(memberId);
-
-		return ResponseEntity.ok(true);
+			.body(response);
 	}
 
 	@PatchMapping("/{memberId}")
-	public ResponseEntity<Boolean> changeMemberInfo(@PathVariable long memberId,
+	public ResponseEntity<Void> changeMemberInfo(@PathVariable long memberId,
 		@RequestBody @Validated MemberInfoChangeRequest memberInfoChangeRequest) {
 		memberService.changeMemberInfo(memberId, memberInfoChangeRequest);
 
-		return ResponseEntity.ok(true);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@DeleteMapping("/{memberId}")
+	public ResponseEntity<Void> deleteMember(@PathVariable long memberId) {
+		memberService.deleteMember(memberId);
+
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PostMapping("/{memberId}/profile")

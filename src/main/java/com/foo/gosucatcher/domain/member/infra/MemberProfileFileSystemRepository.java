@@ -28,8 +28,6 @@ public class MemberProfileFileSystemRepository implements MemberProfileRepositor
 
 	@Override
 	public void initializeMemberProfile(Member member) {
-		createDirectory(ROOT_DIRECTORY);
-
 		Long memberId = member.getId();
 		String profilePath = ROOT_DIRECTORY + "/" + memberId;
 		createDirectory(profilePath);

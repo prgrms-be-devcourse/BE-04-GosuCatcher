@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.member.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,17 +30,23 @@ public class Member extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@Column(nullable = false)
 	private String name;
 
+	@Column(nullable = false)
 	private String password;
 
+	@Column(nullable = false, unique = true)
 	private String email;
 
+	@Column(unique = true)
 	private String phoneNumber;
 
 	@Embedded
+	@Column(nullable = false)
 	private ImageFile profileImageFile;
 
+	@Column(nullable = false)
 	private boolean isDeleted;
 
 	@Builder
@@ -68,8 +75,7 @@ public class Member extends BaseEntity {
 
 	public void changeProfileImageFile(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
-			//todo: 예외클래스 리팩토링 필요
-			throw new InvalidValueException(ErrorCode.INTERNAL_SERVER_ERROR);
+			throw new InvalidValueException(ErrorCode.NOT_FOUND_IMAGE);
 		}
 
 		this.profileImageFile = profileImageFile;
