@@ -60,7 +60,7 @@ public class ExpertService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		Expert updatedExpert = ExpertUpdateRequest.toExpert(request);
-		existingExpert.update(updatedExpert);
+		existingExpert.updateExpert(updatedExpert);
 
 		return existingExpert.getId();
 	}
