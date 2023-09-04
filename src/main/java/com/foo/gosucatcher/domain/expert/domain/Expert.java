@@ -34,31 +34,30 @@ public class Expert extends BaseEntity {
 
 	private String location;
 
-	private int distance;
+	private int maxTravelDistance;
 
 	private String description;
 
 	private boolean isBaroEstimate;
 
 	@Builder
-	public Expert(Member member, String storeName, String location, int distance, String description) {
+	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description) {
 		this.member = member;
 		this.storeName = storeName;
 		this.location = location;
-		this.distance = distance;
+		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isBaroEstimate = false;
 	}
 
-	public void update(boolean isBaroEstimate) {
+	public void updateIsBaroEstimate(boolean isBaroEstimate) {
 		this.isBaroEstimate = isBaroEstimate;
 	}
 
-	public void update(Expert updatedExpert) {
+	public void updateExpert(Expert updatedExpert) {
 		this.storeName = updatedExpert.getStoreName();
 		this.location = updatedExpert.getLocation();
-		this.distance = updatedExpert.getDistance();
+		this.maxTravelDistance = updatedExpert.getMaxTravelDistance();
 		this.description = updatedExpert.getDescription();
-		this.isBaroEstimate = updatedExpert.isBaroEstimate();
 	}
 }
