@@ -3,12 +3,14 @@ package com.foo.gosucatcher.domain.expert.application.dto.request;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 
 public record ExpertCreateRequest(
-	@NotBlank(message = "가게 이름은 필수 입력입니다.")
+	@NotBlank(message = "업체명은 필수 입력입니다.")
+	@Size(max = 20, message = "업체명은 20자 미만이어야 합니다.")
 	String storeName,
 	@NotBlank(message = "위치는 필수 입력입니다.")
 	String location,

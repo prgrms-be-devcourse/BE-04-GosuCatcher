@@ -7,7 +7,7 @@ import javax.validation.constraints.Positive;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 
 public record ExpertUpdateRequest(
-	@NotBlank(message = "가게 이름은 필수 입력입니다.")
+	@NotBlank(message = "업체명은 필수 입력입니다.")
 	String storeName,
 	@NotBlank(message = "위치는 필수 입력입니다.")
 	String location,
