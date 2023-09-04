@@ -17,9 +17,7 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberReques
 import com.foo.gosucatcher.domain.estimate.application.MemberRequestEstimateService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member-request-estimates")
 @RestController
