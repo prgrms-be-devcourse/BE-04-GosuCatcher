@@ -211,7 +211,6 @@ class ControllerTest {
 		void findById() throws Exception {
 
 			// given
-			// ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 
 			long id = 1L;
