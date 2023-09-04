@@ -71,4 +71,11 @@ public class ExpertService {
 
 		expertRepository.delete(expert);
 	}
+
+	public void duplicatedNameCheck(String storeName) {
+		Optional<Expert> existingExpert = expertRepository.findByStoreName(storeName);
+		if (existingExpert.isPresent()) {
+			throw new BusinessException(ErrorCode.DUPLICATED_EXPERT_STORENAME);
+		}
+	}
 }

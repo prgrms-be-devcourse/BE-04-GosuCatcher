@@ -23,6 +23,7 @@ public enum ErrorCode {
 
 	//고수
 	NOT_FOUND_EXPERT("E001", "존재하지 않는 고수입니다."),
+	DUPLICATED_EXPERT_STORENAME("E002", "상점명이 중복될 수 없습니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
