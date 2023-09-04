@@ -30,6 +30,7 @@ public class LikesService {
 	private final MemberRepository memberRepository;
 	private final ExpertRepository expertRepository;
 
+	@Transactional(readOnly = true)
 	public LikesResponses findAll() {
 		List<Likes> likes = likesRepository.findAll();
 
@@ -61,6 +62,7 @@ public class LikesService {
 		return LikesResponse.from(likes);
 	}
 
+	@Transactional(readOnly = true)
 	public Boolean checkStatus(LikesRequest likesRequest) {
 		Member member = memberRepository.findById(likesRequest.memberId())
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
