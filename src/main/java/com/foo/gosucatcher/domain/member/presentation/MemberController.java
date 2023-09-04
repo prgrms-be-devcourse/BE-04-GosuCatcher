@@ -1,10 +1,12 @@
 package com.foo.gosucatcher.domain.member.presentation;
 
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 
 import javax.validation.constraints.Email;
 
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +27,12 @@ import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
+import com.foo.gosucatcher.domain.member.domain.ImageFile;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +47,7 @@ public class MemberController {
 		this.memberService = memberService;
 	}
 
+	//todo: 예외클래스 전부 리팩토링 필요
 	@PostMapping("/signup")
 	public ResponseEntity<MemberSignUpResponse> signUp(
 		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
@@ -81,29 +89,45 @@ public class MemberController {
 	}
 
 	@PostMapping("/{memberId}/profile")
-	public ResponseEntity<Boolean> uploadProfileImage(@PathVariable long memberId, @RequestParam MultipartFile file) {
-		memberService.uploadProfileImage(memberId, file);
+	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(@PathVariable long memberId,
+		@RequestParam MultipartFile file) {
+		var request = new ProfileImageUploadRequest(memberId, file);
+		memberService.uploadProfileImage(request);
 
-		return ResponseEntity.ok(true);
+		var response = new ProfileImageUploadResponse(memberId, file.getOriginalFilename());
+
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(response);
 	}
 
 	@GetMapping("/{memberId}/profile")
 	public ResponseEntity<Resource> findProfileImage(@PathVariable long memberId) {
-		Resource profileImage = memberService.findProfileImage(memberId);
+		ImageFile profileImage = memberService.findProfileImage(memberId);
 
-		String originalFileName = "profile.jpeg";
-		String encodedOriginalFileName = UriUtils.encode(originalFileName, StandardCharsets.UTF_8);
-		String contentDisposition = "attachment; filename=\"" + encodedOriginalFileName + "\"";
+		String contentDisposition = makeContentDisposition(profileImage);
+		String path = profileImage.getPath();
+		try {
+			UrlResource resource = new UrlResource("file:" + path);
 
-		return ResponseEntity.status(HttpStatus.OK)
-			.header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-			.body(profileImage);
+			return ResponseEntity.status(HttpStatus.OK)
+				.header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+				.body(resource);
+		} catch (MalformedURLException e) {
+			throw new InvalidValueException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping("/{memberId}/profile")
-	public ResponseEntity<Boolean> deleteProfileImage(@PathVariable long memberId) {
+	public ResponseEntity<Void> deleteProfileImage(@PathVariable long memberId) {
 		memberService.removeProfileImage(memberId);
 
-		return ResponseEntity.ok(true);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	private String makeContentDisposition(ImageFile profileImage) {
+		String fileName = profileImage.getFileName() + "." + profileImage.getFileExtension();
+		String encodedOriginalFileName = UriUtils.encode(fileName, StandardCharsets.UTF_8);
+
+		return "attachment; filename=\"" + encodedOriginalFileName + "\"";
 	}
 }

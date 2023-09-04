@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.member.domain;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -8,6 +9,8 @@ import javax.persistence.Table;
 
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
 import com.foo.gosucatcher.global.BaseEntity;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -34,24 +37,23 @@ public class Member extends BaseEntity {
 
 	private String phoneNumber;
 
-	private String profileImagePath;
+	@Embedded
+	private ImageFile profileImageFile;
 
 	private boolean isDeleted;
 
 	@Builder
-	public Member(String name, String password, String email, String phoneNumber, String profileImagePath) {
+	public Member(String name, String password, String email, String phoneNumber, ImageFile profileImageFile) {
 		this.name = name;
 		this.password = password;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
-		this.profileImagePath = profileImagePath;
+		this.profileImageFile = profileImageFile;
 		this.isDeleted = false;
 	}
 
-	public void logIn(String password) {
-		if (!this.password.equals(password)) {
-			throw new RuntimeException("비밀번호가 일치하지 않습니다.");
-		}
+	public boolean logIn(String password) {
+		return this.password.equals(password);
 	}
 
 	public void deleteMember() {
@@ -64,7 +66,12 @@ public class Member extends BaseEntity {
 		this.phoneNumber = memberInfoChangeRequest.phoneNumber();
 	}
 
-	public void changeProfileImagePath(String profileImagePath) {
-		this.profileImagePath = profileImagePath;
+	public void changeProfileImageFile(ImageFile profileImageFile) {
+		if (profileImageFile == null) {
+			//todo: 예외클래스 리팩토링 필요
+			throw new InvalidValueException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
+
+		this.profileImageFile = profileImageFile;
 	}
 }
