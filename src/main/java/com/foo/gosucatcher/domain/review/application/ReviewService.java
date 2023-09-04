@@ -46,6 +46,7 @@ public class ReviewService {
 		return ReviewResponse.from(review);
 	}
 
+	@Transactional(readOnly = true)
 	public ReviewResponses findAll() {
 		List<Review> reviews = reviewRepository.findAll();
 
@@ -67,6 +68,14 @@ public class ReviewService {
 		return ReviewResponses.from(reviews);
 	}
 
+	@Transactional(readOnly = true)
+	public ReviewResponse findById(Long id) {
+		Review review = reviewRepository.findById(id)
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+
+		return ReviewResponse.from(review);
+	}
+
 	public Long update(Long id, ReviewUpdateRequest reviewUpdateRequest) {
 		Review review = reviewRepository.findById(id)
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
@@ -86,10 +95,4 @@ public class ReviewService {
 		reviewRepository.deleteById(id);
 	}
 
-	public ReviewResponse findById(Long id) {
-		Review review = reviewRepository.findById(id)
-				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
-
-		return ReviewResponse.from(review);
-	}
 }
