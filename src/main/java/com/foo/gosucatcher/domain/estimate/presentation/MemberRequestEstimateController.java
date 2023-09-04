@@ -27,7 +27,7 @@ public class MemberRequestEstimateController {
 
 	@PostMapping("/{memberId}")
 	public ResponseEntity<MemberRequestEstimateResponse> create(@PathVariable Long memberId,
-		@RequestBody @Validated MemberRequestEstimateRequest memberRequestEstimateRequest) {
+		@Validated @RequestBody MemberRequestEstimateRequest memberRequestEstimateRequest) {
 		MemberRequestEstimateResponse memberRequestEstimateResponse = memberRequestEstimateService.create(memberId,
 			memberRequestEstimateRequest);
 
@@ -55,10 +55,10 @@ public class MemberRequestEstimateController {
 	@PatchMapping("/{memberRequestEstimateId}")
 	public ResponseEntity<Long> update(@PathVariable Long memberRequestEstimateId,
 		@RequestBody @Validated MemberRequestEstimateRequest memberRequestEstimateRequest) {
-		Long MemberRequestEstimateId = memberRequestEstimateService.update(memberRequestEstimateId,
+		Long updatedMemberRequestEstimateId = memberRequestEstimateService.update(memberRequestEstimateId,
 			memberRequestEstimateRequest);
 
-		return ResponseEntity.ok(MemberRequestEstimateId);
+		return ResponseEntity.ok(updatedMemberRequestEstimateId);
 	}
 
 	@DeleteMapping("/{memberRequestEstimateId}")
