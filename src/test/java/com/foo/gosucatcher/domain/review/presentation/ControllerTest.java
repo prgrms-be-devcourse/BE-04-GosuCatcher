@@ -28,7 +28,6 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(ReviewController.class)
-@Rollback(value = false)
 class ControllerTest {
 	String apiBaseUrl = "/api/v1/reviews";
 
