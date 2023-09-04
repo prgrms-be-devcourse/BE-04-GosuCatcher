@@ -17,6 +17,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -47,23 +49,31 @@ public class MemberRequestEstimate extends BaseEntity {
 	private String location;
 
 	@Column(nullable = false)
-	private LocalDateTime startDate;
+	private LocalDateTime preferredStartDate;
 
 	private String detailedDescription;
 
 	@Builder
-	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime startDate,
+	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
 		String detailedDescription) {
 		this.member = member;
 		this.subItem = subItem;
 		this.location = location;
-		this.startDate = startDate;
+		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
 		this.detailedDescription = detailedDescription;
 	}
 
 	public void update(MemberRequestEstimate memberRequestEstimate) {
 		this.location = memberRequestEstimate.getLocation();
-		this.startDate = memberRequestEstimate.getStartDate();
+		this.preferredStartDate = validatePreferredStartDate(memberRequestEstimate.getPreferredStartDate());
 		this.detailedDescription = memberRequestEstimate.getDetailedDescription();
+	}
+
+	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
+		if (LocalDateTime.now().isAfter(preferredStartDate)) {
+			throw new BusinessException(ErrorCode.INVALID_START_DATE);
+		}
+
+		return preferredStartDate;
 	}
 }

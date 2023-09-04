@@ -66,7 +66,7 @@ class MemberRequestEstimateServiceTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.startDate(LocalDateTime.now().plusDays(1))
+			.preferredStartDate(LocalDateTime.now().plusDays(1))
 			.detailedDescription("추가 내용")
 			.build();
 	}
@@ -80,7 +80,7 @@ class MemberRequestEstimateServiceTest {
 		Long memberRequestEstimateId = 1L;
 
 		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId,
-			memberRequestEstimate.getLocation(), memberRequestEstimate.getStartDate(),
+			memberRequestEstimate.getLocation(), memberRequestEstimate.getPreferredStartDate(),
 			memberRequestEstimate.getDetailedDescription());
 
 		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
@@ -96,36 +96,23 @@ class MemberRequestEstimateServiceTest {
 
 		//then
 		assertThat(memberRequestEstimateResponse.location()).isEqualTo(result.getLocation());
-		assertThat(memberRequestEstimateResponse.startDate()).isEqualTo(result.getStartDate());
+		assertThat(memberRequestEstimateResponse.preferredStartDate()).isEqualTo(result.getPreferredStartDate());
 		assertThat(memberRequestEstimateResponse.detailedDescription()).isEqualTo(result.getDetailedDescription());
 	}
 
-	@DisplayName("회원 요정 견적서 저장 실패 테스트 - 희망 시작일이 현재보다 이전인 경우")
+	@DisplayName("회원 요정 견적서 생성 실패 테스트 - 희망 시작일이 현재보다 이전인 경우")
 	@Test
 	void createFailed() {
 		//given
-		Long memberId = 1L;
-		Long subItemId = 1L;
-
-		MemberRequestEstimate memberRequestEstimate2 = MemberRequestEstimate.builder()
+		//when
+		//then
+		assertThrows(BusinessException.class, () -> MemberRequestEstimate.builder()
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.startDate(LocalDateTime.now().minusDays(3))
+			.preferredStartDate(LocalDateTime.now().minusDays(3))
 			.detailedDescription("추가 내용")
-			.build();
-
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId,
-			memberRequestEstimate2.getLocation(), memberRequestEstimate2.getStartDate(),
-			memberRequestEstimate2.getDetailedDescription());
-
-		when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
-		when(subItemRepository.findById(subItemId)).thenReturn(Optional.of(subItem));
-
-		//when
-		//then
-		assertThrows(BusinessException.class,
-			() -> memberRequestEstimateService.create(memberId, memberRequestEstimateRequest));
+			.build());
 	}
 
 	@DisplayName("회원 요정 견적서 회원별 전체 조회 테스트")
@@ -138,7 +125,7 @@ class MemberRequestEstimateServiceTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포2동")
-			.startDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now())
 			.detailedDescription("추가 내용2")
 			.build();
 
@@ -170,7 +157,8 @@ class MemberRequestEstimateServiceTest {
 
 		//then
 		assertThat(memberRequestEstimateResponse.location()).isEqualTo(memberRequestEstimate.getLocation());
-		assertThat(memberRequestEstimateResponse.startDate()).isEqualTo(memberRequestEstimate.getStartDate());
+		assertThat(memberRequestEstimateResponse.preferredStartDate()).isEqualTo(
+			memberRequestEstimate.getPreferredStartDate());
 		assertThat(memberRequestEstimateResponse.detailedDescription()).isEqualTo(
 			memberRequestEstimate.getDetailedDescription());
 	}
@@ -214,6 +202,5 @@ class MemberRequestEstimateServiceTest {
 		//then
 		assertThrows(BusinessException.class,
 			() -> memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest));
-
 	}
 }

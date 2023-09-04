@@ -9,14 +9,14 @@ public record MemberRequestEstimateResponse(
 	Long memberId,
 	Long subItemId,
 	String location,
-	LocalDateTime startDate,
+	LocalDateTime preferredStartDate,
 	String detailedDescription
 ) {
 
 	public static MemberRequestEstimateResponse from(MemberRequestEstimate memberRequestEstimate) {
 		return new MemberRequestEstimateResponse(memberRequestEstimate.getId(),
 			memberRequestEstimate.getMember().getId(), memberRequestEstimate.getSubItem().getId(),
-			memberRequestEstimate.getLocation(), memberRequestEstimate.getStartDate(),
+			memberRequestEstimate.getLocation(), memberRequestEstimate.getPreferredStartDate(),
 			memberRequestEstimate.getDetailedDescription());
 	}
 }

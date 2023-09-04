@@ -117,7 +117,7 @@ class MemberRequestEstimateControllerTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.startDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now())
 			.detailedDescription("추가 내용")
 			.build();
 
@@ -157,7 +157,7 @@ class MemberRequestEstimateControllerTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.startDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now())
 			.detailedDescription("추가 내용")
 			.build();
 

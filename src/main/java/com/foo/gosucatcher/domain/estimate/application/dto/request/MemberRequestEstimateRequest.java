@@ -17,7 +17,7 @@ public record MemberRequestEstimateRequest(
 	String location,
 
 	@NotNull(message = "서비스 희망일을 등록해주세요.")
-	LocalDateTime startDate,
+	LocalDateTime preferredStartDate,
 
 	String detailedDescription
 ) {
@@ -28,7 +28,7 @@ public record MemberRequestEstimateRequest(
 			.member(member)
 			.subItem(subItem)
 			.location(memberRequestEstimateRequest.location)
-			.startDate(memberRequestEstimateRequest.startDate)
+			.preferredStartDate(memberRequestEstimateRequest.preferredStartDate)
 			.detailedDescription(memberRequestEstimateRequest.detailedDescription)
 			.build();
 	}

@@ -19,6 +19,7 @@ public enum ErrorCode {
 
 	//하위 서비스
 	NOT_FOUND_SUB_ITEM("SI001", "존재하지 않는 하위 서비스입니다"),
+	DUPLICATED_SUB_ITEM_NAME("SI002", "하위 서비스 이름이 중복될 수 없습니다."),
 
 	//고수
 	NOT_FOUND_EXPERT("E001", "존재하지 않는 고수입니다."),
