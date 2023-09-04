@@ -27,7 +27,7 @@ public class ExpertController {
 
 	private final ExpertService expertService;
 
-	@PostMapping()
+	@PostMapping
 	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request,
 		@RequestParam Long memberId) {
 		ExpertResponse expertResponse = expertService.create(request, memberId);
