@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.review.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -8,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
@@ -23,23 +25,24 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "reviews")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Where(clause = "isDeleted = false")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE reviews SET is_deleted = true WHERE id = ?")
 public class Review extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
@@ -57,5 +60,10 @@ public class Review extends BaseEntity {
 		this.description = description;
 		this.rating = rating;
 		this.isDeleted = false;
+	}
+
+	public void update(Review updatedReview) {
+		description = updatedReview.getDescription();
+		rating = updatedReview.getRating();
 	}
 }

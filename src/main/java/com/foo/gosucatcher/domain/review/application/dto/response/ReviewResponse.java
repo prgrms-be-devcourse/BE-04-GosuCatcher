@@ -5,7 +5,7 @@ import com.foo.gosucatcher.domain.review.domain.Review;
 public record ReviewResponse(
 		Long id,
 		Long expertId,
-		Long memberId,
+		Long writerId,
 		Long subItemId,
 		String description,
 		int rating

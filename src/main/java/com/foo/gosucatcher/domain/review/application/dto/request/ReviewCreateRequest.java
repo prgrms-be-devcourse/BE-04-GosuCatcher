@@ -10,7 +10,7 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.review.domain.Review;
 
-public record ReviewRequest(
+public record ReviewCreateRequest(
 		Long expertId,
 		Long writerId,
 		Long subItemId,
@@ -23,13 +23,14 @@ public record ReviewRequest(
 		Integer rating
 ) {
 
-	public static Review toReview(ReviewRequest reviewRequest, Expert expert, Member writer, SubItem subItem) {
+	public static Review toReview(ReviewCreateRequest reviewCreateRequest, Expert expert, Member writer,
+			SubItem subItem) {
 		return Review.builder()
 				.expert(expert)
 				.member(writer)
 				.subItem(subItem)
-				.description(reviewRequest.description())
-				.rating(reviewRequest.rating())
+				.description(reviewCreateRequest.description())
+				.rating(reviewCreateRequest.rating())
 				.build();
 	}
 }
