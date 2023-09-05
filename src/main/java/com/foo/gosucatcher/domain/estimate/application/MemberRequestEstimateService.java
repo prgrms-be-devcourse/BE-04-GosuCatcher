@@ -40,7 +40,7 @@ public class MemberRequestEstimateService {
 		List<MemberRequestEstimate> memberRequestEstimatesForDuplicate = memberRequestEstimateRepository.findByMemberIdAndSubItemIdAndIsNotClosed(
 			member.getId(), subItem.getId());
 
-		duplicatedMemberRequestEstimateCheck(memberRequestEstimatesForDuplicate);
+		checkDuplicatedMemberRequestEstimate(memberRequestEstimatesForDuplicate);
 
 		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimateRequest.toMemberRequestEstimate(member,
 			subItem, memberRequestEstimateRequest);
@@ -96,7 +96,7 @@ public class MemberRequestEstimateService {
 		memberRequestEstimateRepository.delete(memberRequestEstimate);
 	}
 
-	private void duplicatedMemberRequestEstimateCheck(List<MemberRequestEstimate> memberRequestEstimates) {
+	private void checkDuplicatedMemberRequestEstimate(List<MemberRequestEstimate> memberRequestEstimates) {
 		Optional.ofNullable(memberRequestEstimates)
 			.filter(result -> !result.isEmpty())
 			.ifPresent(result -> {
