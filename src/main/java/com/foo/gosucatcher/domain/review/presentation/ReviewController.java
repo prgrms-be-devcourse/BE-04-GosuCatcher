@@ -33,7 +33,7 @@ public class ReviewController {
 		return ResponseEntity.ok(reviewResponse);
 	}
 
-	@GetMapping()
+	@GetMapping
 	public ResponseEntity<ReviewResponses> findAll() {
 		ReviewResponses reviewResponses = reviewService.findAll();
 
