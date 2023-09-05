@@ -48,7 +48,7 @@ public class SubItemController {
 		return ResponseEntity.ok(subItemsResponse);
 	}
 
-	@PatchMapping("{id}")
+	@PatchMapping("/{id}")
 	public ResponseEntity<Long> update(@PathVariable Long id,
 		@Validated @RequestBody SubItemUpdateRequest subItemUpdateRequest) {
 
@@ -57,7 +57,7 @@ public class SubItemController {
 		return ResponseEntity.ok(subItemId);
 	}
 
-	@DeleteMapping("{id}")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		subItemService.delete(id);
 
