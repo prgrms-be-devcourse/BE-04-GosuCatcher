@@ -13,14 +13,8 @@ import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.review.domain.Review;
 
 public record ReviewCreateRequest(
-		@NotNull(message = "리뷰의 대상이 되는 고수의 ID를 입력해주세요")
-		Long expertId,
-
 		@NotNull(message = "리뷰를 작성하는 사용자 ID를 입력해주세요")
 		Long writerId,
-
-		@NotNull(message = "리뷰를 남기고자 하는 하위 서비스를 입력해주세요")
-		Long subItemId,
 
 		@NotBlank(message = "리뷰를 입력해주세요")
 		@Length(min = 10, max = 600, message = "10자 이상 600자 이하로 입력 가능합니다")

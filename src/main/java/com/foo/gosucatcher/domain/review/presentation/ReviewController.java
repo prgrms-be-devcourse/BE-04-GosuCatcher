@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foo.gosucatcher.domain.review.application.ReviewService;
@@ -26,9 +27,12 @@ public class ReviewController {
 
 	private final ReviewService reviewService;
 
-	@PostMapping
-	public ResponseEntity<ReviewResponse> create(@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
-		ReviewResponse reviewResponse = reviewService.create(reviewCreateRequest);
+	@PostMapping("/{expertId}")
+	public ResponseEntity<ReviewResponse> create(
+			@PathVariable Long expertId,
+			@RequestParam Long subItemId,
+			@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
+		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
 
 		return ResponseEntity.ok(reviewResponse);
 	}

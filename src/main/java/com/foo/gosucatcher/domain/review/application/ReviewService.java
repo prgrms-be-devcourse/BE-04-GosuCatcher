@@ -32,12 +32,12 @@ public class ReviewService {
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
 
-	public ReviewResponse create(ReviewCreateRequest reviewCreateRequest) {
-		Expert expert = expertRepository.findById(reviewCreateRequest.expertId())
+	public ReviewResponse create(Long expertId, Long subItemId, ReviewCreateRequest reviewCreateRequest) {
+		Expert expert = expertRepository.findById(expertId)
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 		Member writer = memberRepository.findById(reviewCreateRequest.writerId())
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-		SubItem subItem = subItemRepository.findById(reviewCreateRequest.subItemId())
+		SubItem subItem = subItemRepository.findById(subItemId)
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
 		Review review = ReviewCreateRequest.toReview(reviewCreateRequest, expert, writer, subItem);
@@ -84,11 +84,12 @@ public class ReviewService {
 	}
 
 	public void delete(Long id) {
-		if (reviewRepository.findById(id).isEmpty()) {
-			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
-		}
-
-		reviewRepository.deleteById(id);
+		reviewRepository.findById(id).ifPresentOrElse(
+				review -> reviewRepository.deleteById(id),
+				() -> {
+					throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
+				}
+		);
 	}
 
 }

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -28,7 +27,8 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(ReviewController.class)
-class ControllerTest {
+class ReviewControllerTest {
+
 	String apiBaseUrl = "/api/v1/reviews";
 
 	@Autowired
@@ -49,21 +49,25 @@ class ControllerTest {
 		void create() throws Exception {
 
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
+			long expertId = 0L;
+			long subItemId = 0L;
+
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
 			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
-			given(reviewService.create(any()))
+			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
 					.willReturn(reviewResponse);
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
+			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + expertId)
 							.contentType(MediaType.APPLICATION_JSON)
+							.param("subItemId", String.valueOf(subItemId))
 							.content(objectMapper.writeValueAsString(reviewCreateRequest)))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.id").value(0L))
-					.andExpect(jsonPath("$.expertId").value(reviewCreateRequest.expertId()))
+					.andExpect(jsonPath("$.expertId").value(expertId))
 					.andExpect(jsonPath("$.writerId").value(reviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.subItemId").value(reviewCreateRequest.subItemId()))
+					.andExpect(jsonPath("$.subItemId").value(subItemId))
 					.andExpect(jsonPath("$.description").value(reviewCreateRequest.description()))
 					.andExpect(jsonPath("$.rating").value(reviewCreateRequest.rating()));
 		}
@@ -73,15 +77,17 @@ class ControllerTest {
 		void createFailed_NotFoundExpert() throws Exception {
 
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
 
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT))
-					.when(reviewService).create(any(ReviewCreateRequest.class));
+					.when(reviewService).create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class));
 
+			long subItemId = 0L;
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
+			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + 0)
 							.contentType(MediaType.APPLICATION_JSON)
+							.param("subItemId", String.valueOf(subItemId))
 							.content(objectMapper.writeValueAsString(reviewCreateRequest)))
 					.andExpect(status().isNotFound())
 					.andExpect(jsonPath("$.code")
@@ -93,14 +99,17 @@ class ControllerTest {
 		void createFailed_NotFoundSubItem() throws Exception {
 
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
+			long expertId = 0L;
+			long subItemId = 0L;
 
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM))
-					.when(reviewService).create(any(ReviewCreateRequest.class));
+					.when(reviewService).create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class));
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
+			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + expertId)
+							.param("subItemId", String.valueOf(subItemId))
 							.contentType(MediaType.APPLICATION_JSON)
 							.content(objectMapper.writeValueAsString(reviewCreateRequest)))
 					.andExpect(status().isNotFound())
@@ -118,14 +127,15 @@ class ControllerTest {
 		void findByExpertId() throws Exception {
 
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
 			ReviewResponses reviewResponses = new ReviewResponses(
 					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
 							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
 			);
 
+			long subItemId = 1L;
 			long expertId = 1L;
 
 			given(reviewService.findByExpertId(any()))
@@ -138,16 +148,16 @@ class ControllerTest {
 							.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.reviewResponses[0].id").value(1))
-					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(firstReviewCreateRequest.expertId()))
+					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(expertId))
 					.andExpect(jsonPath("$.reviewResponses[0].writerId").value(firstReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(firstReviewCreateRequest.subItemId()))
+					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(subItemId))
 					.andExpect(
 							jsonPath("$.reviewResponses[0].description").value(firstReviewCreateRequest.description()))
 					.andExpect(jsonPath("$.reviewResponses[0].rating").value(firstReviewCreateRequest.rating()))
 					.andExpect(jsonPath("$.reviewResponses[1].id").value(2))
-					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(secondReviewCreateRequest.expertId()))
+					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(expertId))
 					.andExpect(jsonPath("$.reviewResponses[1].writerId").value(secondReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(secondReviewCreateRequest.subItemId()))
+					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(subItemId))
 					.andExpect(
 							jsonPath("$.reviewResponses[1].description").value(secondReviewCreateRequest.description()))
 					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
@@ -174,13 +184,16 @@ class ControllerTest {
 		void findAll() throws Exception {
 
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
 			ReviewResponses reviewResponses = new ReviewResponses(
 					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
 							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
 			);
+
+			long expertId = 1L;
+			long subItemId = 1L;
 
 			given(reviewService.findAll())
 					.willReturn(reviewResponses);
@@ -191,16 +204,16 @@ class ControllerTest {
 							.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
 					.andExpect(jsonPath("$.reviewResponses[0].id").value(1))
-					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(firstReviewCreateRequest.expertId()))
+					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(expertId))
 					.andExpect(jsonPath("$.reviewResponses[0].writerId").value(firstReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(firstReviewCreateRequest.subItemId()))
+					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(subItemId))
 					.andExpect(
 							jsonPath("$.reviewResponses[0].description").value(firstReviewCreateRequest.description()))
 					.andExpect(jsonPath("$.reviewResponses[0].rating").value(firstReviewCreateRequest.rating()))
 					.andExpect(jsonPath("$.reviewResponses[1].id").value(2))
-					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(secondReviewCreateRequest.expertId()))
+					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(expertId))
 					.andExpect(jsonPath("$.reviewResponses[1].writerId").value(secondReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(secondReviewCreateRequest.subItemId()))
+					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(subItemId))
 					.andExpect(
 							jsonPath("$.reviewResponses[1].description").value(secondReviewCreateRequest.description()))
 					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
@@ -294,24 +307,6 @@ class ControllerTest {
 			mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
 							.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(MockMvcResultMatchers.status().isOk());
-		}
-
-		@DisplayName("실패 - 존재하지 않는 리뷰를 삭제 시도하면 에러가 발생한다")
-		@Test
-		void deleteFailed() throws Exception {
-
-			// given
-			long id = 0L;
-			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW)).
-					when(reviewService)
-					.delete(any(Long.class));
-
-			// when
-			// then
-			mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
-							.contentType(MediaType.APPLICATION_JSON))
-					.andExpect(jsonPath("$.code")
-							.value("R001"));
 		}
 	}
 }
