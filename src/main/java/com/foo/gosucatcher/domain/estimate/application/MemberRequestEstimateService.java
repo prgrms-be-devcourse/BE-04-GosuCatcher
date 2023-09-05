@@ -37,10 +37,7 @@ public class MemberRequestEstimateService {
 		SubItem subItem = subItemRepository.findById(memberRequestEstimateRequest.subItemId())
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
-		List<MemberRequestEstimate> memberRequestEstimatesForDuplicate = memberRequestEstimateRepository.findByMemberIdAndSubItemIdAndIsNotClosed(
-			member.getId(), subItem.getId());
-
-		checkDuplicatedMemberRequestEstimate(memberRequestEstimatesForDuplicate);
+		checkDuplicatedMemberRequestEstimate(member.getId(), subItem.getId());
 
 		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimateRequest.toMemberRequestEstimate(member,
 			subItem, memberRequestEstimateRequest);
@@ -96,8 +93,11 @@ public class MemberRequestEstimateService {
 		memberRequestEstimateRepository.delete(memberRequestEstimate);
 	}
 
-	private void checkDuplicatedMemberRequestEstimate(List<MemberRequestEstimate> memberRequestEstimates) {
-		Optional.ofNullable(memberRequestEstimates)
+	private void checkDuplicatedMemberRequestEstimate(Long memberId, Long subItemId) {
+		List<MemberRequestEstimate> memberRequestEstimatesForDuplicate = memberRequestEstimateRepository.findByMemberIdAndSubItemIdAndIsNotClosed(
+			memberId, subItemId);
+
+		Optional.ofNullable(memberRequestEstimatesForDuplicate)
 			.filter(result -> !result.isEmpty())
 			.ifPresent(result -> {
 				throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_REQUEST_ESTIMATE);
