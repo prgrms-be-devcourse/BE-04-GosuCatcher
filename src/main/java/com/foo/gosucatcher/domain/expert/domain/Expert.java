@@ -1,10 +1,13 @@
 package com.foo.gosucatcher.domain.expert.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -26,27 +29,44 @@ public class Expert extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@OneToOne
-	@JoinColumn(name = "member_id")
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
+	@Column(nullable = false, length = 20)
 	private String storeName;
 
+	@Column(nullable = false)
 	private String location;
 
-	private int distance;
+	@Column(nullable = false)
+	private int maxTravelDistance;
 
+	@Column(nullable = false)
+	@Lob
 	private String description;
 
+	@Column(name = "is_baro_estimate", nullable = false)
 	private boolean isBaroEstimate;
 
 	@Builder
-	public Expert(Member member, String storeName, String location, int distance, String description) {
+	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description) {
 		this.member = member;
 		this.storeName = storeName;
 		this.location = location;
-		this.distance = distance;
+		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isBaroEstimate = false;
+	}
+
+	public void updateIsBaroEstimate(boolean isBaroEstimate) {
+		this.isBaroEstimate = isBaroEstimate;
+	}
+
+	public void updateExpert(Expert updatedExpert) {
+		this.storeName = updatedExpert.getStoreName();
+		this.location = updatedExpert.getLocation();
+		this.maxTravelDistance = updatedExpert.getMaxTravelDistance();
+		this.description = updatedExpert.getDescription();
 	}
 }

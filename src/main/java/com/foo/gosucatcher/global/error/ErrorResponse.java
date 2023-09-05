@@ -12,10 +12,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public record ErrorResponse(
-	LocalDateTime timestamp,
-	String code,
-	List<FieldError> errors,
-	String message
+		LocalDateTime timestamp,
+		String code,
+		List<FieldError> errors,
+		String message
 ) {
 
 	private ErrorResponse(ErrorCode code, List<FieldError> errors) {
@@ -61,11 +61,11 @@ public record ErrorResponse(
 		private static List<FieldError> of(final BindingResult bindingResult) {
 			final List<org.springframework.validation.FieldError> fieldErrors = bindingResult.getFieldErrors();
 			return fieldErrors.stream()
-				.map(error -> new FieldError(
-					error.getField(),
-					error.getRejectedValue() == null ? "" : error.getRejectedValue().toString(),
-					error.getDefaultMessage()))
-				.collect(Collectors.toList());
+					.map(error -> new FieldError(
+							error.getField(),
+							error.getRejectedValue() == null ? "" : error.getRejectedValue().toString(),
+							error.getDefaultMessage()))
+					.collect(Collectors.toList());
 		}
 	}
 }
