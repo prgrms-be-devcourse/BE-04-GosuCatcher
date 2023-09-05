@@ -34,6 +34,8 @@ public class ExpertService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
+		duplicatedNameCheck(request.storeName());
+
 		Expert newExpert = ExpertCreateRequest.toExpert(member, request);
 		expertRepository.save(newExpert);
 
@@ -52,12 +54,15 @@ public class ExpertService {
 	public ExpertsResponse findAll() {
 		List<Expert> experts = expertRepository.findAll();
 		ExpertsResponse expertsResponse = ExpertsResponse.from(experts);
+
 		return expertsResponse;
 	}
 
 	public Long update(Long id, ExpertUpdateRequest request) {
 		Expert existingExpert = expertRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+
+		duplicatedNameCheck(request.storeName());
 
 		Expert updatedExpert = ExpertUpdateRequest.toExpert(request);
 		existingExpert.updateExpert(updatedExpert);
