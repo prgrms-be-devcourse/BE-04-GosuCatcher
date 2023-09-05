@@ -36,12 +36,16 @@ public class MemberRequestEstimateController {
 
 	@GetMapping
 	public ResponseEntity<MemberRequestEstimatesResponse> findAll() {
-		return ResponseEntity.ok(memberRequestEstimateService.findAll());
+		MemberRequestEstimatesResponse memberRequestEstimatesResponse = memberRequestEstimateService.findAll();
+
+		return ResponseEntity.ok(memberRequestEstimatesResponse);
 	}
 
 	@GetMapping("/members/{memberId}")
 	public ResponseEntity<MemberRequestEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
-		return ResponseEntity.ok(memberRequestEstimateService.findAllByMember(memberId));
+		MemberRequestEstimatesResponse memberRequestEstimatesResponse = memberRequestEstimateService.findAllByMember(memberId);
+
+		return ResponseEntity.ok(memberRequestEstimatesResponse);
 	}
 
 	@GetMapping("/{memberRequestEstimateId}")
