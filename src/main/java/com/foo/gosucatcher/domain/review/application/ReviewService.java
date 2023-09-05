@@ -36,7 +36,7 @@ public class ReviewService {
 		Expert expert = expertRepository.findById(reviewCreateRequest.expertId())
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 		Member writer = memberRepository.findById(reviewCreateRequest.writerId())
-				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(reviewCreateRequest.subItemId())
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 

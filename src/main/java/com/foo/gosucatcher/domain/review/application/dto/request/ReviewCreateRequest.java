@@ -18,7 +18,7 @@ public record ReviewCreateRequest(
 		Long writerId,
 		Long subItemId,
 
-		@NonNull()
+		@NonNull
 		@NotBlank(message = "리뷰를 입력해주세요")
 		@Length(min = 10, max = 600, message = "10자 이상 600자 이하로 입력 가능합니다")
 		String description,
