@@ -203,7 +203,7 @@ class ExpertControllerTest {
 	void deleteExpertSuccessTest() throws Exception {
 		doNothing().when(expertService).delete(1L);
 
-		mockMvc.perform(delete("/api/v1/experts/1")).andExpect(status().isNoContent()).andDo(print());
+		mockMvc.perform(delete("/api/v1/experts/1")).andExpect(status().isOk()).andDo(print());
 	}
 
 	@Test

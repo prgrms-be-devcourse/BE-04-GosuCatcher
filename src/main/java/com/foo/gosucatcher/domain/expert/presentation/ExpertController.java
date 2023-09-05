@@ -60,6 +60,6 @@ public class ExpertController {
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		expertService.delete(id);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(null);
 	}
 }
