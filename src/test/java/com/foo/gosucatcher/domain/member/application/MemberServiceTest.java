@@ -35,7 +35,7 @@ class MemberServiceTest {
 	void signUpSuccessWhenNoDuplicateEmail() {
 		//given
 		var request = new MemberSignUpRequest("test", "test@gmail.com", "12345");
-		Member member = MemberSignUpRequest.to(request);
+		Member member = MemberSignUpRequest.toMember(request);
 
 		doReturn(Optional.empty())
 			.when(memberRepository)
@@ -108,7 +108,7 @@ class MemberServiceTest {
 	void logInSuccessIfMemberInfoSameAsLogInRequestInfo() {
 		//given
 		var signUpRequest = new MemberSignUpRequest("test", "test@gmail.com", "12345");
-		Member member = MemberSignUpRequest.to(signUpRequest);
+		Member member = MemberSignUpRequest.toMember(signUpRequest);
 		memberService.signUp(signUpRequest);
 
 		//when
@@ -128,7 +128,7 @@ class MemberServiceTest {
 		//given
 		var signUpRequest = new MemberSignUpRequest("test", "test@gmail.com", "12345");
 		memberService.signUp(signUpRequest);
-		Member member = MemberSignUpRequest.to(signUpRequest);
+		Member member = MemberSignUpRequest.toMember(signUpRequest);
 		String email = signUpRequest.email();
 
 		doReturn(Optional.of(member))

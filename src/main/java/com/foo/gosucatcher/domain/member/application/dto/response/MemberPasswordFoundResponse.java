@@ -6,7 +6,8 @@ public record MemberPasswordFoundResponse(
 	String name,
 	String password
 ) {
-	public static MemberPasswordFoundResponse to(Member member) {
+
+	public static MemberPasswordFoundResponse from(Member member) {
 		String memberEmail = member.getEmail();
 		String memberPassword = member.getPassword();
 

@@ -35,6 +35,7 @@ public enum ErrorCode {
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
+	INVALID_IMAGE("F002", "지원하지 않는 이미지 파일 형식입니다."),
 
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_REQUEST_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),

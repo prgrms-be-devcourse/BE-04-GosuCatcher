@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
 import com.foo.gosucatcher.global.BaseEntity;
 import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.AccessLevel;
@@ -19,7 +20,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Getter
 @Entity
 @Table(name = "members")
@@ -66,15 +66,15 @@ public class Member extends BaseEntity {
 		this.isDeleted = true;
 	}
 
-	public void changeMemberInfo(MemberInfoChangeRequest memberInfoChangeRequest) {
-		this.name = memberInfoChangeRequest.name();
-		this.password = memberInfoChangeRequest.password();
-		this.phoneNumber = memberInfoChangeRequest.phoneNumber();
+	public void changeMemberInfo(Member member) {
+		this.name = member.getName();
+		this.password = member.getPassword();
+		this.phoneNumber = member.getPhoneNumber();
 	}
 
 	public void changeProfileImageFile(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
-			throw new InvalidValueException(ErrorCode.NOT_FOUND_IMAGE);
+			throw new BusinessException(ErrorCode.INVALID_IMAGE);
 		}
 
 		this.profileImageFile = profileImageFile;

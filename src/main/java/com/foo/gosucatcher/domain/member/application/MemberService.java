@@ -1,7 +1,11 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
@@ -18,22 +22,18 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
-@Slf4j
 @Transactional
+@RequiredArgsConstructor
 @Service
 public class MemberService {
+
 	private final MemberRepository memberRepository;
 	private final MemberProfileRepository memberProfileRepository;
 
-	public MemberService(MemberRepository memberRepository, MemberProfileRepository memberProfileRepository) {
-		this.memberRepository = memberRepository;
-		this.memberProfileRepository = memberProfileRepository;
-	}
-
-	public void signUp(MemberSignUpRequest memberSignUpRequest) {
-		Member member = MemberSignUpRequest.to(memberSignUpRequest);
+	public void signUp(@Validated MemberSignUpRequest memberSignUpRequest) {
+		Member member = MemberSignUpRequest.toMember(memberSignUpRequest);
 
 		String email = member.getEmail();
 		checkDuplicatedEmail(email);
@@ -43,7 +43,7 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public MemberLogInResponse logIn(MemberLogInRequest memberLogInRequest) {
+	public MemberLogInResponse logIn(@Validated MemberLogInRequest memberLogInRequest) {
 		String email = memberLogInRequest.email();
 		Member logInMember = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
@@ -58,37 +58,41 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public MemberPasswordFoundResponse findPassword(String email) {
+	public MemberPasswordFoundResponse findPassword(@Validated @Email String email) {
 		Member member = memberRepository.findByEmail(email)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
 		//todo: 추후 유저 이메일로 임시 비밀번호 발급하는 걸로 바꿀 수 있을 듯
-		return MemberPasswordFoundResponse.to(member);
+		return MemberPasswordFoundResponse.from(member);
 	}
 
 	@Transactional(readOnly = true)
-	public void checkDuplicatedEmail(String email) {
+	public void checkDuplicatedEmail(@Validated @Email String email) {
 		memberRepository.findByEmail(email)
 			.ifPresent((elem) -> {
 				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER_EMAIL);
 			});
 	}
 
-	public void changeMemberInfo(long memberId, MemberInfoChangeRequest memberInfoChangeRequest) {
+	public long changeMemberInfo(@Validated @Min(0) long memberId,
+		@Validated MemberInfoChangeRequest memberInfoChangeRequest) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		member.changeMemberInfo(memberInfoChangeRequest);
+		Member changedMember = MemberInfoChangeRequest.toMember(memberInfoChangeRequest);
+		member.changeMemberInfo(changedMember);
+
+		return memberId;
 	}
 
-	public void deleteMember(long memberId) {
+	public void deleteMember(@Validated @Min(0) long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
 		member.deleteMember();
 	}
 
-	public void uploadProfileImage(ProfileImageUploadRequest profileImageUploadRequest) {
+	public void uploadProfileImage(@Validated ProfileImageUploadRequest profileImageUploadRequest) {
 		long memberId = profileImageUploadRequest.memberId();
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
@@ -100,17 +104,18 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public ImageFile findProfileImage(long memberId) {
+	public ImageFile findProfileImage(@Validated @Min(0) long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		return memberProfileRepository.findImage(member);
 	}
 
-	public void removeProfileImage(long memberId) {
+	public void removeProfileImage(@Validated @Min(0) long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		memberProfileRepository.deleteImage(member);
+		ImageFile profileImageFile = member.getProfileImageFile();
+		memberProfileRepository.deleteImage(profileImageFile);
 	}
 }

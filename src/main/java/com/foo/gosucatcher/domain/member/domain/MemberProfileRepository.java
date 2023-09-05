@@ -10,5 +10,5 @@ public interface MemberProfileRepository {
 
 	ImageFile findImage(Member member);
 
-	void deleteImage(Member member);
+	void deleteImage(ImageFile image);
 }
