@@ -32,7 +32,8 @@ public enum ErrorCode {
 
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_REQUEST_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),
-	INVALID_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다.");
+	INVALID_MEMBER_REQUEST_ESTIMATE_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
+	DUPLICATE_MEMBER_REQUEST_ESTIMATE("MRE003", "회원 요청 견적서는 중복될 수 없습니다.");
 
 	private final String code;
 	private final String message;
