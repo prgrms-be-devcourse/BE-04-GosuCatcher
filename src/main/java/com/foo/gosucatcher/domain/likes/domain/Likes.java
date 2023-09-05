@@ -40,10 +40,10 @@ public class Likes extends BaseEntity {
 
 	@Builder
 	public Likes(Expert expert, Member member) {
-		Long expertId = expert.getMember().getId();
+		Long expertMemberId = expert.getMember().getId();
 		Long memberId = member.getId();
 
-		if (memberId.equals(expertId)) {
+		if (memberId.equals(expertMemberId)) {
 			throw new NotSupportedLikesException(ErrorCode.NOT_SUPPORTED_SELF_LIKES);
 		}
 
