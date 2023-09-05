@@ -9,6 +9,7 @@ public record ExpertResponse(
 	int maxTravelDistance,
 	String description
 ) {
+
 	public static ExpertResponse from(Expert expert) {
 		return new ExpertResponse(
 			expert.getId(),

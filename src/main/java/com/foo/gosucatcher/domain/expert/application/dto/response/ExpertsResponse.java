@@ -7,6 +7,7 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 public record ExpertsResponse(
 	List<ExpertResponse> expertsResponse
 ) {
+
 	public static ExpertsResponse from(List<Expert> expertList) {
 		return new ExpertsResponse(
 			expertList.stream()
