@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,10 +40,17 @@ public class MemberRequestEstimate extends BaseEntity {
 
 	private String location;
 
+	private LocalDateTime startDate;
+
+	private String detailedDescription;
+
 	@Builder
-	public MemberRequestEstimate(Member member, SubItem subItem, String location) {
+	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime startDate,
+		String detailedDescription) {
 		this.member = member;
 		this.subItem = subItem;
 		this.location = location;
+		this.startDate = startDate;
+		this.detailedDescription = detailedDescription;
 	}
 }
