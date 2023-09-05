@@ -47,16 +47,13 @@ class ExpertControllerTest {
 	MemberRepository memberRepository;
 
 	@Mock
-	private Member member1;
-
-	@Mock
-	private Member member2;
+	private Member member;
 
 	private ExpertCreateRequest expertCreateRequest;
 
 	@BeforeEach
 	void setUp() {
-		given(memberRepository.findById(1L)).willReturn(Optional.of(member1));
+		given(memberRepository.findById(1L)).willReturn(Optional.of(member));
 
 		expertCreateRequest = new ExpertCreateRequest("업체명1", "위치1", 100, "부가설명1");
 
@@ -103,7 +100,7 @@ class ExpertControllerTest {
 
 	@Test
 	@DisplayName("고수 등록 실패: 중복된 상점명")
-	void createExpertFailTest_duplication() throws Exception{
+	void createExpertFailTest_duplication() throws Exception {
 
 		ExpertCreateRequest duplicatedExpertCreateRequest = new ExpertCreateRequest("업체명1", "위치1", 100, "부가설명1");
 
@@ -155,15 +152,16 @@ class ExpertControllerTest {
 	@Test
 	@DisplayName("고수 전체 조회 성공")
 	void getAllExpertsSuccessTest() throws Exception {
-		List<Expert> expertList = List.of(new Expert(member1, "업체명1", "위치1", 100, "부가설명1"),
-			new Expert(member2, "업체명2", "위치2", 200, "부가설명2"));
+		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
 		ExpertsResponse expertsResponse = ExpertsResponse.from(expertList);
 		given(expertService.findAll()).willReturn(expertsResponse);
 
 		mockMvc.perform(get("/api/v1/experts"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.expertsResponse[0].storeName").value("업체명1"))
-			.andExpect(jsonPath("$.expertsResponse[1].storeName").value("업체명2"))
+			.andExpect(jsonPath("$.expertsResponse[0].location").value("위치1"))
+			.andExpect(jsonPath("$.expertsResponse[0].maxTravelDistance").value(100))
+			.andExpect(jsonPath("$.expertsResponse[0].description").value("부가설명1"))
 			.andDo(print());
 	}
 
