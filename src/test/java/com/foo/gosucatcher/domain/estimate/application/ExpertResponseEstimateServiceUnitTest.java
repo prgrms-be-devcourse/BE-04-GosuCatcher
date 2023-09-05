@@ -83,14 +83,14 @@ class ExpertResponseEstimateServiceUnitTest {
 			.member(member)
 			.storeName("축구 레슨")
 			.location("서울시 강남구")
-			.distance(10)
+			.maxTravelDistance(10)
 			.description("축구 레슨 해드립니다.")
 			.build();
 
 		memberRequestEstimate = MemberRequestEstimate.builder()
 			.member(member)
 			.subItem(subItem)
-			.startDate(LocalDateTime.now().plusDays(1))
+			.preferredStartDate(LocalDateTime.now().plusDays(1))
 			.detailedDescription("메시가 되고 싶어요")
 			.build();
 
