@@ -3,7 +3,7 @@ package com.foo.gosucatcher.global.error;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+@@Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
 
