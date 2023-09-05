@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.item.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,7 +26,7 @@ public class SubItem extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "main_item_id")
 	private MainItem mainItem;
 
@@ -38,5 +39,10 @@ public class SubItem extends BaseEntity {
 		this.mainItem = mainItem;
 		this.name = name;
 		this.description = description;
+	}
+
+	public void update(SubItem subItem) {
+		this.name = subItem.getName();
+		this.description = subItem.getDescription();
 	}
 }
