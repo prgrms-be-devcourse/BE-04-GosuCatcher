@@ -19,6 +19,7 @@ import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,7 +35,8 @@ public class ExpertService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
-		duplicatedNameCheck(request.storeName());
+		duplicatedStoreNameCheck(request.storeName());
+		checkMaxTravelDistance(request.maxTravelDistance());
 
 		Expert newExpert = ExpertCreateRequest.toExpert(member, request);
 		expertRepository.save(newExpert);
@@ -62,7 +64,8 @@ public class ExpertService {
 		Expert existingExpert = expertRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		duplicatedNameCheck(request.storeName());
+		duplicatedStoreNameCheck(request.storeName());
+		checkMaxTravelDistance(request.maxTravelDistance());
 
 		Expert updatedExpert = ExpertUpdateRequest.toExpert(request);
 		existingExpert.updateExpert(updatedExpert);
@@ -77,10 +80,16 @@ public class ExpertService {
 		expertRepository.delete(expert);
 	}
 
-	private void duplicatedNameCheck(String storeName) {
+	private void duplicatedStoreNameCheck(String storeName) {
 		Optional<Expert> existingExpert = expertRepository.findByStoreName(storeName);
 		if (existingExpert.isPresent()) {
 			throw new BusinessException(ErrorCode.DUPLICATED_EXPERT_STORENAME);
+		}
+	}
+
+	private void checkMaxTravelDistance(int maxTravelDistance) {
+		if (maxTravelDistance < 0) {
+			throw new InvalidValueException(ErrorCode.INVALID_MAX_TRAVEL_DISTANCE);
 		}
 	}
 }
