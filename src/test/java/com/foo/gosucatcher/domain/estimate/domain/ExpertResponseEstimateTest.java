@@ -28,7 +28,7 @@ class ExpertResponseEstimateTest {
 
 		memberRequestEstimate = MemberRequestEstimate.builder()
 			.location("Location")
-			.startDate(LocalDateTime.now().plusDays(1))
+			.preferredStartDate(LocalDateTime.now().plusDays(1))
 			.detailedDescription("Description")
 			.build();
 	}
