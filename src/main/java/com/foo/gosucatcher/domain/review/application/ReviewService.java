@@ -50,10 +50,6 @@ public class ReviewService {
 	public ReviewResponses findAll() {
 		List<Review> reviews = reviewRepository.findAll();
 
-		if (reviews.isEmpty()) {
-			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
-		}
-
 		return ReviewResponses.from(reviews);
 	}
 
