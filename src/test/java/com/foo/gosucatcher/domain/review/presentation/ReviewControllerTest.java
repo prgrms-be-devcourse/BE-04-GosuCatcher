@@ -44,7 +44,7 @@ class ControllerTest {
 	@DisplayName("<리뷰 등록>")
 	class createTest {
 
-		@DisplayName("성공")
+		@DisplayName("성공 - 리뷰를 추가할 수 있다")
 		@Test
 		void create() throws Exception {
 
@@ -113,7 +113,7 @@ class ControllerTest {
 	@DisplayName("<리뷰 검색/조회>")
 	class FindTest {
 
-		@DisplayName("[성공] 특정 고수에 대한 리뷰를 모두 조회할 수 있다")
+		@DisplayName("성공 - 특정 고수에 대한 리뷰를 모두 조회할 수 있다")
 		@Test
 		void findByExpertId() throws Exception {
 
@@ -153,7 +153,7 @@ class ControllerTest {
 					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
-		@DisplayName("[실패] 특정 고수에 대한 리뷰가 존재하지 않는 경우 에러가 발생한다")
+		@DisplayName("실패 - 특정 고수에 대한 리뷰가 존재하지 않는 경우 에러가 발생한다")
 		@Test
 		void findByExpertIdFailed_empty() throws Exception {
 
@@ -169,7 +169,7 @@ class ControllerTest {
 					.andExpect(jsonPath("$.code").value("R001"));
 		}
 
-		@DisplayName("[성공] 리뷰를 모두 조회할 수 있다")
+		@DisplayName("성공 - 리뷰를 모두 조회할 수 있다")
 		@Test
 		void findAll() throws Exception {
 
@@ -206,12 +206,11 @@ class ControllerTest {
 					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
-		@DisplayName("[성공] 리뷰를 아이디로 조회할 수 있다")
+		@DisplayName("성공 - 리뷰를 아이디로 조회할 수 있다")
 		@Test
 		void findById() throws Exception {
 
 			// given
-			// ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 
 			long id = 1L;
