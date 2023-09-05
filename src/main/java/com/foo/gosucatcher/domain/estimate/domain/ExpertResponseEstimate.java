@@ -38,13 +38,11 @@ public class ExpertResponseEstimate extends BaseEntity {
 	@JoinColumn(name = "member_request_estimate_id")
 	private MemberRequestEstimate memberRequestEstimate;
 
-	@Column(nullable = false)
 	private int totalCost;
 
 	@Column(nullable = false)
 	private String description;
 
-	@Column(nullable = false)
 	private boolean isOftenUsed;
 
 	@Builder
@@ -66,7 +64,7 @@ public class ExpertResponseEstimate extends BaseEntity {
 
 	private int checkInvalidTotalCost(int totalCost) {
 		if (totalCost <= 0) {
-			throw new BusinessException(ErrorCode.NOT_FOUND_MAIN_ITEM);
+			throw new BusinessException(ErrorCode.TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO);
 		}
 
 		return totalCost;

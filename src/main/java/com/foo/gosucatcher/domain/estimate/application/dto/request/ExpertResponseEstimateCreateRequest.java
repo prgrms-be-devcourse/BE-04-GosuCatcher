@@ -13,14 +13,14 @@ public record ExpertResponseEstimateCreateRequest(
 	Long memberRequestEstimateId,
 
 	@NotNull(message = "총 비용을 입력하세요.")
-	int totalCost,
+	Integer totalCost,
 
 	@NotBlank(message = "견적서를 설명해주세요.")
 	@Size(min = 6, message = "견적서에 대한 설명은 6자 이상 적어주세요.")
 	String description,
 
 	@NotNull(message = "자주 사용하는 견적서로 등록할 유무를 알려주세요.")
-	boolean isOftenUsed
+	Boolean isOftenUsed
 ) {
 
 	public static ExpertResponseEstimate toExpertResponseEstimate(

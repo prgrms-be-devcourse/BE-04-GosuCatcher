@@ -29,7 +29,6 @@ public class ExpertResponseEstimateController {
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ExpertResponseEstimateResponse> create(@PathVariable Long expertId,
 		@Validated @RequestBody ExpertResponseEstimateCreateRequest request) {
-
 		ExpertResponseEstimateResponse expertResponseEstimateResponse = expertResponseEstimateService.create(expertId,
 			request);
 
@@ -53,7 +52,6 @@ public class ExpertResponseEstimateController {
 	@PatchMapping("/{id}")
 	public ResponseEntity<Long> update(@PathVariable Long id,
 		@Validated @RequestBody ExpertResponseEstimateUpdateRequest request) {
-
 		Long updatedId = expertResponseEstimateService.update(id, request);
 
 		return ResponseEntity.ok(updatedId);
