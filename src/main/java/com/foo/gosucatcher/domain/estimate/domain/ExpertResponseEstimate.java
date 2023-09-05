@@ -38,11 +38,15 @@ public class ExpertResponseEstimate extends BaseEntity {
 
 	private String description;
 
+	private boolean isOftenUsed;
+
 	@Builder
-	public ExpertResponseEstimate(Expert expert, MemberRequestEstimate memberRequestEstimate, int cost, String description) {
+	public ExpertResponseEstimate(Expert expert, MemberRequestEstimate memberRequestEstimate, int cost,
+		String description) {
 		this.expert = expert;
 		this.memberRequestEstimate = memberRequestEstimate;
 		this.cost = cost;
 		this.description = description;
+		this.isOftenUsed = false;
 	}
 }
