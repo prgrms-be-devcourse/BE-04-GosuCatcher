@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.likes.presentation;
+package com.foo.gosucatcher.domain.buckets.presentation;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -17,17 +17,17 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.likes.application.LikesService;
-import com.foo.gosucatcher.domain.likes.dto.request.LikesRequest;
-import com.foo.gosucatcher.domain.likes.dto.response.LikesResponse;
-import com.foo.gosucatcher.domain.likes.dto.response.LikesResponses;
+import com.foo.gosucatcher.domain.buckets.application.BucketService;
+import com.foo.gosucatcher.domain.buckets.dto.request.BucketRequest;
+import com.foo.gosucatcher.domain.buckets.dto.response.BucketResponse;
+import com.foo.gosucatcher.domain.buckets.dto.response.BucketsResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(LikesController.class)
-class LikesControllerTest {
+@WebMvcTest(BucketController.class)
+class BucketControllerTest {
 
-	String apiBaseUrl = "/api/v1/likes";
+	String apiBaseUrl = "/api/v1/buckets";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -36,24 +36,24 @@ class LikesControllerTest {
 	private ObjectMapper objectMapper;
 
 	@MockBean
-	private LikesService likesService;
+	private BucketService bucketService;
 
 	@Test
 	@DisplayName("찜 내역을 모두 조회할 수 있다")
 	void findAll() throws Exception {
 		// given
-		LikesResponses likesResponses = new LikesResponses(List.of(new LikesResponse(1L, 2L, 3L)));
-		given(likesService.findAll())
-				.willReturn(likesResponses);
+		BucketsResponse bucketsResponse = new BucketsResponse(List.of(new BucketResponse(1L, 2L, 3L)));
+		given(bucketService.findAll())
+				.willReturn(bucketsResponse);
 
 		// when
 		// then
 		mockMvc.perform(get(apiBaseUrl)
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.likesResponses[0].id").value(1L))
-				.andExpect(jsonPath("$.likesResponses[0].expertId").value(2L))
-				.andExpect(jsonPath("$.likesResponses[0].memberId").value(3L));
+				.andExpect(jsonPath("$.responses[0].id").value(1L))
+				.andExpect(jsonPath("$.responses[0].expertId").value(2L))
+				.andExpect(jsonPath("$.responses[0].memberId").value(3L));
 	}
 
 	@Test
@@ -61,16 +61,16 @@ class LikesControllerTest {
 	void like() throws Exception {
 
 		// given
-		LikesRequest likesRequest = new LikesRequest(1L, 2L);
-		LikesResponse likesResponse = new LikesResponse(0L, 1L, 2L);
-		given(likesService.create(any(LikesRequest.class)))
-				.willReturn(likesResponse);
+		BucketRequest bucketRequest = new BucketRequest(1L, 2L);
+		BucketResponse bucketResponse = new BucketResponse(0L, 1L, 2L);
+		given(bucketService.create(any(BucketRequest.class)))
+				.willReturn(bucketResponse);
 
 		// when
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
 						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(likesRequest)))
+						.content(objectMapper.writeValueAsString(bucketRequest)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(0L))
 				.andExpect(jsonPath("$.expertId").value(1L))
@@ -82,12 +82,12 @@ class LikesControllerTest {
 	void checkLikedYN() throws Exception {
 
 		// given
-		LikesRequest likesRequest = new LikesRequest(1L, 2L);
-		likesService.create(likesRequest);
+		BucketRequest bucketRequest = new BucketRequest(1L, 2L);
+		bucketService.create(bucketRequest);
 
 		String expertId = "1";
 		String memberId = "2";
-		given(likesService.checkStatus(any(Long.class), any(Long.class)))
+		given(bucketService.checkStatus(any(Long.class), any(Long.class)))
 				.willReturn(Boolean.TRUE);
 
 		// when
@@ -96,7 +96,7 @@ class LikesControllerTest {
 						.contentType(MediaType.APPLICATION_JSON)
 						.param("expertId", expertId)
 						.param("memberId", memberId)
-						.content(objectMapper.writeValueAsString(likesRequest)))
+						.content(objectMapper.writeValueAsString(bucketRequest)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").value("true"));
 	}
@@ -108,7 +108,7 @@ class LikesControllerTest {
 		// given
 		long id = 0L;
 		doNothing()
-				.when(likesService)
+				.when(bucketService)
 				.deleteById(id);
 
 		// when
@@ -118,7 +118,7 @@ class LikesControllerTest {
 				.andExpect(MockMvcResultMatchers.status().isOk());
 
 		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_LIKES)).
-				when(likesService)
+				when(bucketService)
 				.deleteById(id);
 	}
 }

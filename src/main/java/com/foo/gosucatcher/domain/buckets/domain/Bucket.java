@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.likes.domain;
+package com.foo.gosucatcher.domain.buckets.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,9 +22,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "likes")
+@Table(name = "buckets")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Likes extends BaseEntity {
+public class Bucket extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +39,7 @@ public class Likes extends BaseEntity {
 	private Member member;
 
 	@Builder
-	public Likes(Expert expert, Member member) {
+	public Bucket(Expert expert, Member member) {
 		Long expertMemberId = expert.getMember().getId();
 		Long memberId = member.getId();
 

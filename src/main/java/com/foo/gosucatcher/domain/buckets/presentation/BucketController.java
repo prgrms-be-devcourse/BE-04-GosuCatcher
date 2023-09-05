@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.likes.presentation;
+package com.foo.gosucatcher.domain.buckets.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,44 +10,44 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.foo.gosucatcher.domain.likes.application.LikesService;
-import com.foo.gosucatcher.domain.likes.dto.request.LikesRequest;
-import com.foo.gosucatcher.domain.likes.dto.response.LikesResponse;
-import com.foo.gosucatcher.domain.likes.dto.response.LikesResponses;
+import com.foo.gosucatcher.domain.buckets.application.BucketService;
+import com.foo.gosucatcher.domain.buckets.dto.request.BucketRequest;
+import com.foo.gosucatcher.domain.buckets.dto.response.BucketResponse;
+import com.foo.gosucatcher.domain.buckets.dto.response.BucketsResponse;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/likes")
-public class LikesController {
+@RequestMapping("/api/v1/buckets")
+public class BucketController {
 
-	private final LikesService likesService;
+	private final BucketService bucketService;
 
 	@GetMapping
-	public ResponseEntity<LikesResponses> findAll() {
-		LikesResponses likesResponses = likesService.findAll();
+	public ResponseEntity<BucketsResponse> findAll() {
+		BucketsResponse bucketsResponse = bucketService.findAll();
 
-		return ResponseEntity.ok(likesResponses);
+		return ResponseEntity.ok(bucketsResponse);
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		likesService.deleteById(id);
+		bucketService.deleteById(id);
 
 		return ResponseEntity.ok(null);
 	}
 
 	@PostMapping
-	public ResponseEntity<LikesResponse> create(@RequestBody LikesRequest likesRequest) {
-		LikesResponse likesResponse = likesService.create(likesRequest);
+	public ResponseEntity<BucketResponse> create(@RequestBody BucketRequest bucketRequest) {
+		BucketResponse bucketResponse = bucketService.create(bucketRequest);
 
-		return ResponseEntity.ok(likesResponse);
+		return ResponseEntity.ok(bucketResponse);
 	}
 
 	@GetMapping("/{status}")
 	public ResponseEntity<Boolean> checkStatus(@RequestParam Long expertId, @RequestParam Long memberId) {
-		Boolean status = likesService.checkStatus(expertId, memberId);
+		Boolean status = bucketService.checkStatus(expertId, memberId);
 
 		return ResponseEntity.ok(status);
 	}
