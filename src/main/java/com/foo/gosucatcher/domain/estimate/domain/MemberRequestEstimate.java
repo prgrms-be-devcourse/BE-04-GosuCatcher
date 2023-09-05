@@ -13,6 +13,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -26,6 +29,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Where(clause = "is_closed = false")
+@SQLDelete(sql = "UPDATE member_request_estimates SET is_closed = true WHERE id = ?")
 @Table(name = "member_request_estimates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberRequestEstimate extends BaseEntity {
@@ -51,6 +56,8 @@ public class MemberRequestEstimate extends BaseEntity {
 	@Column(length = 500)
 	private String detailedDescription;
 
+	private boolean isClosed;
+
 	@Builder
 	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
 		String detailedDescription) {
@@ -59,6 +66,7 @@ public class MemberRequestEstimate extends BaseEntity {
 		this.location = location;
 		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
 		this.detailedDescription = detailedDescription;
+		this.isClosed = false;
 	}
 
 	public void update(MemberRequestEstimate memberRequestEstimate) {
@@ -69,7 +77,7 @@ public class MemberRequestEstimate extends BaseEntity {
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
 		if (LocalDateTime.now().isAfter(preferredStartDate)) {
-			throw new BusinessException(ErrorCode.INVALID_START_DATE);
+			throw new BusinessException(ErrorCode.INVALID_MEMBER_REQUEST_ESTIMATE_START_DATE);
 		}
 
 		return preferredStartDate;
