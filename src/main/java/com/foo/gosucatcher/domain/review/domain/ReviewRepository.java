@@ -1,8 +1,10 @@
 package com.foo.gosucatcher.domain.review.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import java.util.List;
 
-@Repository
+import org.springframework.data.jpa.repository.JpaRepository;
+
 public interface ReviewRepository extends JpaRepository<Review, Long> {
+
+	List<Review> findAllByExpertId(Long expertId);
 }
