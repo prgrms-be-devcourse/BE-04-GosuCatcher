@@ -16,7 +16,6 @@ import com.foo.gosucatcher.domain.likes.dto.response.LikesResponse;
 import com.foo.gosucatcher.domain.likes.dto.response.LikesResponses;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
-import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -51,8 +50,8 @@ public class LikesService {
 
 	public LikesResponse create(LikesRequest likesRequest) {
 		Member member = memberRepository.findById(likesRequest.memberId())
-				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-		Expert expert = expertRepository.findById(likesRequest.memberId())
+				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+		Expert expert = expertRepository.findById(likesRequest.expertId())
 				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		Likes likes = LikesRequest.toLikes(member, expert);
@@ -65,8 +64,8 @@ public class LikesService {
 	@Transactional(readOnly = true)
 	public Boolean checkStatus(LikesRequest likesRequest) {
 		Member member = memberRepository.findById(likesRequest.memberId())
-				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-		Expert expert = expertRepository.findById(likesRequest.memberId())
+				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+		Expert expert = expertRepository.findById(likesRequest.expertId())
 				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		return likesRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
