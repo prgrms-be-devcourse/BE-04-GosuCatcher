@@ -4,12 +4,12 @@ import java.util.List;
 
 import com.foo.gosucatcher.domain.review.domain.Review;
 
-public record ReviewResponses(
+public record ReviewsResponse(
 		List<ReviewResponse> reviewResponses
 ) {
 
-	public static ReviewResponses from(List<Review> reviews) {
-		return new ReviewResponses(
+	public static ReviewsResponse from(List<Review> reviews) {
+		return new ReviewsResponse(
 				reviews.stream()
 						.map(ReviewResponse::from)
 						.toList());

@@ -22,7 +22,7 @@ import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
-import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponses;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -130,7 +130,7 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
-			ReviewResponses reviewResponses = new ReviewResponses(
+			ReviewsResponse reviewsResponse = new ReviewsResponse(
 					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
 							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
 			);
@@ -139,7 +139,7 @@ class ReviewControllerTest {
 			long expertId = 1L;
 
 			given(reviewService.findByExpertId(any()))
-					.willReturn(reviewResponses);
+					.willReturn(reviewsResponse);
 
 			// when
 			// then
@@ -187,7 +187,7 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
-			ReviewResponses reviewResponses = new ReviewResponses(
+			ReviewsResponse reviewsResponse = new ReviewsResponse(
 					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
 							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
 			);
@@ -196,7 +196,7 @@ class ReviewControllerTest {
 			long subItemId = 1L;
 
 			given(reviewService.findAll())
-					.willReturn(reviewResponses);
+					.willReturn(reviewsResponse);
 
 			// when
 			// then

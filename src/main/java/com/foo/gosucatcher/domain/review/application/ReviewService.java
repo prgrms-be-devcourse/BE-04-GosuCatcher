@@ -14,7 +14,7 @@ import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
-import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponses;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 import com.foo.gosucatcher.domain.review.domain.Review;
 import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -47,21 +47,21 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewResponses findAll() {
+	public ReviewsResponse findAll() {
 		List<Review> reviews = reviewRepository.findAll();
 
-		return ReviewResponses.from(reviews);
+		return ReviewsResponse.from(reviews);
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewResponses findByExpertId(Long expertId) {
+	public ReviewsResponse findByExpertId(Long expertId) {
 		List<Review> reviews = reviewRepository.findAllByExpertId(expertId);
 
 		if (reviews.isEmpty()) {
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
 		}
 
-		return ReviewResponses.from(reviews);
+		return ReviewsResponse.from(reviews);
 	}
 
 	@Transactional(readOnly = true)

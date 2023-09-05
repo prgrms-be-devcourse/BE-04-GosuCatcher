@@ -16,7 +16,7 @@ import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
-import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponses;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,17 +38,17 @@ public class ReviewController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ReviewResponses> findAll() {
-		ReviewResponses reviewResponses = reviewService.findAll();
+	public ResponseEntity<ReviewsResponse> findAll() {
+		ReviewsResponse reviewsResponse = reviewService.findAll();
 
-		return ResponseEntity.ok(reviewResponses);
+		return ResponseEntity.ok(reviewsResponse);
 	}
 
 	@GetMapping("/experts/{expertId}")
-	public ResponseEntity<ReviewResponses> findByExpertId(@PathVariable Long expertId) {
-		ReviewResponses reviewResponses = reviewService.findByExpertId(expertId);
+	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId) {
+		ReviewsResponse reviewsResponse = reviewService.findByExpertId(expertId);
 
-		return ResponseEntity.ok(reviewResponses);
+		return ResponseEntity.ok(reviewsResponse);
 	}
 
 	@GetMapping("/{id}")
