@@ -50,7 +50,6 @@ public enum ErrorCode {
 	// 찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
 	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다.");
-	;
 
 	private final String code;
 	private final String message;
