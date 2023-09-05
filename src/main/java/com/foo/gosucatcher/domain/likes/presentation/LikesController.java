@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foo.gosucatcher.domain.likes.application.LikesService;
@@ -44,9 +45,9 @@ public class LikesController {
 		return ResponseEntity.ok(likesResponse);
 	}
 
-	@PostMapping("/{status}")
-	public ResponseEntity<Boolean> checkStatus(@RequestBody LikesRequest likesRequest) {
-		Boolean status = likesService.checkStatus(likesRequest);
+	@GetMapping("/{status}")
+	public ResponseEntity<Boolean> checkStatus(@RequestParam Long expertId, @RequestParam Long memberId) {
+		Boolean status = likesService.checkStatus(expertId, memberId);
 
 		return ResponseEntity.ok(status);
 	}

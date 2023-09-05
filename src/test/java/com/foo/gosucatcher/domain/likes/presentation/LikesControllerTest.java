@@ -85,14 +85,17 @@ class LikesControllerTest {
 		LikesRequest likesRequest = new LikesRequest(1L, 2L);
 		likesService.create(likesRequest);
 
-		LikesResponse likesResponse = new LikesResponse(0L, 1L, 2L);
-		given(likesService.checkStatus(any(LikesRequest.class)))
+		String expertId = "1";
+		String memberId = "2";
+		given(likesService.checkStatus(any(Long.class), any(Long.class)))
 				.willReturn(Boolean.TRUE);
 
 		// when
 		// then
-		mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/status")
+		mockMvc.perform(get(apiBaseUrl + "/status")
 						.contentType(MediaType.APPLICATION_JSON)
+						.param("expertId", expertId)
+						.param("memberId", memberId)
 						.content(objectMapper.writeValueAsString(likesRequest)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").value("true"));

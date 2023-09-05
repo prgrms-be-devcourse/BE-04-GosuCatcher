@@ -33,10 +33,6 @@ public class LikesService {
 	public LikesResponses findAll() {
 		List<Likes> likes = likesRepository.findAll();
 
-		if (likes.isEmpty()) {
-			throw new EntityNotFoundException(NOT_FOUND_LIKES);
-		}
-
 		return LikesResponses.from(likes);
 	}
 
@@ -62,10 +58,10 @@ public class LikesService {
 	}
 
 	@Transactional(readOnly = true)
-	public Boolean checkStatus(LikesRequest likesRequest) {
-		Member member = memberRepository.findById(likesRequest.memberId())
+	public Boolean checkStatus(Long expertId, Long memberId) {
+		Member member = memberRepository.findById(memberId)
 				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
-		Expert expert = expertRepository.findById(likesRequest.expertId())
+		Expert expert = expertRepository.findById(expertId)
 				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		return likesRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
