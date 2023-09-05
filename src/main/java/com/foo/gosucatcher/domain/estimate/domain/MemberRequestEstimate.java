@@ -48,6 +48,7 @@ public class MemberRequestEstimate extends BaseEntity {
 	@Column(nullable = false)
 	private LocalDateTime preferredStartDate;
 
+	@Column(length = 500)
 	private String detailedDescription;
 
 	@Builder

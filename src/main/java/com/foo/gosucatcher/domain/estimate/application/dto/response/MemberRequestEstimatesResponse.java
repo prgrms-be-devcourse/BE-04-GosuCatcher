@@ -9,6 +9,7 @@ public record MemberRequestEstimatesResponse(
 ) {
 
 	public static MemberRequestEstimatesResponse from(List<MemberRequestEstimate> memberRequestEstimates) {
+
 		return new MemberRequestEstimatesResponse(
 			memberRequestEstimates.stream().map(MemberRequestEstimateResponse::from).toList());
 	}

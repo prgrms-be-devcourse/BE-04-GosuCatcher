@@ -14,6 +14,7 @@ public record MemberRequestEstimateResponse(
 ) {
 
 	public static MemberRequestEstimateResponse from(MemberRequestEstimate memberRequestEstimate) {
+
 		return new MemberRequestEstimateResponse(memberRequestEstimate.getId(),
 			memberRequestEstimate.getMember().getId(), memberRequestEstimate.getSubItem().getId(),
 			memberRequestEstimate.getLocation(), memberRequestEstimate.getPreferredStartDate(),
