@@ -13,7 +13,7 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
 import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.NotSupportedLikesException;
+import com.foo.gosucatcher.global.error.exception.NotSupportedBucketException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -44,7 +44,7 @@ public class Bucket extends BaseEntity {
 		Long memberId = member.getId();
 
 		if (memberId.equals(expertMemberId)) {
-			throw new NotSupportedLikesException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
+			throw new NotSupportedBucketException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;
