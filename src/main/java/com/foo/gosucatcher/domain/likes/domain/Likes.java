@@ -11,6 +11,7 @@ import javax.persistence.Table;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.global.BaseEntity;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.NotSupportedLikesException;
 
@@ -23,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "likes")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Likes {
+public class Likes extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +40,13 @@ public class Likes {
 
 	@Builder
 	public Likes(Expert expert, Member member) {
-		if (member.getId().equals(expert.getMember().getId())) {
+		Long expertId = expert.getMember().getId();
+		Long memberId = member.getId();
+
+		if (memberId.equals(expertId)) {
 			throw new NotSupportedLikesException(ErrorCode.NOT_SUPPORTED_SELF_LIKES);
 		}
+
 		this.expert = expert;
 		this.member = member;
 	}
