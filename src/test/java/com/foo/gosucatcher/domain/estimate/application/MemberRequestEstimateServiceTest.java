@@ -66,7 +66,7 @@ class MemberRequestEstimateServiceTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.preferredStartDate(LocalDateTime.now().plusDays(1))
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
 			.detailedDescription("추가 내용")
 			.build();
 	}
@@ -125,7 +125,7 @@ class MemberRequestEstimateServiceTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포2동")
-			.preferredStartDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
 			.detailedDescription("추가 내용2")
 			.build();
 

@@ -48,10 +48,10 @@ class MemberRequestEstimateControllerTest {
 		Long subItemId = 1L;
 
 		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId,
-			"서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
+			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
-			subItemId, "서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
+			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
 		when(memberRequestEstimateService.create(memberId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateResponse);
@@ -76,10 +76,10 @@ class MemberRequestEstimateControllerTest {
 		Long memberId = 1L;
 		Long subItemId = 1L;
 		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, " ",
-			LocalDateTime.now(), "추가 내용");
+			LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
-			subItemId, " ", LocalDateTime.now(), "추가 내용");
+			subItemId, " ", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		when(memberRequestEstimateService.create(memberId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateResponse);
@@ -117,7 +117,7 @@ class MemberRequestEstimateControllerTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.preferredStartDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
 			.detailedDescription("추가 내용")
 			.build();
 
@@ -157,7 +157,7 @@ class MemberRequestEstimateControllerTest {
 			.member(member)
 			.subItem(subItem)
 			.location("서울 강남구 개포1동")
-			.preferredStartDate(LocalDateTime.now())
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
 			.detailedDescription("추가 내용")
 			.build();
 
@@ -186,7 +186,7 @@ class MemberRequestEstimateControllerTest {
 		Long subItemId = 1L;
 
 		MemberRequestEstimateResponse memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, memberId,
-			subItemId, "서울 강남구 개포1동", LocalDateTime.now(), "추가 내용");
+			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		when(memberRequestEstimateService.findById(memberRequestEstimateId)).thenReturn(memberRequestEstimateResponse);
 
@@ -227,7 +227,7 @@ class MemberRequestEstimateControllerTest {
 		Long subItemId = 1L;
 
 		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
-			LocalDateTime.now(), "수정 내용");
+			LocalDateTime.now().plusDays(3), "수정 내용");
 
 		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateId);
@@ -247,7 +247,7 @@ class MemberRequestEstimateControllerTest {
 		Long subItemId = 1L;
 
 		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, " ",
-			LocalDateTime.now(), "수정 내용");
+			LocalDateTime.now().plusDays(3), "수정 내용");
 
 		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
 			memberRequestEstimateId);
