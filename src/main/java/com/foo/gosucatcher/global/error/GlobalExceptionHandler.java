@@ -14,29 +14,29 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 public class GlobalExceptionHandler {
 
 	@ExceptionHandler(EntityNotFoundException.class)
-	public ResponseEntity<ErrorResponse> entityNotFoundException(EntityNotFoundException e) {
+	public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(InvalidValueException.class)
-	public ResponseEntity<ErrorResponse> invalidValueException(InvalidValueException e) {
+	public ResponseEntity<ErrorResponse> handleInvalidValueException(InvalidValueException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(BusinessException.class)
-	public ResponseEntity<ErrorResponse> businessException(BusinessException e) {
+	public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
-	public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e) {
-		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR, e.getBindingResult());
+	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
