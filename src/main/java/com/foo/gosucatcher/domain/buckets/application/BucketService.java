@@ -38,7 +38,7 @@ public class BucketService {
 
 	public void deleteById(Long id) {
 		if (bucketRepository.findById(id).isEmpty()) {
-			throw new EntityNotFoundException(NOT_FOUND_LIKES);
+			throw new EntityNotFoundException(NOT_FOUND_BUCKET);
 		}
 
 		bucketRepository.deleteById(id);

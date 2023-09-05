@@ -44,7 +44,7 @@ public class Bucket extends BaseEntity {
 		Long memberId = member.getId();
 
 		if (memberId.equals(expertMemberId)) {
-			throw new NotSupportedLikesException(ErrorCode.NOT_SUPPORTED_SELF_LIKES);
+			throw new NotSupportedLikesException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;

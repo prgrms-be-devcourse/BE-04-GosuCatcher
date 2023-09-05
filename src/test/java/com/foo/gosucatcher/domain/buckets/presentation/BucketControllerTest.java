@@ -117,7 +117,7 @@ class BucketControllerTest {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 
-		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_LIKES)).
+		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_BUCKET)).
 				when(bucketService)
 				.deleteById(id);
 	}

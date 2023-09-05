@@ -46,8 +46,8 @@ public enum ErrorCode {
 	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("ERE002", "총 금액은 0원보다 적을 수 없습니다."),
 
 	// 찜
-	NOT_FOUND_LIKES("L001", "찜 내역이 존재하지 않습니다."),
-	NOT_SUPPORTED_SELF_LIKES("L002", "자기 자신을 찜할 수 없습니다.");
+	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
+	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다.");
 
 	private final String code;
 	private final String message;
