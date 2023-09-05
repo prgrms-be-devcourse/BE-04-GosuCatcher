@@ -47,7 +47,7 @@ class SubItemControllerTest {
 
 	@BeforeEach
 	void setUp() {
-		subItemCreateRequest = new SubItemCreateRequest(1L, "청소 알바", "청소 설명");
+		subItemCreateRequest = new SubItemCreateRequest(1L, "청소 알바", "청소 설명 입니다.");
 	}
 
 	@Test
@@ -55,7 +55,7 @@ class SubItemControllerTest {
 	void createSubItemSuccessTest() throws Exception {
 
 		//given
-		SubItemResponse subItemResponse = new SubItemResponse(1L, "알바", "청소 알바", "설명");
+		SubItemResponse subItemResponse = new SubItemResponse(1L, "알바", "청소 알바", "청소 설명 입니다.");
 
 		given(subItemService.create(any())).willReturn(subItemResponse);
 
@@ -66,7 +66,7 @@ class SubItemControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.mainItemName").value("알바"))
 			.andExpect(jsonPath("$.name").value("청소 알바"))
-			.andExpect(jsonPath("$.description").value("설명"))
+			.andExpect(jsonPath("$.description").value("청소 설명 입니다."))
 			.andDo(print());
 	}
 
@@ -95,7 +95,7 @@ class SubItemControllerTest {
 	void createSubItemFailTest_duplicatedName() throws Exception {
 
 		//given
-		SubItemCreateRequest duplicatedSubItemCreateRequest = new SubItemCreateRequest(1L, "청소 알바", "청소 설명");
+		SubItemCreateRequest duplicatedSubItemCreateRequest = new SubItemCreateRequest(1L, "청소 알바", "설명을적습니다.");
 
 		given(subItemService.create(any()))
 			.willThrow(new BusinessException(ErrorCode.DUPLICATED_SUB_ITEM_NAME));
@@ -117,7 +117,7 @@ class SubItemControllerTest {
 	void createSubItemFailTest_invalidValue() throws Exception {
 
 		//given
-		SubItemCreateRequest invalidSubItemCreateRequest = new SubItemCreateRequest(1L, "@#@#", "청소 설명");
+		SubItemCreateRequest invalidSubItemCreateRequest = new SubItemCreateRequest(1L, "@#@#", "청소 설명 입니다.");
 
 		//when -> then
 		mockMvc.perform(post("/api/v1/sub-items")
@@ -136,7 +136,7 @@ class SubItemControllerTest {
 	@DisplayName("하위 서비스 전체 조회")
 	void findAllSuccessTest() throws Exception {
 
-		//given
+		//givenR
 		SubItemsResponse subItemsResponse = new SubItemsResponse(
 			List.of(new SubItemResponse(1L, "알바", "청소 알바", "청소 알바 설명")));
 		given(subItemService.findAll()).willReturn(subItemsResponse);
@@ -191,8 +191,8 @@ class SubItemControllerTest {
 	void updateSubItemSuccessTest() throws Exception {
 
 		//given
-		SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest("축구 레슨", "내용 변경");
-		SubItemResponse subItemResponse = new SubItemResponse(1L, "레슨", "축구 레슨", "내용변경");
+		SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest("축구 레슨", "설명을적습니다.");
+		SubItemResponse subItemResponse = new SubItemResponse(1L, "레슨", "축구 레슨", "수정된설명을적습니다.");
 
 		given(subItemService.update(anyLong(), any()))
 			.willReturn(subItemResponse.id());

@@ -48,8 +48,8 @@ class MainItemControllerTest {
 	void createMainItemSuccessTest() throws Exception {
 
 		//given
-		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest("알바", "설명");
-		MainItemResponse mainItemResponse = new MainItemResponse(1L, "알바", "설명");
+		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest("알바", "설명을적습니다.");
+		MainItemResponse mainItemResponse = new MainItemResponse(1L, "알바", "설명을적습니다.");
 
 		given(mainItemService.create(any()))
 			.willReturn(mainItemResponse);
@@ -60,7 +60,7 @@ class MainItemControllerTest {
 				.content(objectMapper.writeValueAsString(mainItemCreateRequest)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.name").value("알바"))
-			.andExpect(jsonPath("$.description").value("설명"))
+			.andExpect(jsonPath("$.description").value("설명을적습니다."))
 			.andDo(print());
 	}
 
@@ -69,7 +69,7 @@ class MainItemControllerTest {
 	void createMainItemFailTest_duplicatedName() throws Exception {
 
 		//given
-		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest("알바", "설명");
+		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest("알바", "내용변경입니다.");
 
 		given(mainItemService.create(any()))
 			.willThrow(new BusinessException(ErrorCode.DUPLICATED_MAIN_ITEM_NAME));
@@ -91,7 +91,7 @@ class MainItemControllerTest {
 	void createMainItemFailTest_invalidValue() throws Exception {
 
 		//given
-		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest(" ", "설명");
+		MainItemCreateRequest mainItemCreateRequest = new MainItemCreateRequest(" ", "설명을적습니다.");
 
 		//when -> then
 		mockMvc.perform(post("/api/v1/main-items")
@@ -167,8 +167,8 @@ class MainItemControllerTest {
 	void updateMainItemSuccessTest() throws Exception {
 
 		//given
-		MainItemUpdateRequest mainItemUpdateRequest = new MainItemUpdateRequest("레슨", "내용변경");
-		MainItemResponse mainItemResponse = new MainItemResponse(1L, "레슨", "내용변경");
+		MainItemUpdateRequest mainItemUpdateRequest = new MainItemUpdateRequest("레슨", "내용변경입니다.");
+		MainItemResponse mainItemResponse = new MainItemResponse(1L, "레슨", "내용변경입니다.");
 		given(mainItemService.update(anyLong(), any()))
 			.willReturn(mainItemResponse.id());
 
