@@ -19,7 +19,7 @@ import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
-import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsSliceResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,39 +29,38 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private final ReviewService reviewService;
+	private final int DEFAULT_PAGING_SIZE = 3;
 
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ReviewResponse> create(
-			@PathVariable Long expertId,
-			@RequestParam Long subItemId,
-			@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
+		@PathVariable Long expertId,
+		@RequestParam Long subItemId,
+		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
 		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
 
 		return ResponseEntity.ok(reviewResponse);
 	}
 
 	@GetMapping
-	public ResponseEntity<ReviewsResponse> findAll(
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
-			Pageable pageable) {
-		ReviewsResponse reviewsResponse = reviewService.findAll(pageable);
+	public ResponseEntity<ReviewsSliceResponse> findAll(
+		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+		Pageable pageable) {
+		ReviewsSliceResponse response = reviewService.findAll(pageable);
 
-		return ResponseEntity.ok(reviewsResponse);
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/experts/{expertId}")
-	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId,
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
-			Pageable pageable) {
-		ReviewsResponse reviewsResponse = reviewService.findByExpertId(pageable, expertId);
-		return ResponseEntity.ok(reviewsResponse);
+	public ResponseEntity<ReviewsSliceResponse> findAllByExpertId(@PathVariable Long expertId,
+		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+		Pageable pageable) {
+		ReviewsSliceResponse response = reviewService.findAllByExpertId(pageable, expertId);
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id,
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
-			Pageable pageable) {
-		ReviewResponse reviewResponse = reviewService.findById(id, pageable);
+	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
+		ReviewResponse reviewResponse = reviewService.findById(id);
 
 		return ResponseEntity.ok(reviewResponse);
 	}
