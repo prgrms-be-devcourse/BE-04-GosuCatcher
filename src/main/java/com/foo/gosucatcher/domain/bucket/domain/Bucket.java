@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.buckets.domain;
+package com.foo.gosucatcher.domain.bucket.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "buckets")
+@Table(name = "bucket")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends BaseEntity {
 

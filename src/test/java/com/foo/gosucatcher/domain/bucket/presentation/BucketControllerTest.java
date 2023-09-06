@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.buckets.presentation;
+package com.foo.gosucatcher.domain.bucket.presentation;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -17,10 +17,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.buckets.application.BucketService;
-import com.foo.gosucatcher.domain.buckets.dto.request.BucketRequest;
-import com.foo.gosucatcher.domain.buckets.dto.response.BucketResponse;
-import com.foo.gosucatcher.domain.buckets.dto.response.BucketsResponse;
+import com.foo.gosucatcher.domain.bucket.application.BucketService;
+import com.foo.gosucatcher.domain.bucket.dto.request.BucketRequest;
+import com.foo.gosucatcher.domain.bucket.dto.response.BucketResponse;
+import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 

@@ -1,6 +1,6 @@
-package com.foo.gosucatcher.domain.buckets.dto.request;
+package com.foo.gosucatcher.domain.bucket.dto.request;
 
-import com.foo.gosucatcher.domain.buckets.domain.Bucket;
+import com.foo.gosucatcher.domain.bucket.domain.Bucket;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 

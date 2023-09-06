@@ -1,8 +1,8 @@
-package com.foo.gosucatcher.domain.buckets.dto.response;
+package com.foo.gosucatcher.domain.bucket.dto.response;
 
 import java.util.List;
 
-import com.foo.gosucatcher.domain.buckets.domain.Bucket;
+import com.foo.gosucatcher.domain.bucket.domain.Bucket;
 
 public record BucketsResponse(
 		List<BucketResponse> responses
