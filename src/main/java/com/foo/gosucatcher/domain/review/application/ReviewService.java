@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.review.application;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -14,7 +15,7 @@ import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
-import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsSliceResponse;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 import com.foo.gosucatcher.domain.review.domain.Review;
 import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -47,17 +48,17 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewsSliceResponse findAll(Pageable pageable) {
-		Slice<Review> reviews = reviewRepository.findAll(pageable);
+	public ReviewsResponse findAll(Pageable pageable) {
+		Page<Review> reviews = reviewRepository.findAll(pageable);
 
-		return ReviewsSliceResponse.from(reviews);
+		return ReviewsResponse.from(reviews);
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewsSliceResponse findAllByExpertId(Pageable pageable, Long expertId) {
+	public ReviewsResponse findAllByExpertId(Pageable pageable, Long expertId) {
 		Slice<Review> reviews = reviewRepository.findAllByExpertId(expertId, pageable);
 
-		return ReviewsSliceResponse.from(reviews);
+		return ReviewsResponse.from(reviews);
 	}
 
 	@Transactional(readOnly = true)
