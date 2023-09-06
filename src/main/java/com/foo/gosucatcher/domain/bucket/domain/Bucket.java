@@ -9,6 +9,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -22,7 +25,9 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
-@Table(name = "bucket")
+@Table(name = "buckets")
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE buckets SET is_deleted = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends BaseEntity {
 
