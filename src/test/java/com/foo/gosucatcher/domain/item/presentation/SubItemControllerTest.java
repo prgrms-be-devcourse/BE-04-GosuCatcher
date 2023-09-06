@@ -3,9 +3,12 @@ package com.foo.gosucatcher.domain.item.presentation;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.item.application.SubItemService;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemSliceRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemSliceResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -182,6 +185,31 @@ class SubItemControllerTest {
                 .andExpect(jsonPath("$.code").value("SI002"))
                 .andExpect(jsonPath("$.errors").isEmpty())
                 .andExpect(jsonPath("$.message").value("하위 서비스 이름이 중복될 수 없습니다."))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("메인 서비스 이름으로 하위 서비스들 검색")
+    void findAllSubItemsByMainItemName() throws Exception {
+
+        //given
+        String mainItemName = "청소";
+        int page = 0;
+        int size = 10;
+        SubItemsSliceResponse subItemsSliceResponse = new SubItemsSliceResponse(List.of(new SubItemSliceResponse(1L, "화장실 청소", "화장실 청소 설명")), false);
+
+        given(subItemService.findAllByMainItemName(mainItemName, new SubItemSliceRequest(page, size)))
+                .willReturn(subItemsSliceResponse);
+
+        //when -> then
+        mockMvc.perform(get("/api/v1/sub-items/mainItem")
+                        .param("mainItemName", mainItemName)
+                        .param("page", String.valueOf(page))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.subItemSlicesResponse.[0].id").value(1))
+                .andExpect(jsonPath("$.subItemSlicesResponse.[0].name").value("화장실 청소"))
+                .andExpect(jsonPath("$.hasNext").isBoolean())
                 .andDo(print());
     }
 
