@@ -43,6 +43,8 @@ public class Bucket extends BaseEntity {
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	private final boolean isDeleted = false;
+
 	@Builder
 	public Bucket(Expert expert, Member member) {
 		Long expertMemberId = expert.getMember().getId();
