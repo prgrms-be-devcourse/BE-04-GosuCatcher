@@ -1,14 +1,12 @@
 package com.foo.gosucatcher.domain.item.application;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemSliceRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemSliceResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
@@ -16,67 +14,82 @@ import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class SubItemService {
 
-	private final SubItemRepository subItemRepository;
-	private final MainItemRepository mainItemRepository;
+    private final SubItemRepository subItemRepository;
+    private final MainItemRepository mainItemRepository;
 
-	public SubItemResponse create(SubItemCreateRequest request) {
-		MainItem mainItem = mainItemRepository.findById(request.mainItemId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+    public SubItemResponse create(SubItemCreateRequest request) {
+        MainItem mainItem = mainItemRepository.findById(request.mainItemId())
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
-		duplicatedNameCheck(request.name());
+        duplicatedNameCheck(request.name());
 
-		SubItem subItem = SubItemCreateRequest.toSubItem(mainItem, request);
-		subItemRepository.save(subItem);
+        SubItem subItem = SubItemCreateRequest.toSubItem(mainItem, request);
+        subItemRepository.save(subItem);
 
-		return SubItemResponse.from(subItem);
-	}
+        return SubItemResponse.from(subItem);
+    }
 
-	@Transactional(readOnly = true)
-	public SubItemResponse findById(Long id) {
-		SubItem subItem = subItemRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+    @Transactional(readOnly = true)
+    public SubItemResponse findById(Long id) {
+        SubItem subItem = subItemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
-		return SubItemResponse.from(subItem);
-	}
+        return SubItemResponse.from(subItem);
+    }
 
-	@Transactional(readOnly = true)
-	public SubItemsResponse findAll() {
-		List<SubItem> subItemList = subItemRepository.findAll();
+    @Transactional(readOnly = true)
+    public SubItemsResponse findAll() {
+        List<SubItem> subItemList = subItemRepository.findAll();
 
-		return SubItemsResponse.from(subItemList);
-	}
+        return SubItemsResponse.from(subItemList);
+    }
 
-	public Long update(Long id, SubItemUpdateRequest request) {
-		SubItem foundSubItem = subItemRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+    @Transactional(readOnly = true)
+    public SubItemsSliceResponse findAllByMainItemName(String mainItemName, SubItemSliceRequest sliceRequest) {
+        Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(sliceRequest.page(), sliceRequest.size()));
 
-		duplicatedNameCheck(request.name());
+        return SubItemsSliceResponse.of(subItems.stream()
+                .map(SubItemSliceResponse::from)
+                .toList(), subItems.hasNext());
+    }
 
-		SubItem subItem = SubItemUpdateRequest.toSubItem(foundSubItem.getMainItem(), request);
 
-		foundSubItem.update(subItem);
+    public Long update(Long id, SubItemUpdateRequest request) {
+        SubItem foundSubItem = subItemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
-		return foundSubItem.getId();
-	}
+        duplicatedNameCheck(request.name());
 
-	public void delete(Long id) {
-		SubItem subItem = subItemRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+        SubItem subItem = SubItemUpdateRequest.toSubItem(foundSubItem.getMainItem(), request);
 
-		subItemRepository.delete(subItem);
-	}
+        foundSubItem.update(subItem);
 
-	private void duplicatedNameCheck(String name) {
-		subItemRepository.findByName(name).ifPresent(subItem -> {
-			throw new BusinessException(ErrorCode.DUPLICATED_SUB_ITEM_NAME);
-		});
-	}
+        return foundSubItem.getId();
+    }
+
+    public void delete(Long id) {
+        SubItem subItem = subItemRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+
+        subItemRepository.delete(subItem);
+    }
+
+    private void duplicatedNameCheck(String name) {
+        subItemRepository.findByName(name).ifPresent(subItem -> {
+            throw new BusinessException(ErrorCode.DUPLICATED_SUB_ITEM_NAME);
+        });
+    }
 }
