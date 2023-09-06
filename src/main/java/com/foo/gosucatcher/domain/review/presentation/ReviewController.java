@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private final ReviewService reviewService;
+	private final int DEFAULT_PAGING_SIZE = 3;
 
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ReviewResponse> create(
@@ -42,7 +43,7 @@ public class ReviewController {
 
 	@GetMapping
 	public ResponseEntity<ReviewsResponse> findAll(
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
 			Pageable pageable) {
 		ReviewsResponse reviewsResponse = reviewService.findAll(pageable);
 
@@ -51,7 +52,7 @@ public class ReviewController {
 
 	@GetMapping("/experts/{expertId}")
 	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId,
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
 			Pageable pageable) {
 		ReviewsResponse reviewsResponse = reviewService.findByExpertId(pageable, expertId);
 		return ResponseEntity.ok(reviewsResponse);
@@ -59,7 +60,7 @@ public class ReviewController {
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id,
-			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
 			Pageable pageable) {
 		ReviewResponse reviewResponse = reviewService.findById(id, pageable);
 
