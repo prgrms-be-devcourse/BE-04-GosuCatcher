@@ -8,6 +8,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +24,8 @@ import javax.persistence.Table;
 @Getter
 @Entity
 @Table(name = "expert_response_estimates")
+@SQLDelete(sql = "UPDATE expert_response_estimate SET is_deleted = TRUE WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpertResponseEstimate extends BaseEntity {
 
