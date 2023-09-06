@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.item.application.dto.response;
+package com.foo.gosucatcher.domain.item.application.dto.response.main;
 
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 

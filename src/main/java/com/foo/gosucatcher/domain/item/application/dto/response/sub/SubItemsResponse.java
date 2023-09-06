@@ -1,8 +1,8 @@
-package com.foo.gosucatcher.domain.item.application.dto.response;
-
-import java.util.List;
+package com.foo.gosucatcher.domain.item.application.dto.response.sub;
 
 import com.foo.gosucatcher.domain.item.domain.SubItem;
+
+import java.util.List;
 
 public record SubItemsResponse(
 	List<SubItemResponse> subItemsResponse

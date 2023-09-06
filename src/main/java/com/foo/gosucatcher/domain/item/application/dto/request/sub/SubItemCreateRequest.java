@@ -1,12 +1,12 @@
-package com.foo.gosucatcher.domain.item.application.dto.request;
+package com.foo.gosucatcher.domain.item.application.dto.request.sub;
+
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
-import com.foo.gosucatcher.domain.item.domain.MainItem;
-import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public record SubItemCreateRequest(
 	@NotNull
