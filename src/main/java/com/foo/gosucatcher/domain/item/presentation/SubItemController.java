@@ -51,8 +51,11 @@ public class SubItemController {
     }
 
     @GetMapping("/mainItem")
-    public ResponseEntity<SubItemsSliceResponse> findSubItemsByMainItemName(@RequestParam String mainItemName, @RequestBody SubItemSliceRequest sliceRequest) {
-        SubItemsSliceResponse sliceResponse = subItemService.findAllByMainItemName(mainItemName, sliceRequest);
+    public ResponseEntity<SubItemsSliceResponse> findSubItemsByMainItemName(@RequestParam String mainItemName,
+                                                                            @RequestParam(defaultValue = "0") int page,
+                                                                            @RequestParam(defaultValue = "10") int size) {
+        SubItemSliceRequest subItemSliceRequest = new SubItemSliceRequest(page, size);
+        SubItemsSliceResponse sliceResponse = subItemService.findAllByMainItemName(mainItemName, subItemSliceRequest);
 
         return ResponseEntity.ok(sliceResponse);
     }
