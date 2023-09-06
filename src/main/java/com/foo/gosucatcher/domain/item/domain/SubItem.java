@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,8 +19,9 @@ import javax.persistence.Table;
 
 @Getter
 @Entity
+@SQLDelete(sql = "UPDATE sub_items SET is_deleted = TRUE WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Table(name = "sub_items")
-@SQLDelete(sql = "UPDATE sub_item SET is_deleted = TRUE WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubItem extends BaseEntity {
 

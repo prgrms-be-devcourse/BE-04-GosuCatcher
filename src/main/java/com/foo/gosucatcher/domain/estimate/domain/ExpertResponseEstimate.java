@@ -24,7 +24,7 @@ import javax.persistence.Table;
 @Getter
 @Entity
 @Table(name = "expert_response_estimates")
-@SQLDelete(sql = "UPDATE expert_response_estimate SET is_deleted = TRUE WHERE id = ?")
+@SQLDelete(sql = "UPDATE expert_response_estimates SET is_deleted = TRUE WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ExpertResponseEstimate extends BaseEntity {
