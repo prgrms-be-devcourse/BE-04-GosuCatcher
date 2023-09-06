@@ -2,12 +2,13 @@ package com.foo.gosucatcher.domain.item.presentation;
 
 import com.foo.gosucatcher.domain.item.application.SubItemService;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemSliceRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -51,11 +52,8 @@ public class SubItemController {
     }
 
     @GetMapping("/mainItem")
-    public ResponseEntity<SubItemsSliceResponse> findSubItemsByMainItemName(@RequestParam String mainItemName,
-                                                                            @RequestParam(defaultValue = "0") int page,
-                                                                            @RequestParam(defaultValue = "10") int size) {
-        SubItemSliceRequest subItemSliceRequest = new SubItemSliceRequest(page, size);
-        SubItemsSliceResponse sliceResponse = subItemService.findAllByMainItemName(mainItemName, subItemSliceRequest);
+    public ResponseEntity<SubItemsSliceResponse> findSubItemsByMainItemName(@RequestParam String mainItemName, @PageableDefault(page = 0, size = 10) Pageable pageable) {
+        SubItemsSliceResponse sliceResponse = subItemService.findAllByMainItemName(mainItemName, pageable);
 
         return ResponseEntity.ok(sliceResponse);
     }

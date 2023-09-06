@@ -1,7 +1,6 @@
 package com.foo.gosucatcher.domain.item.application;
 
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemSliceRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemSliceResponse;
@@ -15,7 +14,7 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,14 +57,13 @@ public class SubItemService {
     }
 
     @Transactional(readOnly = true)
-    public SubItemsSliceResponse findAllByMainItemName(String mainItemName, SubItemSliceRequest sliceRequest) {
-        Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(sliceRequest.page(), sliceRequest.size()));
+    public SubItemsSliceResponse findAllByMainItemName(String mainItemName, Pageable pageable) {
+        Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, pageable);
 
         return SubItemsSliceResponse.of(subItems.stream()
             .map(SubItemSliceResponse::from)
             .toList(), subItems.hasNext());
     }
-
 
     public Long update(Long id, SubItemUpdateRequest request) {
         SubItem foundSubItem = subItemRepository.findById(id)

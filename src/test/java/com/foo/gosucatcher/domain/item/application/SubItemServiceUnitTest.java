@@ -1,7 +1,6 @@
 package com.foo.gosucatcher.domain.item.application;
 
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemSliceRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
@@ -183,18 +182,18 @@ class SubItemServiceUnitTest {
         String mainItemName = "청소";
         int page = 0;
         int size = 10;
-        SubItemSliceRequest sliceRequest = new SubItemSliceRequest(page, size);
 
         List<SubItem> subItems = new ArrayList<>();
         subItems.add(subItem);
+        PageRequest pageRequest = PageRequest.of(page, size);
 
-        Slice<SubItem> subItemSlice = new SliceImpl<>(subItems, PageRequest.of(page, size), true);
+        Slice<SubItem> subItemSlice = new SliceImpl<>(subItems, pageRequest, true);
 
         when(subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(page, size)))
             .thenReturn(subItemSlice);
 
         //when
-        SubItemsSliceResponse response = subItemService.findAllByMainItemName(mainItemName, sliceRequest);
+        SubItemsSliceResponse response = subItemService.findAllByMainItemName(mainItemName, pageRequest);
 
         //then
         assertThat(response.subItemSlicesResponse()).hasSize(subItems.size());
