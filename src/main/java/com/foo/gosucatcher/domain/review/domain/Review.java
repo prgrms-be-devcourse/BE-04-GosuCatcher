@@ -50,7 +50,7 @@ public class Review extends BaseEntity {
 
 	private int rating;
 
-	private boolean isDeleted;
+	private boolean isDeleted = false;
 
 	@Builder
 	public Review(Expert expert, Member member, SubItem subItem, String description, int rating) {
