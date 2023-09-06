@@ -46,9 +46,9 @@ public class BucketService {
 
 	public BucketResponse create(BucketRequest bucketRequest) {
 		Member member = memberRepository.findById(bucketRequest.memberId())
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 		Expert expert = expertRepository.findById(bucketRequest.expertId())
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		Bucket bucket = BucketRequest.toLikes(member, expert);
 
@@ -60,11 +60,11 @@ public class BucketService {
 	@Transactional(readOnly = true)
 	public Boolean checkStatus(Long expertId, Long memberId) {
 		Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 		Expert expert = expertRepository.findById(expertId)
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		return bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
-				.isPresent();
+			.isPresent();
 	}
 }
