@@ -36,7 +36,7 @@ public class MainItemService {
     public MainItemResponse findById(Long id) {
 
         MainItem mainItem = mainItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
         return MainItemResponse.from(mainItem);
     }
@@ -50,7 +50,7 @@ public class MainItemService {
 
     public Long update(Long id, MainItemUpdateRequest request) {
         MainItem foundMainItem = mainItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
         duplicatedNameCheck(request.name());
 
@@ -62,7 +62,7 @@ public class MainItemService {
 
     public void delete(Long id) {
         MainItem mainItem = mainItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
         mainItemRepository.delete(mainItem);
     }

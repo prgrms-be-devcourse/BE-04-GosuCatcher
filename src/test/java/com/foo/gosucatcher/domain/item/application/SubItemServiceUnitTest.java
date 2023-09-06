@@ -56,15 +56,15 @@ class SubItemServiceUnitTest {
     @BeforeEach
     void setUp() {
         mainItem = MainItem.builder()
-                .name("청소")
-                .description("청소를 구해보세요.")
-                .build();
+            .name("청소")
+            .description("청소를 구해보세요.")
+            .build();
 
         subItem = SubItem.builder()
-                .mainItem(mainItem)
-                .name("방 청소")
-                .description("방 청소 설명")
-                .build();
+            .mainItem(mainItem)
+            .name("방 청소")
+            .description("방 청소 설명")
+            .build();
 
         subItemCreateRequest = new SubItemCreateRequest(1L, "방 청소", "방 청소 설명");
     }
@@ -75,13 +75,13 @@ class SubItemServiceUnitTest {
 
         //given
         when(subItemRepository.save(any(SubItem.class)))
-                .thenReturn(subItem);
+            .thenReturn(subItem);
 
         when(subItemRepository.findById(null))
-                .thenReturn(Optional.of(subItem));
+            .thenReturn(Optional.of(subItem));
 
         when(mainItemRepository.findById(anyLong()))
-                .thenReturn(Optional.of(mainItem));
+            .thenReturn(Optional.of(mainItem));
 
         //when
         SubItemResponse subItemResponse = subItemService.create(subItemCreateRequest);
@@ -99,11 +99,11 @@ class SubItemServiceUnitTest {
 
         //given
         when(mainItemRepository.findById(anyLong()))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         //when -> then
         assertThrows(EntityNotFoundException.class,
-                () -> subItemService.create(subItemCreateRequest));
+            () -> subItemService.create(subItemCreateRequest));
     }
 
     @Test
@@ -114,14 +114,14 @@ class SubItemServiceUnitTest {
         String duplicateName = "방 청소";
 
         when(mainItemRepository.findById(anyLong()))
-                .thenReturn(Optional.of(mainItem));
+            .thenReturn(Optional.of(mainItem));
 
         when(subItemRepository.findByName(duplicateName))
-                .thenReturn(Optional.of(subItem));
+            .thenReturn(Optional.of(subItem));
 
         //when -> then
         assertThrows(BusinessException.class,
-                () -> subItemService.create(subItemCreateRequest));
+            () -> subItemService.create(subItemCreateRequest));
     }
 
     @Test
@@ -132,7 +132,7 @@ class SubItemServiceUnitTest {
         List<SubItem> subItemList = Collections.singletonList(subItem);
 
         when(subItemRepository.findAll())
-                .thenReturn(subItemList);
+            .thenReturn(subItemList);
 
         //when
         SubItemsResponse subItemsResponse = subItemService.findAll();
@@ -153,7 +153,7 @@ class SubItemServiceUnitTest {
         Long subItemId = subItem.getId();
 
         when(subItemRepository.findById(subItemId))
-                .thenReturn(Optional.of(subItem));
+            .thenReturn(Optional.of(subItem));
 
         //when
         SubItemResponse subItemResponse = subItemService.findById(subItemId);
@@ -170,7 +170,7 @@ class SubItemServiceUnitTest {
         //given
         Long subItemId = subItem.getId();
         when(subItemRepository.findById(subItemId))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         //when -> then
         assertThrows(EntityNotFoundException.class, () -> subItemService.findById(subItemId));
@@ -191,7 +191,7 @@ class SubItemServiceUnitTest {
         Slice<SubItem> subItemSlice = new SliceImpl<>(subItems, PageRequest.of(page, size), true);
 
         when(subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(page, size)))
-                .thenReturn(subItemSlice);
+            .thenReturn(subItemSlice);
 
         //when
         SubItemsSliceResponse response = subItemService.findAllByMainItemName(mainItemName, sliceRequest);
@@ -210,10 +210,10 @@ class SubItemServiceUnitTest {
         SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
 
         when(subItemRepository.findById(null))
-                .thenReturn(Optional.of(subItem));
+            .thenReturn(Optional.of(subItem));
 
         when(subItemRepository.findByName(newName))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         //when
         subItemService.update(mainItem.getId(), subItemUpdateRequest);
@@ -232,11 +232,11 @@ class SubItemServiceUnitTest {
         SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
 
         when(subItemRepository.findById(null))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         //when -> then
         assertThrows(EntityNotFoundException.class,
-                () -> subItemService.update(mainItem.getId(), subItemUpdateRequest));
+            () -> subItemService.update(mainItem.getId(), subItemUpdateRequest));
     }
 
     @Test
@@ -245,7 +245,7 @@ class SubItemServiceUnitTest {
 
         //given
         when(subItemRepository.findById(null))
-                .thenReturn(Optional.of(subItem));
+            .thenReturn(Optional.of(subItem));
 
         //when
         assertDoesNotThrow(() -> subItemService.delete(subItem.getId()));

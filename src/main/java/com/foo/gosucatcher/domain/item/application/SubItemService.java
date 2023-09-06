@@ -32,7 +32,7 @@ public class SubItemService {
 
     public SubItemResponse create(SubItemCreateRequest request) {
         MainItem mainItem = mainItemRepository.findById(request.mainItemId())
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
         duplicatedNameCheck(request.name());
 
@@ -45,7 +45,7 @@ public class SubItemService {
     @Transactional(readOnly = true)
     public SubItemResponse findById(Long id) {
         SubItem subItem = subItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
         return SubItemResponse.from(subItem);
     }
@@ -62,14 +62,14 @@ public class SubItemService {
         Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(sliceRequest.page(), sliceRequest.size()));
 
         return SubItemsSliceResponse.of(subItems.stream()
-                .map(SubItemSliceResponse::from)
-                .toList(), subItems.hasNext());
+            .map(SubItemSliceResponse::from)
+            .toList(), subItems.hasNext());
     }
 
 
     public Long update(Long id, SubItemUpdateRequest request) {
         SubItem foundSubItem = subItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
         duplicatedNameCheck(request.name());
 
@@ -82,7 +82,7 @@ public class SubItemService {
 
     public void delete(Long id) {
         SubItem subItem = subItemRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+            .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
         subItemRepository.delete(subItem);
     }
