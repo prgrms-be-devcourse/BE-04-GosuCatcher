@@ -4,6 +4,7 @@ import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -52,8 +55,11 @@ class ReviewControllerTest {
 			long expertId = 0L;
 			long subItemId = 0L;
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
-			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, localDateTime,
+					localDateTime);
 			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
 					.willReturn(reviewResponse);
 
@@ -130,15 +136,17 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
-					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
-							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
+					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime, localDateTime),
+							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, localDateTime, localDateTime))
 			);
 
 			long subItemId = 1L;
 			long expertId = 1L;
 
-			given(reviewService.findByExpertId(any()))
+			given(reviewService.findByExpertId(any(PageRequest.class), any(Long.class)))
 					.willReturn(reviewsResponse);
 
 			// when
@@ -169,7 +177,7 @@ class ReviewControllerTest {
 
 			long expertId = 1L;
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW))
-					.when(reviewService).findByExpertId(any(Long.class));
+					.when(reviewService).findByExpertId(any(Pageable.class), any(Long.class));
 
 			// when
 			// then
@@ -187,15 +195,16 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
-					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
-							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
+					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime, localDateTime),
+							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, localDateTime, localDateTime))
 			);
 
 			long expertId = 1L;
 			long subItemId = 1L;
-
-			given(reviewService.findAll())
+			given(reviewService.findAll(any(PageRequest.class)))
 					.willReturn(reviewsResponse);
 
 			// when
@@ -224,10 +233,12 @@ class ReviewControllerTest {
 		void findById() throws Exception {
 
 			// given
-			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			LocalDateTime localDateTime = LocalDateTime.now();
+			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime,
+					localDateTime);
 
 			long id = 1L;
-			given(reviewService.findById(id))
+			given(reviewService.findById(any(Long.class), any(PageRequest.class)))
 					.willReturn(reviewResponse);
 
 			// when

@@ -1,5 +1,8 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -38,22 +41,27 @@ public class ReviewController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ReviewsResponse> findAll() {
-		ReviewsResponse reviewsResponse = reviewService.findAll();
+	public ResponseEntity<ReviewsResponse> findAll(
+			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			Pageable pageable) {
+		ReviewsResponse reviewsResponse = reviewService.findAll(pageable);
 
 		return ResponseEntity.ok(reviewsResponse);
 	}
 
 	@GetMapping("/experts/{expertId}")
-	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId) {
-		ReviewsResponse reviewsResponse = reviewService.findByExpertId(expertId);
-
+	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId,
+			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			Pageable pageable) {
+		ReviewsResponse reviewsResponse = reviewService.findByExpertId(pageable, expertId);
 		return ResponseEntity.ok(reviewsResponse);
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
-		ReviewResponse reviewResponse = reviewService.findById(id);
+	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id,
+			@PageableDefault(sort = "updatedAt", size = 3, direction = Sort.Direction.DESC)
+			Pageable pageable) {
+		ReviewResponse reviewResponse = reviewService.findById(id, pageable);
 
 		return ResponseEntity.ok(reviewResponse);
 	}

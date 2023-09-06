@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.review.application;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,15 +48,16 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewsResponse findAll() {
-		List<Review> reviews = reviewRepository.findAll();
+	public ReviewsResponse findAll(Pageable pageable) {
+		List<Review> reviews = reviewRepository.findAll(pageable)
+				.toList();
 
 		return ReviewsResponse.from(reviews);
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewsResponse findByExpertId(Long expertId) {
-		List<Review> reviews = reviewRepository.findAllByExpertId(expertId);
+	public ReviewsResponse findByExpertId(Pageable pageable, Long expertId) {
+		List<Review> reviews = reviewRepository.findAllByExpertId(expertId, pageable);
 
 		if (reviews.isEmpty()) {
 			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
@@ -65,8 +67,8 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewResponse findById(Long id) {
-		Review review = reviewRepository.findById(id)
+	public ReviewResponse findById(Long id, Pageable pageable) {
+		Review review = reviewRepository.findById(id, pageable)
 				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
 
 		return ReviewResponse.from(review);
