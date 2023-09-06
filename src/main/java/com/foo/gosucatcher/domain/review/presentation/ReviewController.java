@@ -54,7 +54,9 @@ public class ReviewController {
 	public ResponseEntity<ReviewsSliceResponse> findAllByExpertId(@PathVariable Long expertId,
 		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
 		Pageable pageable) {
+
 		ReviewsSliceResponse response = reviewService.findAllByExpertId(pageable, expertId);
+
 		return ResponseEntity.ok(response);
 	}
 
