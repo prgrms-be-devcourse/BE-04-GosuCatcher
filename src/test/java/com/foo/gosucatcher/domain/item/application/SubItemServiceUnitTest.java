@@ -1,18 +1,15 @@
 package com.foo.gosucatcher.domain.item.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
+import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,16 +18,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemsResponse;
-import com.foo.gosucatcher.domain.item.domain.MainItem;
-import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
-import com.foo.gosucatcher.domain.item.domain.SubItem;
-import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SubItemServiceUnitTest {

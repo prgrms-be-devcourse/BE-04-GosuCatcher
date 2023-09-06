@@ -1,5 +1,24 @@
 package com.foo.gosucatcher.domain.item.presentation;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foo.gosucatcher.domain.item.application.MainItemService;
+import com.foo.gosucatcher.domain.item.application.dto.request.main.MainItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.main.MainItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.main.MainItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.main.MainItemsResponse;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.List;
+
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -10,26 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.List;
-
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.item.application.MainItemService;
-import com.foo.gosucatcher.domain.item.application.dto.request.MainItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.MainItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.MainItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.MainItemsResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(MainItemController.class)
 class MainItemControllerTest {

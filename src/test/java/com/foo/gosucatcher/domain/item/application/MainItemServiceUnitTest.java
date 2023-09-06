@@ -1,17 +1,13 @@
 package com.foo.gosucatcher.domain.item.application;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
+import com.foo.gosucatcher.domain.item.application.dto.request.main.MainItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.main.MainItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.main.MainItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.main.MainItemsResponse;
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,14 +16,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.foo.gosucatcher.domain.item.application.dto.request.MainItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.MainItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.MainItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.MainItemsResponse;
-import com.foo.gosucatcher.domain.item.domain.MainItem;
-import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MainItemServiceUnitTest {
