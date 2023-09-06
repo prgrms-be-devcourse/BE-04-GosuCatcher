@@ -1,5 +1,11 @@
 package com.foo.gosucatcher.domain.item.domain;
 
+import com.foo.gosucatcher.global.BaseEntity;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -8,13 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.foo.gosucatcher.global.BaseEntity;
-
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
@@ -34,11 +33,14 @@ public class SubItem extends BaseEntity {
 
 	private String description;
 
+	private boolean isDeleted = Boolean.FALSE;
+
 	@Builder
 	public SubItem(MainItem mainItem, String name, String description) {
 		this.mainItem = mainItem;
 		this.name = name;
 		this.description = description;
+		this.isDeleted = false;
 	}
 
 	public void update(SubItem subItem) {
