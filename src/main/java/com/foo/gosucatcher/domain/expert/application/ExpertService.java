@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.expert.application;
 
-import static com.foo.gosucatcher.global.error.ErrorCode.*;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +55,7 @@ public class ExpertService {
 
 	@Transactional(readOnly = true)
 	public ExpertsResponse findAll() {
-		List<Expert> experts = expertRepository.findAll();
+		List<Expert> experts = expertRepository.findAllByIsDeletedFalse();
 		ExpertsResponse expertsResponse = ExpertsResponse.from(experts);
 
 		return expertsResponse;
@@ -77,7 +78,7 @@ public class ExpertService {
 		Expert expert = expertRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		expertRepository.delete(expert);
+		expert.deleteExpert();
 	}
 
 	private void duplicatedStoreNameCheck(String storeName) {
@@ -92,4 +93,25 @@ public class ExpertService {
 			throw new InvalidValueException(ErrorCode.INVALID_MAX_TRAVEL_DISTANCE);
 		}
 	}
+
+	// //수정 중
+	//
+	// public void uploadExpertImages(long expertId, List<MultipartFile> files) {
+	// 	Expert expert = expertRepository.findById(expertId)
+	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	// 	List<ImageFile> imageFiles = expertProfileRepository.uploadImages(expert, files);
+	// 	expert.addProfileImages(imageFiles);
+	// }
+	//
+	// public List<ImageFile> findExpertImages(long expertId) {
+	// 	Expert expert = expertRepository.findById(expertId)
+	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	// 	return expert.getProfileImages();
+	// }
+	//
+	// public void deleteExpertImages(long expertId) {
+	// 	Expert expert = expertRepository.findById(expertId)
+	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	// 	expert.clearProfileImages();
+	// }
 }
