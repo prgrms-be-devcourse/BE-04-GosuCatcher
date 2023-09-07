@@ -32,10 +32,10 @@ public class BucketController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
+	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		bucketService.deleteById(id);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent().build();
 	}
 
 	@PostMapping

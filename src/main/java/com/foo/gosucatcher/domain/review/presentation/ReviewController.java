@@ -78,10 +78,10 @@ public class ReviewController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
+	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		reviewService.delete(id);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent().build();
 	}
 
 	@PostMapping("/{reviewId}/replies")
