@@ -27,8 +27,9 @@ public enum ErrorCode {
 	INVALID_MAX_TRAVEL_DISTANCE("E003", "최대 이동거리는 0 이상이어야 합니다."),
 
 	//리뷰
-	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
+	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
 	UNSUPPORTED_REPLIER("R002", "리뷰에 대한 답장은 서비스를 제공한 고수만 가능합니다."),
+	NOT_FOUND_REPLY("R003", "존재하지 않는 리뷰에 대한 답장입니다."),
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
