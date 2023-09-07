@@ -49,6 +49,8 @@ public class Expert extends BaseEntity {
 	@Column(name = "is_baro_estimate", nullable = false)
 	private boolean isBaroEstimate;
 
+	private boolean isDeleted = Boolean.FALSE;
+
 	@Builder
 	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description) {
 		this.member = member;
@@ -57,6 +59,10 @@ public class Expert extends BaseEntity {
 		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isBaroEstimate = false;
+	}
+
+	public void deleteExpert() {
+		this.isDeleted = Boolean.TRUE;
 	}
 
 	public void updateIsBaroEstimate(boolean isBaroEstimate) {
