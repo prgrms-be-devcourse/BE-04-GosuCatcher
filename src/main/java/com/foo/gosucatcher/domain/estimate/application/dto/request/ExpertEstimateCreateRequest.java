@@ -5,13 +5,13 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public record ExpertEstimateCreateRequest(
 	@NotNull(message = "응답할 고객의 요청 견적서 ID를 입력해주세요.")
-	Long memberRequestEstimateId,
+	Long memberEstimateId,
 
 	@NotNull(message = "제공할 서비스 ID를 입력해주세요.")
 	Long subItemId,
@@ -29,11 +29,11 @@ public record ExpertEstimateCreateRequest(
 
 	public static ExpertEstimate toExpertResponseEstimate(
 		ExpertEstimateCreateRequest expertEstimateCreateRequest,
-		MemberRequestEstimate memberRequestEstimate,
+		MemberEstimate memberEstimate,
 		Expert expert, SubItem subItem) {
 
 		return ExpertEstimate.builder()
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.subItem(subItem)
 			.expert(expert)
 			.totalCost(expertEstimateCreateRequest.totalCost)

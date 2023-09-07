@@ -16,7 +16,7 @@ import com.foo.gosucatcher.global.error.exception.BusinessException;
 class ExpertEstimateTest {
 
 	private Expert expert;
-	private MemberRequestEstimate memberRequestEstimate;
+	private MemberEstimate memberEstimate;
 
 	@BeforeEach
 	void setUp() {
@@ -26,7 +26,7 @@ class ExpertEstimateTest {
 			.description("Description")
 			.build();
 
-		memberRequestEstimate = MemberRequestEstimate.builder()
+		memberEstimate = MemberEstimate.builder()
 			.location("Location")
 			.preferredStartDate(LocalDateTime.now().plusDays(1))
 			.detailedDescription("Description")
@@ -41,7 +41,7 @@ class ExpertEstimateTest {
 		//when -> then
 		assertDoesNotThrow(() -> ExpertEstimate.builder()
 			.expert(expert)
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.totalCost(totalCost)
 			.description("Sample Description")
 			.build());
@@ -55,7 +55,7 @@ class ExpertEstimateTest {
 		//when -> then
 		assertThrows(BusinessException.class, () -> ExpertEstimate.builder()
 			.expert(expert)
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.totalCost(invalidTotalCost)
 			.description("Sample Description")
 			.build());

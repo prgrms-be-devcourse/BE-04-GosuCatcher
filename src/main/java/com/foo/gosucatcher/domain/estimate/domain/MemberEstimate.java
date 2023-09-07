@@ -31,9 +31,9 @@ import lombok.NoArgsConstructor;
 @Entity
 @Where(clause = "is_closed = false")
 @SQLDelete(sql = "UPDATE member_request_estimates SET is_closed = true WHERE id = ?")
-@Table(name = "member_request_estimates")
+@Table(name = "member_estimates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberRequestEstimate extends BaseEntity {
+public class MemberEstimate extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -59,7 +59,7 @@ public class MemberRequestEstimate extends BaseEntity {
 	private boolean isClosed = Boolean.FALSE;
 
 	@Builder
-	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
+	public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
 		String detailedDescription) {
 		this.member = member;
 		this.subItem = subItem;
