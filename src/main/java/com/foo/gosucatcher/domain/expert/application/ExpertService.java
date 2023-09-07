@@ -93,25 +93,4 @@ public class ExpertService {
 			throw new InvalidValueException(ErrorCode.INVALID_MAX_TRAVEL_DISTANCE);
 		}
 	}
-
-	// //수정 중
-	//
-	// public void uploadExpertImages(long expertId, List<MultipartFile> files) {
-	// 	Expert expert = expertRepository.findById(expertId)
-	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-	// 	List<ImageFile> imageFiles = expertProfileRepository.uploadImages(expert, files);
-	// 	expert.addProfileImages(imageFiles);
-	// }
-	//
-	// public List<ImageFile> findExpertImages(long expertId) {
-	// 	Expert expert = expertRepository.findById(expertId)
-	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-	// 	return expert.getProfileImages();
-	// }
-	//
-	// public void deleteExpertImages(long expertId) {
-	// 	Expert expert = expertRepository.findById(expertId)
-	// 		.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-	// 	expert.clearProfileImages();
-	// }
 }
