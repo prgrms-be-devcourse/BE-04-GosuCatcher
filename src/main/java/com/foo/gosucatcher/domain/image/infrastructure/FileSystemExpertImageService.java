@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -39,7 +38,7 @@ public class FileSystemExpertImageService implements ImageService {
 	private final ExpertImageRepository expertImageRepository;
 	private final ExpertRepository expertRepository;
 
-	@Value("${spring.servlet.multipart.location}")
+	// @Value("${spring.servlet.multipart.location}")
 	private String uploadPath;
 
 	@Override
