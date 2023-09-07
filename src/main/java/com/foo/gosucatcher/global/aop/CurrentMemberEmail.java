@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.aop;
+package com.foo.gosucatcher.global.aop;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -26,7 +26,7 @@ public record MemberSignUpRequest(
 			.name(memberSignUpRequest.name())
 			.email(memberSignUpRequest.email())
 			.password(memberSignUpRequest.password())
-			.role(Roles.USER)
+			.role(Roles.ROLE_USER)
 			.build();
 	}
 }

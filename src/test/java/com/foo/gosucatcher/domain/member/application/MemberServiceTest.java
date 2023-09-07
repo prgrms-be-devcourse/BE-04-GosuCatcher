@@ -12,9 +12,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberProfileRepository;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
@@ -45,7 +45,7 @@ class MemberServiceTest {
 			.save(any(Member.class));
 
 		//when, then
-		assertThatCode(() -> memberService.signUp(request))
+		assertThatCode(() -> memberService.signup(request))
 			.doesNotThrowAnyException();
 		verify(memberRepository, times(1))
 			.findByEmail(request.email());
@@ -58,14 +58,14 @@ class MemberServiceTest {
 	void signUpFailWhenDuplicateEmail() {
 		//given
 		var request = new MemberSignUpRequest("test", "test@gmail.com", "12345");
-		memberService.signUp(request);
+		memberService.signup(request);
 
 		doThrow(InvalidValueException.class)
 			.when(memberRepository)
 			.findByEmail(request.email());
 
 		//when, then
-		assertThatThrownBy(() -> memberService.signUp(request))
+		assertThatThrownBy(() -> memberService.signup(request))
 			.isInstanceOf(InvalidValueException.class);
 		verify(memberRepository, times(2))
 			.findByEmail(request.email());
@@ -93,7 +93,7 @@ class MemberServiceTest {
 	void throwExceptionWhenDuplicateEmail() {
 		//given
 		var request = new MemberSignUpRequest("test", "test@gmail.com", "12345");
-		memberService.signUp(request);
+		memberService.signup(request);
 		doThrow(InvalidValueException.class)
 			.when(memberRepository)
 			.findByEmail("test@gmail.com");
@@ -109,17 +109,17 @@ class MemberServiceTest {
 		//given
 		var signUpRequest = new MemberSignUpRequest("test", "test@gmail.com", "12345");
 		Member member = MemberSignUpRequest.toMember(signUpRequest);
-		memberService.signUp(signUpRequest);
+		memberService.signup(signUpRequest);
 
 		//when
-		var logInRequest = new MemberLogInRequest("test@gmail.com", "12345");
+		var logInRequest = new MemberLoginRequest("test@gmail.com", "12345");
 		doReturn(Optional.of(member))
 			.when(memberRepository)
 			.findByEmail("test@gmail.com");
 
 		//then
-		assertThat(memberService.logIn(logInRequest))
-			.isInstanceOf(MemberLogInResponse.class);
+		assertThat(memberService.login(logInRequest))
+			.isInstanceOf(MemberCertifiedResponse.class);
 	}
 
 	@Test
@@ -127,7 +127,7 @@ class MemberServiceTest {
 	void findSuccessIfMemberEmailIsValid() {
 		//given
 		var signUpRequest = new MemberSignUpRequest("test", "test@gmail.com", "12345");
-		memberService.signUp(signUpRequest);
+		memberService.signup(signUpRequest);
 		Member member = MemberSignUpRequest.toMember(signUpRequest);
 		String email = signUpRequest.email();
 

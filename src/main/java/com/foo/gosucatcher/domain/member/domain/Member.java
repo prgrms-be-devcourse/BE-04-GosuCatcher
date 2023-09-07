@@ -60,7 +60,7 @@ public class Member extends BaseEntity implements UserDetails {
 	private String refreshToken;
 
 	@Column
-	private boolean isDeleted;
+	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public Member(String name, String password, String email, String phoneNumber, Roles role,
@@ -71,14 +71,9 @@ public class Member extends BaseEntity implements UserDetails {
 		this.phoneNumber = phoneNumber;
 		this.role = role;
 		this.profileImageFile = profileImageFile;
-		this.isDeleted = false;
 	}
 
-	public boolean isCorrectPassword(String password) {
-		return this.password.equals(password);
-	}
-
-	public void logOut() {
+	public void logout() {
 		this.refreshToken = "";
 	}
 
@@ -92,16 +87,16 @@ public class Member extends BaseEntity implements UserDetails {
 		this.phoneNumber = member.getPhoneNumber();
 	}
 
+	public void deleteMember() {
+		this.isDeleted = true;
+	}
+
 	public void changeProfileImageFile(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
 			throw new BusinessException(ErrorCode.INVALID_IMAGE);
 		}
 
 		this.profileImageFile = profileImageFile;
-	}
-
-	public void deleteMember() {
-		this.isDeleted = true;
 	}
 
 	@Override

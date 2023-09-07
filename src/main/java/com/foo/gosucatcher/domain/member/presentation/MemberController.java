@@ -19,23 +19,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.foo.gosucatcher.aop.CurrentMemberEmail;
 import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
+import com.foo.gosucatcher.global.aop.CurrentMemberEmail;
+import com.foo.gosucatcher.global.aop.CurrentMemberId;
 import com.foo.gosucatcher.global.util.ImageFileUtils;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/members")
@@ -46,32 +46,42 @@ public class MemberController {
 	@PostMapping("/signup")
 	public ResponseEntity<MemberSignUpResponse> signUp(
 		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
-		MemberSignUpResponse response = memberService.signUp(memberSignUpRequest);
+		MemberSignUpResponse response = memberService.signup(memberSignUpRequest);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(response);
 	}
 
 	@GetMapping("/signup")
-	public ResponseEntity<Void> checkDuplicatedEmail(@RequestParam @Validated @Email String email) {
+	public ResponseEntity<Boolean> checkDuplicatedEmail(
+		@RequestParam @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
 		memberService.checkDuplicatedEmail(email);
 
-		return ResponseEntity.ok()
-			.build();
+		return ResponseEntity.ok(true);
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<MemberLogInResponse> logIn(
-		@RequestBody @Validated MemberLogInRequest memberLogInRequest) {
-		MemberLogInResponse response = memberService.logIn(memberLogInRequest);
+	public ResponseEntity<MemberCertifiedResponse> login(
+		@RequestBody @Validated MemberLoginRequest memberLogInRequest) {
+		// 3. 패스워드 검증절차 코드 객체지향적으로 리팩토링
+		// 4. 유저기능 관련 테스트 코드 작성
+		MemberCertifiedResponse response = memberService.login(memberLogInRequest);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/refresh-token")
+	public ResponseEntity<MemberCertifiedResponse> refreshToken(
+		@RequestBody @Validated MemberRefreshRequest memberRefreshRequest) {
+		MemberCertifiedResponse response = memberService.refresh(memberRefreshRequest);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberEmail
 	@DeleteMapping("/logout")
-	public ResponseEntity<Void> logOut(String memberEmail) {
-		memberService.logOut(memberEmail);
+	public ResponseEntity<Void> logout(String memberEmail) {
+		memberService.logout(memberEmail);
 
 		return ResponseEntity.ok()
 			.build();
@@ -84,16 +94,15 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	@CurrentMemberEmail
-	@PatchMapping("/{memberId}")
-	public ResponseEntity<Long> changeMemberInfo(@PathVariable long memberId,
+	@CurrentMemberId
+	@PatchMapping("/profile")
+	public ResponseEntity<Long> changeMemberInfo(Long memberId,
 		@RequestBody @Validated MemberInfoChangeRequest memberInfoChangeRequest) {
 		long responseId = memberService.changeMemberInfo(memberId, memberInfoChangeRequest);
 
 		return ResponseEntity.ok(responseId);
 	}
 
-	@CurrentMemberEmail
 	@DeleteMapping("/{memberId}")
 	public ResponseEntity<Void> deleteMember(@PathVariable long memberId) {
 		memberService.deleteMember(memberId);

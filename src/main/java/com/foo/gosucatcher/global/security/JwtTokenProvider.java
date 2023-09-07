@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.security;
+package com.foo.gosucatcher.global.security;
 
 import java.time.Duration;
 import java.util.Base64;
@@ -13,6 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import com.foo.gosucatcher.domain.member.domain.Member;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;
@@ -45,15 +47,15 @@ public class JwtTokenProvider {
 		this.customUserDetailsService = customUserDetailsService;
 	}
 
-	public String createAccessToken(String memberEmail) {
-		return getToken(memberEmail, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
+	public String createAccessToken(String memberEmail, Long memberId) {
+		return getToken(memberEmail, memberId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
 	}
 
-	public String createRefreshToken(String memberEmail) {
-		return getToken(memberEmail, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
+	public String createRefreshToken(String memberEmail, Long memberId) {
+		return getToken(memberEmail, memberId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
 	}
 
-	public Authentication getAccessTokenAuthentication(String token) {
+	public Authentication getAccessTokenAuthenticationByMemberEmail(String token) {
 		UserDetails userDetails = customUserDetailsService.loadUserByUsername(
 			getMemberEmail(token, accessTokenSecretKey));
 		String email = userDetails.getUsername();
@@ -61,6 +63,16 @@ public class JwtTokenProvider {
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
 
 		return new UsernamePasswordAuthenticationToken(email, password, authorities);
+	}
+
+	public Authentication getAccessTokenAuthenticationByMemberId(String token) {
+		UserDetails userDetails = customUserDetailsService.loadUserByUsername(
+			getMemberId(token, accessTokenSecretKey));
+		Long id = ((Member)userDetails).getId();
+		String password = userDetails.getPassword();
+		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
+		return new UsernamePasswordAuthenticationToken(id, password, authorities);
 	}
 
 	public Authentication getRefreshTokenAuthentication(String token) {
@@ -82,19 +94,20 @@ public class JwtTokenProvider {
 	}
 
 	public boolean validateRefreshToken(String token) {
-		return extracted(token, accessTokenSecretKey);
+		return extracted(token, refreshTokenSecretKey);
 	}
 
 	public String bearerRemove(String token) {
 		return token.substring("Bearer ".length());
 	}
 
-	private String getToken(String memberEmail, long tokenExpiredTime, String secretKey) {
+	private String getToken(String memberEmail, Long memberId, long tokenExpiredTime, String secretKey) {
 		Date date = new Date();
 
 		Claims claims = Jwts.claims()
 			.setSubject("GosuCatcher");
 		claims.put("memberEmail", memberEmail);
+		claims.put("memberId", memberId);
 
 		return Jwts.builder()
 			.setHeaderParam(Header.TYPE, Header.JWT_TYPE)
@@ -114,6 +127,18 @@ public class JwtTokenProvider {
 			.getBody()
 			.get("memberEmail")
 			.toString();
+	}
+
+	private Long getMemberId(String token, String secretKey) {
+		log.warn("token : {}", token);
+		String memberId = Jwts.parser()
+			.setSigningKey(secretKey)
+			.parseClaimsJws(token)
+			.getBody()
+			.get("memberId")
+			.toString();
+
+		return Long.parseLong(memberId);
 	}
 
 	private boolean extracted(String token, String secretKey) {

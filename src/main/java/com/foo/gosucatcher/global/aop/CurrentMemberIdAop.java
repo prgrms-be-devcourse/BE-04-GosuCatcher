@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.aop;
+package com.foo.gosucatcher.global.aop;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.foo.gosucatcher.security.JwtTokenProvider;
+import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Aspect
 @Component
-public class CurrentMemberEmailAop {
+public class CurrentMemberIdAop {
 
-	private static final String MEMBER_ID = "memberEmail";
+	private static final String MEMBER_ID = "memberId";
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Around("@annotation(currentMemberId)")
-	public Object getCurrentMemberId(ProceedingJoinPoint proceedingJoinPoint, CurrentMemberEmail currentMemberId) throws
+	public Object getCurrentMemberId(ProceedingJoinPoint proceedingJoinPoint, CurrentMemberId currentMemberId) throws
 		Throwable {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
@@ -39,15 +39,15 @@ public class CurrentMemberEmailAop {
 		String token = jwtTokenProvider.resolveAccessToken(request);
 		token = jwtTokenProvider.bearerRemove(token);
 
-		Authentication authentication = jwtTokenProvider.getAccessTokenAuthentication(token);
-		String memberEmail = authentication.getPrincipal().toString();
+		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberId(token);
+		Long memberId = Long.parseLong(authentication.getPrincipal().toString());
 
-		Object[] modifiedArgs = modifyArgsWithMemberEmail(memberEmail, proceedingJoinPoint);
+		Object[] modifiedArgs = modifyArgsWithMemberId(memberId, proceedingJoinPoint);
 
 		return proceedingJoinPoint.proceed(modifiedArgs);
 	}
 
-	private Object[] modifyArgsWithMemberEmail(String memberEmail, ProceedingJoinPoint proceedingJoinPoint) {
+	private Object[] modifyArgsWithMemberId(Long memberId, ProceedingJoinPoint proceedingJoinPoint) {
 		Object[] parameters = proceedingJoinPoint.getArgs();
 
 		MethodSignature signature = (MethodSignature)proceedingJoinPoint.getSignature();
@@ -57,7 +57,7 @@ public class CurrentMemberEmailAop {
 		for (int i = 0; i < methodParameters.length; i++) {
 			String parameterName = methodParameters[i].getName();
 			if (parameterName.equals(MEMBER_ID)) {
-				parameters[i] = memberEmail;
+				parameters[i] = memberId;
 			}
 		}
 

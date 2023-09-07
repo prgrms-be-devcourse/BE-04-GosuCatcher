@@ -12,8 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.foo.gosucatcher.security.JwtAccessTokenFilter;
-import com.foo.gosucatcher.security.JwtTokenProvider;
+import com.foo.gosucatcher.global.security.JwtAccessTokenFilter;
+import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 

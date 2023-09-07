@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.security;
+package com.foo.gosucatcher.global.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +20,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
 		return memberRepository.findByEmail(memberEmail)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	}
+
+	public UserDetails loadUserByUsername(Long memberId) throws UsernameNotFoundException {
+		return memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 	}
 }

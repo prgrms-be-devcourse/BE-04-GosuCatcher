@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.security;
+package com.foo.gosucatcher.global.security;
 
 import java.io.IOException;
 
@@ -33,7 +33,7 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 		try {
 			if (token != null && jwtTokenProvider.validateAccessToken(token)) {
 				token = jwtTokenProvider.bearerRemove(token);
-				Authentication authentication = jwtTokenProvider.getAccessTokenAuthentication(token);
+				Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 
