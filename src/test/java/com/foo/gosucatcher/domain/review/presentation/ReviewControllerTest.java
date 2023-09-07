@@ -1,9 +1,16 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
-import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.doThrow;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -52,8 +60,11 @@ class ReviewControllerTest {
 			long expertId = 0L;
 			long subItemId = 0L;
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
-			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, localDateTime,
+					localDateTime);
 			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
 					.willReturn(reviewResponse);
 
@@ -130,15 +141,18 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
-					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
-							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
+					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime, localDateTime),
+							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, localDateTime, localDateTime)),
+					true
 			);
 
 			long subItemId = 1L;
 			long expertId = 1L;
 
-			given(reviewService.findByExpertId(any()))
+			given(reviewService.findAllByExpertId(any(PageRequest.class), any(Long.class)))
 					.willReturn(reviewsResponse);
 
 			// when
@@ -147,36 +161,24 @@ class ReviewControllerTest {
 							.param("expertId", String.valueOf(expertId))
 							.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.reviewResponses[0].id").value(1))
-					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(expertId))
-					.andExpect(jsonPath("$.reviewResponses[0].writerId").value(firstReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(subItemId))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].id").value(1))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].expertId").value(expertId))
 					.andExpect(
-							jsonPath("$.reviewResponses[0].description").value(firstReviewCreateRequest.description()))
-					.andExpect(jsonPath("$.reviewResponses[0].rating").value(firstReviewCreateRequest.rating()))
-					.andExpect(jsonPath("$.reviewResponses[1].id").value(2))
-					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(expertId))
-					.andExpect(jsonPath("$.reviewResponses[1].writerId").value(secondReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(subItemId))
+							jsonPath("$.ReviewsSliceResponse[0].writerId").value(firstReviewCreateRequest.writerId()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].subItemId").value(subItemId))
 					.andExpect(
-							jsonPath("$.reviewResponses[1].description").value(secondReviewCreateRequest.description()))
-					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
-		}
-
-		@DisplayName("실패 - 특정 고수에 대한 리뷰가 존재하지 않는 경우 에러가 발생한다")
-		@Test
-		void findByExpertIdFailed_empty() throws Exception {
-
-			long expertId = 1L;
-			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW))
-					.when(reviewService).findByExpertId(any(Long.class));
-
-			// when
-			// then
-			mockMvc.perform(get(apiBaseUrl + "/experts/" + expertId)
-							.contentType(MediaType.APPLICATION_JSON))
-					.andExpect(status().isNotFound())
-					.andExpect(jsonPath("$.code").value("R001"));
+							jsonPath("$.ReviewsSliceResponse[0].description").value(
+									firstReviewCreateRequest.description()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].rating").value(firstReviewCreateRequest.rating()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].id").value(2))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].expertId").value(expertId))
+					.andExpect(
+							jsonPath("$.ReviewsSliceResponse[1].writerId").value(secondReviewCreateRequest.writerId()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].subItemId").value(subItemId))
+					.andExpect(
+							jsonPath("$.ReviewsSliceResponse[1].description").value(
+									secondReviewCreateRequest.description()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
 		@DisplayName("성공 - 리뷰를 모두 조회할 수 있다")
@@ -187,15 +189,17 @@ class ReviewControllerTest {
 			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
 			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
+			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
-					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5),
-							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3))
+					List.of(new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime, localDateTime),
+							new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, localDateTime, localDateTime)),
+					true
 			);
 
 			long expertId = 1L;
 			long subItemId = 1L;
-
-			given(reviewService.findAll())
+			given(reviewService.findAll(any(PageRequest.class)))
 					.willReturn(reviewsResponse);
 
 			// when
@@ -203,20 +207,24 @@ class ReviewControllerTest {
 			mockMvc.perform(get(apiBaseUrl)
 							.contentType(MediaType.APPLICATION_JSON))
 					.andExpect(status().isOk())
-					.andExpect(jsonPath("$.reviewResponses[0].id").value(1))
-					.andExpect(jsonPath("$.reviewResponses[0].expertId").value(expertId))
-					.andExpect(jsonPath("$.reviewResponses[0].writerId").value(firstReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[0].subItemId").value(subItemId))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].id").value(1))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].expertId").value(expertId))
 					.andExpect(
-							jsonPath("$.reviewResponses[0].description").value(firstReviewCreateRequest.description()))
-					.andExpect(jsonPath("$.reviewResponses[0].rating").value(firstReviewCreateRequest.rating()))
-					.andExpect(jsonPath("$.reviewResponses[1].id").value(2))
-					.andExpect(jsonPath("$.reviewResponses[1].expertId").value(expertId))
-					.andExpect(jsonPath("$.reviewResponses[1].writerId").value(secondReviewCreateRequest.writerId()))
-					.andExpect(jsonPath("$.reviewResponses[1].subItemId").value(subItemId))
+							jsonPath("$.ReviewsSliceResponse[0].writerId").value(firstReviewCreateRequest.writerId()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].subItemId").value(subItemId))
 					.andExpect(
-							jsonPath("$.reviewResponses[1].description").value(secondReviewCreateRequest.description()))
-					.andExpect(jsonPath("$.reviewResponses[1].rating").value(secondReviewCreateRequest.rating()));
+							jsonPath("$.ReviewsSliceResponse[0].description").value(
+									firstReviewCreateRequest.description()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[0].rating").value(firstReviewCreateRequest.rating()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].id").value(2))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].expertId").value(expertId))
+					.andExpect(
+							jsonPath("$.ReviewsSliceResponse[1].writerId").value(secondReviewCreateRequest.writerId()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].subItemId").value(subItemId))
+					.andExpect(
+							jsonPath("$.ReviewsSliceResponse[1].description").value(
+									secondReviewCreateRequest.description()))
+					.andExpect(jsonPath("$.ReviewsSliceResponse[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
 		@DisplayName("성공 - 리뷰를 아이디로 조회할 수 있다")
@@ -224,10 +232,12 @@ class ReviewControllerTest {
 		void findById() throws Exception {
 
 			// given
-			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			LocalDateTime localDateTime = LocalDateTime.now();
+			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, localDateTime,
+					localDateTime);
 
 			long id = 1L;
-			given(reviewService.findById(id))
+			given(reviewService.findById(any(Long.class)))
 					.willReturn(reviewResponse);
 
 			// when

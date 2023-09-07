@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.buckets.domain;
+package com.foo.gosucatcher.domain.bucket.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -23,17 +26,18 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Table(name = "buckets")
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE buckets SET is_deleted = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends BaseEntity {
 
+	private final boolean isDeleted = false;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;

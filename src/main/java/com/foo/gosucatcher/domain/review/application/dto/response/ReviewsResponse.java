@@ -2,16 +2,19 @@ package com.foo.gosucatcher.domain.review.application.dto.response;
 
 import java.util.List;
 
+import org.springframework.data.domain.Slice;
+
 import com.foo.gosucatcher.domain.review.domain.Review;
 
 public record ReviewsResponse(
-		List<ReviewResponse> reviewResponses
+		List<ReviewResponse> ReviewsSliceResponse,
+		boolean hasNext
 ) {
 
-	public static ReviewsResponse from(List<Review> reviews) {
+	public static ReviewsResponse from(Slice<Review> reviews) {
 		return new ReviewsResponse(
 				reviews.stream()
 						.map(ReviewResponse::from)
-						.toList());
+						.toList(), reviews.hasNext());
 	}
 }

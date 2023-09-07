@@ -1,5 +1,8 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private final ReviewService reviewService;
+	private final int DEFAULT_PAGING_SIZE = 3;
 
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ReviewResponse> create(
@@ -38,17 +42,22 @@ public class ReviewController {
 	}
 
 	@GetMapping
-	public ResponseEntity<ReviewsResponse> findAll() {
-		ReviewsResponse reviewsResponse = reviewService.findAll();
+	public ResponseEntity<ReviewsResponse> findAll(
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+			Pageable pageable) {
+		ReviewsResponse response = reviewService.findAll(pageable);
 
-		return ResponseEntity.ok(reviewsResponse);
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/experts/{expertId}")
-	public ResponseEntity<ReviewsResponse> findByExpertId(@PathVariable Long expertId) {
-		ReviewsResponse reviewsResponse = reviewService.findByExpertId(expertId);
+	public ResponseEntity<ReviewsResponse> findAllByExpertId(@PathVariable Long expertId,
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+			Pageable pageable) {
 
-		return ResponseEntity.ok(reviewsResponse);
+		ReviewsResponse response = reviewService.findAllByExpertId(pageable, expertId);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/{id}")

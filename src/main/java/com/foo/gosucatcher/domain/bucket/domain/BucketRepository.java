@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.buckets.domain;
+package com.foo.gosucatcher.domain.bucket.domain;
 
 import java.util.Optional;
 

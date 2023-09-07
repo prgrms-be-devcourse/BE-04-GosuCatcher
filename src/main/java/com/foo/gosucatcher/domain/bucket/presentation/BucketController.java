@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.buckets.presentation;
+package com.foo.gosucatcher.domain.bucket.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.foo.gosucatcher.domain.buckets.application.BucketService;
-import com.foo.gosucatcher.domain.buckets.dto.request.BucketRequest;
-import com.foo.gosucatcher.domain.buckets.dto.response.BucketResponse;
-import com.foo.gosucatcher.domain.buckets.dto.response.BucketsResponse;
+import com.foo.gosucatcher.domain.bucket.application.BucketService;
+import com.foo.gosucatcher.domain.bucket.dto.request.BucketRequest;
+import com.foo.gosucatcher.domain.bucket.dto.response.BucketResponse;
+import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
 
 import lombok.RequiredArgsConstructor;
 

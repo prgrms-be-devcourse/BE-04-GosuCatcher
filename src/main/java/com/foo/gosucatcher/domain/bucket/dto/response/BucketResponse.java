@@ -1,6 +1,6 @@
-package com.foo.gosucatcher.domain.buckets.dto.response;
+package com.foo.gosucatcher.domain.bucket.dto.response;
 
-import com.foo.gosucatcher.domain.buckets.domain.Bucket;
+import com.foo.gosucatcher.domain.bucket.domain.Bucket;
 
 public record BucketResponse(
 		Long id,
