@@ -1,5 +1,13 @@
 package com.foo.gosucatcher.domain.expert.presentation;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,12 +19,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.image.ImageService;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 public class ExpertController {
 
 	private final ExpertService expertService;
+	private final ImageService imageService;
 
 	@PostMapping
 	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request,
@@ -35,9 +50,9 @@ public class ExpertController {
 		return ResponseEntity.ok(expertResponse);
 	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<ExpertResponse> findOne(@PathVariable Long id) {
-		ExpertResponse expert = expertService.findById(id);
+	@GetMapping("/{expertId}")
+	public ResponseEntity<ExpertResponse> findOne(@PathVariable Long expertId) {
+		ExpertResponse expert = expertService.findById(expertId);
 
 		return ResponseEntity.ok(expert);
 	}
@@ -49,17 +64,66 @@ public class ExpertController {
 		return ResponseEntity.ok(experts);
 	}
 
-	@PatchMapping("/{id}")
-	public ResponseEntity<Long> update(@PathVariable Long id, @Validated @RequestBody ExpertUpdateRequest request) {
-		Long expertId = expertService.update(id, request);
+	@PatchMapping("/{expertId}")
+	public ResponseEntity<Long> update(@PathVariable Long expertId,
+		@Validated @RequestBody ExpertUpdateRequest request) {
+		Long updatedExpertId = expertService.update(expertId, request);
 
-		return ResponseEntity.ok(expertId);
+		return ResponseEntity.ok(updatedExpertId);
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
-		expertService.delete(id);
+	@DeleteMapping("/{expertId}")
+	public ResponseEntity<Void> delete(@PathVariable Long expertId) {
+		expertService.delete(expertId);
 
 		return ResponseEntity.ok(null);
 	}
+
+	@PostMapping("/{expertId}/images")
+	public ResponseEntity<ImageUploadResponse> uploadImage(@PathVariable Long expertId, MultipartFile file) throws
+		IllegalStateException,
+		IOException {
+		ImageUploadRequest request = new ImageUploadRequest(expertId, file);
+		String uploadedFilename = imageService.store(request);
+
+		ImageUploadResponse response = new ImageUploadResponse(expertId, uploadedFilename);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
+
+	@GetMapping("/{expertId}/images/{filename}")
+	public ResponseEntity<Resource> getImage(@PathVariable Long expertId,
+		@PathVariable String filename) {
+
+		Resource file = imageService.loadAsResource(expertId, filename);
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
+			"attachment; filename=\"" + file.getFilename() + "\"").body(file);
+	}
+
+	@DeleteMapping("/{expertId}/images/{filename}")
+	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
+		@PathVariable String filename) {
+		imageService.delete(expertId, filename);
+		return ResponseEntity.ok(null);
+	}
+
+	@GetMapping("{expertId}/images")
+	public ResponseEntity<List<ImageResponse>> getImages(@PathVariable Long expertId) {
+		List<ImageResponse> fileInfos = imageService.loadAll(expertId)
+			.map(path -> {
+				String filename = path.getFileName().toString();
+				String url = MvcUriComponentsBuilder.fromMethodName(ExpertController.class,
+					"getImage", expertId, filename).build().toString();
+				Long size;
+				try {
+					size = Files.size(path);
+				} catch (IOException e) {
+					size = 0L;
+				}
+				return new ImageResponse(filename, url, size);
+			})
+			.collect(Collectors.toList());
+
+		return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
+	}
+
 }
