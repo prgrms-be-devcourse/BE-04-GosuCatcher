@@ -219,53 +219,6 @@ class MemberRequestEstimateControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 회원 요청 견적서입니다."));
 	}
 
-	@DisplayName("회원 요청 견적서 수정 성공 테스트")
-	@Test
-	void update() throws Exception {
-		//given
-		Long memberRequestEstimateId = 1L;
-		Long subItemId = 1L;
-
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
-			LocalDateTime.now().plusDays(3), "수정 내용");
-
-		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
-			memberRequestEstimateId);
-
-		//when
-		//then
-		mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/member-request-estimates/{id}", memberRequestEstimateId)
-			.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
-			.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
-	}
-
-	@DisplayName("회원 요청 견적서 수정 실패 테스트")
-	@Test
-	void updateFailed() throws Exception {
-		//given
-		Long memberRequestEstimateId = 1L;
-		Long subItemId = 1L;
-
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, " ",
-			LocalDateTime.now().plusDays(3), "수정 내용");
-
-		when(memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest)).thenReturn(
-			memberRequestEstimateId);
-
-		//when
-		//then
-		mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/member-request-estimates/{id}", memberRequestEstimateId)
-				.content(objectMapper.writeValueAsString(memberRequestEstimateRequest))
-				.contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value("C001"))
-			.andExpect(jsonPath("$.errors").isArray())
-			.andExpect(jsonPath("$.errors[0].field").value("location"))
-			.andExpect(jsonPath("$.errors[0].value").value(" "))
-			.andExpect(jsonPath("$.errors[0].reason").value("지역을 등록해주세요."))
-			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."));
-	}
-
 	@DisplayName("회원 요청 견적서 삭제 성공 테스트")
 	@Test
 	void delete() throws Exception {

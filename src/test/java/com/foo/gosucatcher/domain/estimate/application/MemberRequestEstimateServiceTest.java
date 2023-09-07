@@ -162,45 +162,4 @@ class MemberRequestEstimateServiceTest {
 		assertThat(memberRequestEstimateResponse.detailedDescription()).isEqualTo(
 			memberRequestEstimate.getDetailedDescription());
 	}
-
-	@DisplayName("회원 요정 견적서 수정 성공 테스트")
-	@Test
-	void update() {
-		//given
-		Long memberRequestEstimateId = 1L;
-		Long subItemId = 1L;
-
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
-			LocalDateTime.now().plusDays(2), "수정 내용");
-
-		when(memberRequestEstimateRepository.findById(memberRequestEstimateId)).thenReturn(
-			Optional.of(memberRequestEstimate));
-
-		//when
-		memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest);
-
-		//then
-		assertThat(memberRequestEstimateRequest.location()).isEqualTo(memberRequestEstimate.getLocation());
-		assertThat(memberRequestEstimateRequest.detailedDescription()).isEqualTo(
-			memberRequestEstimate.getDetailedDescription());
-	}
-
-	@DisplayName("회원 요정 견적서 수정 실패 테스트 - 희망 시작일이 현재보다 이전인 경우")
-	@Test
-	void updateFailed() {
-		//given
-		Long memberRequestEstimateId = 1L;
-		Long subItemId = 1L;
-
-		MemberRequestEstimateRequest memberRequestEstimateRequest = new MemberRequestEstimateRequest(subItemId, "수정 지역",
-			LocalDateTime.now().minusDays(3), "수정 내용");
-
-		when(memberRequestEstimateRepository.findById(memberRequestEstimateId)).thenReturn(
-			Optional.of(memberRequestEstimate));
-
-		//when
-		//then
-		assertThrows(BusinessException.class,
-			() -> memberRequestEstimateService.update(memberRequestEstimateId, memberRequestEstimateRequest));
-	}
 }

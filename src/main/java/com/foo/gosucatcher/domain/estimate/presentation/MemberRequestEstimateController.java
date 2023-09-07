@@ -4,7 +4,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -43,7 +42,8 @@ public class MemberRequestEstimateController {
 
 	@GetMapping("/members/{memberId}")
 	public ResponseEntity<MemberRequestEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
-		MemberRequestEstimatesResponse memberRequestEstimatesResponse = memberRequestEstimateService.findAllByMember(memberId);
+		MemberRequestEstimatesResponse memberRequestEstimatesResponse = memberRequestEstimateService.findAllByMember(
+			memberId);
 
 		return ResponseEntity.ok(memberRequestEstimatesResponse);
 	}
@@ -54,15 +54,6 @@ public class MemberRequestEstimateController {
 			memberRequestEstimateId);
 
 		return ResponseEntity.ok(memberRequestEstimateResponse);
-	}
-
-	@PatchMapping("/{memberRequestEstimateId}")
-	public ResponseEntity<Long> update(@PathVariable Long memberRequestEstimateId,
-		@RequestBody @Validated MemberRequestEstimateRequest memberRequestEstimateRequest) {
-		Long updatedMemberRequestEstimateId = memberRequestEstimateService.update(memberRequestEstimateId,
-			memberRequestEstimateRequest);
-
-		return ResponseEntity.ok(updatedMemberRequestEstimateId);
 	}
 
 	@DeleteMapping("/{memberRequestEstimateId}")

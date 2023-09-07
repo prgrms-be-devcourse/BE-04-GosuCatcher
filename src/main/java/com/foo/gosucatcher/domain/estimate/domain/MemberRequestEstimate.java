@@ -56,7 +56,7 @@ public class MemberRequestEstimate extends BaseEntity {
 	@Column(length = 500)
 	private String detailedDescription;
 
-	private boolean isClosed;
+	private boolean isClosed = Boolean.FALSE;
 
 	@Builder
 	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
@@ -66,13 +66,6 @@ public class MemberRequestEstimate extends BaseEntity {
 		this.location = location;
 		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
 		this.detailedDescription = detailedDescription;
-		this.isClosed = false;
-	}
-
-	public void update(MemberRequestEstimate memberRequestEstimate) {
-		this.location = memberRequestEstimate.getLocation();
-		this.preferredStartDate = validatePreferredStartDate(memberRequestEstimate.getPreferredStartDate());
-		this.detailedDescription = memberRequestEstimate.getDetailedDescription();
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {

@@ -72,20 +72,6 @@ public class MemberRequestEstimateService {
 		return MemberRequestEstimateResponse.from(memberRequestEstimate);
 	}
 
-	public Long update(Long memberRequestEstimateId, MemberRequestEstimateRequest memberRequestEstimateRequest) {
-		MemberRequestEstimate foundMemberRequestEstimate = memberRequestEstimateRepository.findById(
-				memberRequestEstimateId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
-
-		MemberRequestEstimate memberRequestEstimate = MemberRequestEstimateRequest.toMemberRequestEstimate(
-			foundMemberRequestEstimate.getMember(), foundMemberRequestEstimate.getSubItem(),
-			memberRequestEstimateRequest);
-
-		foundMemberRequestEstimate.update(memberRequestEstimate);
-
-		return foundMemberRequestEstimate.getId();
-	}
-
 	public void delete(Long memberRequestEstimateId) {
 		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(memberRequestEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
