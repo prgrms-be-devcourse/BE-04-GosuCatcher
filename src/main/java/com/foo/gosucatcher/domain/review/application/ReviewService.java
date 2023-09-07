@@ -35,11 +35,11 @@ public class ReviewService {
 
 	public ReviewResponse create(Long expertId, Long subItemId, ReviewCreateRequest reviewCreateRequest) {
 		Expert expert = expertRepository.findById(expertId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 		Member writer = memberRepository.findById(reviewCreateRequest.writerId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(subItemId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
 		Review review = ReviewCreateRequest.toReview(reviewCreateRequest, expert, writer, subItem);
 		reviewRepository.save(review);
@@ -64,14 +64,14 @@ public class ReviewService {
 	@Transactional(readOnly = true)
 	public ReviewResponse findById(Long id) {
 		Review review = reviewRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
 
 		return ReviewResponse.from(review);
 	}
 
 	public Long update(Long id, ReviewUpdateRequest reviewUpdateRequest) {
 		Review review = reviewRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
 
 		Review updatedReview = ReviewUpdateRequest.toReview(reviewUpdateRequest);
 
@@ -82,10 +82,10 @@ public class ReviewService {
 
 	public void delete(Long id) {
 		reviewRepository.findById(id).ifPresentOrElse(
-			review -> reviewRepository.deleteById(id),
-			() -> {
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
-			}
+				review -> reviewRepository.deleteById(id),
+				() -> {
+					throw new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW);
+				}
 		);
 	}
 

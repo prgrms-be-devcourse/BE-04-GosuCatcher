@@ -33,9 +33,9 @@ public class ReviewController {
 
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ReviewResponse> create(
-		@PathVariable Long expertId,
-		@RequestParam Long subItemId,
-		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
+			@PathVariable Long expertId,
+			@RequestParam Long subItemId,
+			@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
 		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
 
 		return ResponseEntity.ok(reviewResponse);
@@ -43,8 +43,8 @@ public class ReviewController {
 
 	@GetMapping
 	public ResponseEntity<ReviewsResponse> findAll(
-		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-		Pageable pageable) {
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+			Pageable pageable) {
 		ReviewsResponse response = reviewService.findAll(pageable);
 
 		return ResponseEntity.ok(response);
@@ -52,8 +52,8 @@ public class ReviewController {
 
 	@GetMapping("/experts/{expertId}")
 	public ResponseEntity<ReviewsResponse> findAllByExpertId(@PathVariable Long expertId,
-		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-		Pageable pageable) {
+			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+			Pageable pageable) {
 
 		ReviewsResponse response = reviewService.findAllByExpertId(pageable, expertId);
 
