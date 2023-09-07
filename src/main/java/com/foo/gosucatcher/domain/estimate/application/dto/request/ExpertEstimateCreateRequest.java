@@ -4,13 +4,17 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.foo.gosucatcher.domain.estimate.domain.ExpertResponseEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
 
-public record ExpertResponseEstimateCreateRequest(
+public record ExpertEstimateCreateRequest(
 	@NotNull(message = "응답할 고객의 요청 견적서 ID를 입력해주세요.")
 	Long memberRequestEstimateId,
+
+	@NotNull(message = "제공할 서비스 ID를 입력해주세요.")
+	Long subItemId,
 
 	@NotNull(message = "총 비용을 입력하세요.")
 	Integer totalCost,
@@ -20,20 +24,21 @@ public record ExpertResponseEstimateCreateRequest(
 	String description,
 
 	@NotNull(message = "자주 사용하는 견적서로 등록할 유무를 알려주세요.")
-	Boolean isOftenUsed
+	Boolean isAuto
 ) {
 
-	public static ExpertResponseEstimate toExpertResponseEstimate(
-		ExpertResponseEstimateCreateRequest expertResponseEstimateCreateRequest,
+	public static ExpertEstimate toExpertResponseEstimate(
+		ExpertEstimateCreateRequest expertEstimateCreateRequest,
 		MemberRequestEstimate memberRequestEstimate,
-		Expert expert) {
+		Expert expert, SubItem subItem) {
 
-		return ExpertResponseEstimate.builder()
+		return ExpertEstimate.builder()
 			.memberRequestEstimate(memberRequestEstimate)
+			.subItem(subItem)
 			.expert(expert)
-			.totalCost(expertResponseEstimateCreateRequest.totalCost)
-			.description(expertResponseEstimateCreateRequest.description)
-			.isOftenUsed(expertResponseEstimateCreateRequest.isOftenUsed)
+			.totalCost(expertEstimateCreateRequest.totalCost)
+			.description(expertEstimateCreateRequest.description)
+			.isAuto(expertEstimateCreateRequest.isAuto)
 			.build();
 	}
 }

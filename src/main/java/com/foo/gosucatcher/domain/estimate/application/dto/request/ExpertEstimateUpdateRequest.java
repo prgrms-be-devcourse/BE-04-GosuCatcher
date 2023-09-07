@@ -4,11 +4,11 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.foo.gosucatcher.domain.estimate.domain.ExpertResponseEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 
-public record ExpertResponseEstimateUpdateRequest(
+public record ExpertEstimateUpdateRequest(
 	@NotNull(message = "총 비용을 입력하세요.")
 	Integer totalCost,
 
@@ -17,19 +17,19 @@ public record ExpertResponseEstimateUpdateRequest(
 	String description,
 
 	@NotNull(message = "자주 사용하는 견적서로 등록할 유무를 알려주세요.")
-	Boolean isOftenUsed
+	Boolean isAuto
 ) {
 
-	public static ExpertResponseEstimate toExpertResponseEstimate(
-		ExpertResponseEstimateUpdateRequest expertResponseEstimateUpdateRequest, Expert expert,
+	public static ExpertEstimate toExpertResponseEstimate(
+		ExpertEstimateUpdateRequest expertEstimateUpdateRequest, Expert expert,
 		MemberRequestEstimate memberRequestEstimate
 	) {
-		return ExpertResponseEstimate.builder()
+		return ExpertEstimate.builder()
 			.expert(expert)
 			.memberRequestEstimate(memberRequestEstimate)
-			.totalCost(expertResponseEstimateUpdateRequest.totalCost)
-			.description(expertResponseEstimateUpdateRequest.description)
-			.isOftenUsed(expertResponseEstimateUpdateRequest.isOftenUsed)
+			.totalCost(expertEstimateUpdateRequest.totalCost)
+			.description(expertEstimateUpdateRequest.description)
+			.isAuto(expertEstimateUpdateRequest.isAuto)
 			.build();
 	}
 }

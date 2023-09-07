@@ -23,16 +23,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.estimate.application.ExpertResponseEstimateService;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertResponseEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertResponseEstimateUpdateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertResponseEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertResponseEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateUpdateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(ExpertResponseEstimateController.class)
-class ExpertResponseEstimateControllerTest {
+@WebMvcTest(ExpertEstimateController.class)
+class ExpertEstimateControllerTest {
 
 	@Autowired
 	MockMvc mockMvc;
@@ -41,15 +41,15 @@ class ExpertResponseEstimateControllerTest {
 	ObjectMapper objectMapper;
 
 	@MockBean
-	ExpertResponseEstimateService expertResponseEstimateService;
+	ExpertEstimateService expertEstimateService;
 
-	private ExpertResponseEstimateCreateRequest expertResponseEstimateCreateRequest;
+	private ExpertEstimateCreateRequest expertEstimateCreateRequest;
 	private String baseUrl = "/api/v1/expert-response-estimates";
 
 	@BeforeEach
 	void setUp() {
-		expertResponseEstimateCreateRequest =
-			new ExpertResponseEstimateCreateRequest(1L, 100, "상세설명을씁니다", true);
+		expertEstimateCreateRequest =
+			new ExpertEstimateCreateRequest(1L, 1L,100, "상세설명을씁니다", true);
 	}
 
 	@Test
@@ -57,15 +57,15 @@ class ExpertResponseEstimateControllerTest {
 	void createExpertEstimateSuccessTest() throws Exception {
 
 		//given
-		ExpertResponseEstimateResponse expertResponseEstimateResponse = new ExpertResponseEstimateResponse(1L, 1L, 1L,
+		ExpertEstimateResponse expertEstimateResponse = new ExpertEstimateResponse(1L, 1L, 1L,
 			100, "상세설명을씁니다", true);
-		given(expertResponseEstimateService.create(anyLong(), any(ExpertResponseEstimateCreateRequest.class)))
-			.willReturn(expertResponseEstimateResponse);
+		given(expertEstimateService.create(anyLong(), any(ExpertEstimateCreateRequest.class)))
+			.willReturn(expertEstimateResponse);
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/{id}", 1L)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(expertResponseEstimateCreateRequest)))
+				.content(objectMapper.writeValueAsString(expertEstimateCreateRequest)))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(1))
 			.andExpect(jsonPath("$.memberRequestEstimateId").value(1))
@@ -80,13 +80,13 @@ class ExpertResponseEstimateControllerTest {
 	void createExpertEstimateFailTest_notFoundExpert() throws Exception {
 
 		//given
-		given(expertResponseEstimateService.create(anyLong(), any(ExpertResponseEstimateCreateRequest.class)))
+		given(expertEstimateService.create(anyLong(), any(ExpertEstimateCreateRequest.class)))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/{id}", 1L)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(expertResponseEstimateCreateRequest)))
+				.content(objectMapper.writeValueAsString(expertEstimateCreateRequest)))
 			.andExpect(status().isNotFound())
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -101,13 +101,13 @@ class ExpertResponseEstimateControllerTest {
 	void createExpertEstimateFailTest_notFoundMemberRequestEstimate() throws Exception {
 
 		//given
-		given(expertResponseEstimateService.create(anyLong(), any(ExpertResponseEstimateCreateRequest.class)))
+		given(expertEstimateService.create(anyLong(), any(ExpertEstimateCreateRequest.class)))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/{id}", 1L)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(expertResponseEstimateCreateRequest)))
+				.content(objectMapper.writeValueAsString(expertEstimateCreateRequest)))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("MRE001"))
@@ -121,13 +121,13 @@ class ExpertResponseEstimateControllerTest {
 	void createExpertEstimateFailTest_invalidValue() throws Exception {
 
 		//given
-		expertResponseEstimateCreateRequest =
-			new ExpertResponseEstimateCreateRequest(1L, 100, "짧은 설명", true);
+		expertEstimateCreateRequest =
+			new ExpertEstimateCreateRequest(1L, 1L,100, "짧은 설명", true);
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/{id}", 1L)
 				.contentType(APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(expertResponseEstimateCreateRequest)))
+				.content(objectMapper.writeValueAsString(expertEstimateCreateRequest)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("C001"))
@@ -142,10 +142,10 @@ class ExpertResponseEstimateControllerTest {
 	void findAllSuccessTest() throws Exception {
 
 		//given
-		ExpertResponseEstimatesResponse estimatesResponse = new ExpertResponseEstimatesResponse(
-			List.of(new ExpertResponseEstimateResponse(1L, 1L, 1L, 100, "설명을 적어보세요", true)
+		ExpertEstimatesResponse estimatesResponse = new ExpertEstimatesResponse(
+			List.of(new ExpertEstimateResponse(1L, 1L, 1L, 100, "설명을 적어보세요", true)
 			));
-		given(expertResponseEstimateService.findAll()).willReturn(estimatesResponse);
+		given(expertEstimateService.findAll()).willReturn(estimatesResponse);
 
 		//when -> then
 		mockMvc.perform(get(baseUrl))
@@ -160,9 +160,9 @@ class ExpertResponseEstimateControllerTest {
 	void findExpertEstimateByIdSuccessTest() throws Exception {
 
 		//given
-		ExpertResponseEstimateResponse expertResponseEstimateResponse = new ExpertResponseEstimateResponse(1L, 1L, 1L,
+		ExpertEstimateResponse expertEstimateResponse = new ExpertEstimateResponse(1L, 1L, 1L,
 			100, "설명을 적어보세요", true);
-		given(expertResponseEstimateService.findById(anyLong())).willReturn(expertResponseEstimateResponse);
+		given(expertEstimateService.findById(anyLong())).willReturn(expertEstimateResponse);
 
 		//when -> then
 		mockMvc.perform(get(baseUrl + "/{id}", 1L))
@@ -178,7 +178,7 @@ class ExpertResponseEstimateControllerTest {
 	void findExpertEstimateByIdFailTest_notFoundExpertEstimate() throws Exception {
 
 		//given
-		given(expertResponseEstimateService.findById(anyLong()))
+		given(expertEstimateService.findById(anyLong()))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
 
 		//when -> then
@@ -196,13 +196,13 @@ class ExpertResponseEstimateControllerTest {
 	void updateExpertEstimateSuccessTest() throws Exception {
 
 		//given
-		ExpertResponseEstimateUpdateRequest updateRequest = new ExpertResponseEstimateUpdateRequest(9999, "수정한 설명입니다.",
+		ExpertEstimateUpdateRequest updateRequest = new ExpertEstimateUpdateRequest(9999, "수정한 설명입니다.",
 			false);
-		ExpertResponseEstimateResponse expertResponseEstimateResponse = new ExpertResponseEstimateResponse(1L, 1L, 1L,
+		ExpertEstimateResponse expertEstimateResponse = new ExpertEstimateResponse(1L, 1L, 1L,
 			999, "수정한 설명입니다.", false);
 
-		given(expertResponseEstimateService.update(anyLong(), any()))
-			.willReturn(expertResponseEstimateResponse.id());
+		given(expertEstimateService.update(anyLong(), any()))
+			.willReturn(expertEstimateResponse.id());
 
 		//when -> then
 		mockMvc.perform(patch(baseUrl + "/{id}", 1L, updateRequest)

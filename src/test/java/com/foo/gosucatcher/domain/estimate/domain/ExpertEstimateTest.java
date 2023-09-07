@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 
-class ExpertResponseEstimateTest {
+class ExpertEstimateTest {
 
 	private Expert expert;
 	private MemberRequestEstimate memberRequestEstimate;
@@ -39,7 +39,7 @@ class ExpertResponseEstimateTest {
 	void createExpertResponseEstimateSuccessTest(int totalCost) {
 
 		//when -> then
-		assertDoesNotThrow(() -> ExpertResponseEstimate.builder()
+		assertDoesNotThrow(() -> ExpertEstimate.builder()
 			.expert(expert)
 			.memberRequestEstimate(memberRequestEstimate)
 			.totalCost(totalCost)
@@ -53,7 +53,7 @@ class ExpertResponseEstimateTest {
 	void createExpertResponseEstimateFailTest_InvalidTotalCost(int invalidTotalCost) {
 
 		//when -> then
-		assertThrows(BusinessException.class, () -> ExpertResponseEstimate.builder()
+		assertThrows(BusinessException.class, () -> ExpertEstimate.builder()
 			.expert(expert)
 			.memberRequestEstimate(memberRequestEstimate)
 			.totalCost(invalidTotalCost)
