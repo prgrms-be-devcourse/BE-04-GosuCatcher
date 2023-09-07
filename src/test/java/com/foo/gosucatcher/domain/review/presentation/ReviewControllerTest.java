@@ -401,13 +401,14 @@ class ReviewControllerTest {
 			// given
 			long reviewId = 1L;
 			long replyId = 4L;
+
 			doNothing()
 				.when(reviewService)
 				.deleteReply(reviewId, replyId);
 
 			// when
 			// then
-			mockMvc.perform(delete("/api/v1/reviews/1/replies/4")
+			mockMvc.perform(delete(apiBaseUrl + "/" + reviewId + "/replies/" + replyId)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
