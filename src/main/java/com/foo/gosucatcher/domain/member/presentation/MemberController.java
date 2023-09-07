@@ -20,13 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.member.application.MemberService;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
@@ -43,6 +45,23 @@ public class MemberController {
 
 	private final MemberService memberService;
 
+	@PostMapping("/recovery/password")
+	public ResponseEntity<MemberPasswordFoundResponse> findPassword(
+		@RequestBody @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+		//todo: 이메일 인증 시스템 만들기
+		MemberPasswordFoundResponse response = memberService.findPassword(email);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/signup")
+	public ResponseEntity<MemberEmailDuplicateResponse> checkDuplicatedEmail(
+		@RequestParam @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+		MemberEmailDuplicateResponse response = memberService.checkDuplicatedEmail(email);
+
+		return ResponseEntity.ok(response);
+	}
+
 	@PostMapping("/signup")
 	public ResponseEntity<MemberSignUpResponse> signUp(
 		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
@@ -52,20 +71,10 @@ public class MemberController {
 			.body(response);
 	}
 
-	@GetMapping("/signup")
-	public ResponseEntity<Boolean> checkDuplicatedEmail(
-		@RequestParam @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
-		memberService.checkDuplicatedEmail(email);
-
-		return ResponseEntity.ok(true);
-	}
-
 	@PostMapping("/login")
 	public ResponseEntity<MemberCertifiedResponse> login(
-		@RequestBody @Validated MemberLoginRequest memberLogInRequest) {
-		// 3. 패스워드 검증절차 코드 객체지향적으로 리팩토링
-		// 4. 유저기능 관련 테스트 코드 작성
-		MemberCertifiedResponse response = memberService.login(memberLogInRequest);
+		@RequestBody @Validated MemberLoginRequest memberLoginRequest) {
+		MemberCertifiedResponse response = memberService.login(memberLoginRequest);
 
 		return ResponseEntity.ok(response);
 	}
@@ -83,34 +92,28 @@ public class MemberController {
 	public ResponseEntity<Void> logout(String memberEmail) {
 		memberService.logout(memberEmail);
 
-		return ResponseEntity.ok()
-			.build();
+		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/{email}")
-	public ResponseEntity<MemberPasswordFoundResponse> findPassword(@PathVariable @Validated @Email String email) {
-		MemberPasswordFoundResponse response = memberService.findPassword(email);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@CurrentMemberId
-	@PatchMapping("/profile")
-	public ResponseEntity<Long> changeMemberInfo(Long memberId,
-		@RequestBody @Validated MemberInfoChangeRequest memberInfoChangeRequest) {
-		long responseId = memberService.changeMemberInfo(memberId, memberInfoChangeRequest);
-
-		return ResponseEntity.ok(responseId);
-	}
-
-	@DeleteMapping("/{memberId}")
+	@DeleteMapping("/me")
 	public ResponseEntity<Void> deleteMember(@PathVariable long memberId) {
 		memberService.deleteMember(memberId);
 
 		return ResponseEntity.ok(null);
 	}
 
-	@PostMapping("/{memberId}/profile")
+	@CurrentMemberId
+	@PatchMapping("/me/profile")
+	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(Long memberId,
+		@RequestBody @Validated MemberProfileChangeRequest memberProfileChangeRequest) {
+		MemberProfileChangeResponse response = memberService.changeMemberProfile(memberId,
+			memberProfileChangeRequest);
+
+		return ResponseEntity.ok(response);
+	}
+
+	//todo: 리팩토링 예정
+	@PostMapping("/me/profile/image")
 	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(@PathVariable long memberId,
 		@RequestParam MultipartFile file) {
 		ProfileImageUploadRequest request = new ProfileImageUploadRequest(memberId, file);
@@ -122,7 +125,7 @@ public class MemberController {
 			.body(response);
 	}
 
-	@GetMapping("/{memberId}/profile")
+	@GetMapping("/me/profile/image")
 	public ResponseEntity<Resource> findProfileImage(@PathVariable long memberId) {
 		ImageFile profileImage = memberService.findProfileImage(memberId);
 
@@ -134,9 +137,9 @@ public class MemberController {
 			.body(resource);
 	}
 
-	@DeleteMapping("/{memberId}/profile")
+	@DeleteMapping("/me/profile/image")
 	public ResponseEntity<Void> deleteProfileImage(@PathVariable long memberId) {
-		memberService.removeProfileImage(memberId);
+		memberService.deleteProfileImage(memberId);
 
 		return ResponseEntity.ok(null);
 	}

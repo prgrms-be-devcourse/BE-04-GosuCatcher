@@ -18,9 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Aspect

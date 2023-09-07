@@ -4,19 +4,21 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -39,23 +41,36 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final MemberProfileRepository memberProfileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
-	private final BCryptPasswordEncoder passwordEncoder;
+	private final PasswordEncoder passwordEncoder;
+
+	@Transactional(readOnly = true)
+	public MemberPasswordFoundResponse findPassword(@Validated @Email String email) {
+		Member member = memberRepository.findByEmail(email)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
+
+		return MemberPasswordFoundResponse.from(member);
+	}
+
+	@Transactional(readOnly = true)
+	public MemberEmailDuplicateResponse checkDuplicatedEmail(
+		@Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+		memberRepository.findByEmail(email)
+			.ifPresent((member) -> {
+				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER_EMAIL);
+			});
+
+		return MemberEmailDuplicateResponse.from(email);
+	}
 
 	public MemberSignUpResponse signup(@Validated MemberSignUpRequest memberSignUpRequest) {
-		String signUpEmail = memberSignUpRequest.email();
-		String signUpPassword = memberSignUpRequest.password();
-		String signUpName = memberSignUpRequest.name();
+		Member signupMember = MemberSignUpRequest.toMember(memberSignUpRequest);
+		String signupEmail = signupMember.getEmail();
 
-		checkDuplicatedEmail(signUpEmail);
+		checkDuplicatedEmail(signupEmail);
 
-		String encodedPassword = passwordEncoder.encode(signUpPassword);
-		Member signUpMember = Member.builder()
-			.email(signUpEmail)
-			.password(encodedPassword)
-			.name(signUpName)
-			.role(Roles.ROLE_USER)
-			.build();
-		Member savedMember = memberRepository.save(signUpMember);
+		signupMember.encodePassword(passwordEncoder);
+		signupMember.changeMemberRole(Roles.ROLE_USER);
+		Member savedMember = memberRepository.save(signupMember);
 
 		memberProfileRepository.initializeMemberProfile(savedMember);
 
@@ -65,33 +80,27 @@ public class MemberService {
 	@Transactional
 	public MemberCertifiedResponse login(@Validated MemberLoginRequest memberLoginRequest) {
 		String loginRequestEmail = memberLoginRequest.email();
-		Member foundMember = memberRepository.findByEmail(loginRequestEmail)
+		Member member = memberRepository.findByEmail(loginRequestEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
-		String loginRequestPassword = memberLoginRequest.password();
-		String memberPassword = foundMember.getPassword();
-		if (!passwordEncoder.matches(loginRequestPassword, memberPassword)) {
-			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
-		}
+		Member loginRequestMember = MemberLoginRequest.toMember(memberLoginRequest);
+		member.authenticate(loginRequestMember, passwordEncoder);
 
-		return getMemberCertifiedResponse(foundMember);
+		return getMemberCertifiedResponse(member);
 	}
 
 	public MemberCertifiedResponse refresh(MemberRefreshRequest memberRefreshRequest) {
 		String refreshToken = memberRefreshRequest.refreshToken();
 
 		if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
-			throw new MemberCertifiedFailException(ErrorCode.CERTIFIED_FAIL);
+			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
 		}
 
-		Authentication authentication = jwtTokenProvider.getRefreshTokenAuthentication(refreshToken);
-		String memberEmail = authentication.getName();
-		Member member = memberRepository.findByEmail(memberEmail)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		Member member = getMemberByRefreshToken(refreshToken);
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
-			throw new MemberCertifiedFailException(ErrorCode.CERTIFIED_FAIL);
+			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
 		}
 
 		return getMemberCertifiedResponse(member);
@@ -104,38 +113,23 @@ public class MemberService {
 		member.logout();
 	}
 
-	@Transactional(readOnly = true)
-	public MemberPasswordFoundResponse findPassword(@Validated @Email String email) {
-		Member member = memberRepository.findByEmail(email)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
-
-		return MemberPasswordFoundResponse.from(member);
-	}
-
-	@Transactional(readOnly = true)
-	public void checkDuplicatedEmail(@Validated @Email String email) {
-		memberRepository.findByEmail(email)
-			.ifPresent((elem) -> {
-				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER_EMAIL);
-			});
-	}
-
-	public long changeMemberInfo(@Validated @Min(0) long memberId,
-		@Validated MemberInfoChangeRequest memberInfoChangeRequest) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-
-		Member changedMember = MemberInfoChangeRequest.toMember(memberInfoChangeRequest);
-		member.changeMemberInfo(changedMember);
-
-		return memberId;
-	}
-
 	public void deleteMember(@Validated @Min(0) long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
 		member.deleteMember();
+	}
+
+	public MemberProfileChangeResponse changeMemberProfile(@Validated @Min(0) Long memberId,
+		@Validated MemberProfileChangeRequest memberProfileChangeRequest) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		//todo:휴대폰 인증 시스템 만들기
+		Member changedMember = MemberProfileChangeRequest.toMember(memberProfileChangeRequest);
+		member.changeMemberProfile(changedMember, passwordEncoder);
+
+		return MemberProfileChangeResponse.from(member);
 	}
 
 	public void uploadProfileImage(@Validated ProfileImageUploadRequest profileImageUploadRequest) {
@@ -157,7 +151,7 @@ public class MemberService {
 		return memberProfileRepository.findImage(member);
 	}
 
-	public void removeProfileImage(@Validated @Min(0) long memberId) {
+	public void deleteProfileImage(@Validated @Min(0) long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
@@ -172,8 +166,16 @@ public class MemberService {
 		String accessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId);
 		String refreshToken = jwtTokenProvider.createRefreshToken(memberEmail, memberId);
 
-		member.refresh(refreshToken);
+		member.refreshToken(refreshToken);
 
 		return MemberCertifiedResponse.from(accessToken, refreshToken);
+	}
+
+	private Member getMemberByRefreshToken(String refreshToken) {
+		Authentication authentication = jwtTokenProvider.getRefreshTokenAuthentication(refreshToken);
+		String memberEmail = authentication.getName();
+
+		return memberRepository.findByEmail(memberEmail)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 	}
 }

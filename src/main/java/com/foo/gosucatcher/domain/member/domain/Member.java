@@ -16,10 +16,12 @@ import javax.persistence.Table;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.foo.gosucatcher.global.BaseEntity;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -48,6 +50,9 @@ public class Member extends BaseEntity implements UserDetails {
 	@Column(length = 20, unique = true)
 	private String phoneNumber;
 
+	@Column
+	private boolean isDeleted = Boolean.FALSE;
+
 	@Embedded
 	@Column(nullable = false)
 	private ImageFile profileImageFile;
@@ -58,9 +63,6 @@ public class Member extends BaseEntity implements UserDetails {
 
 	@Column
 	private String refreshToken;
-
-	@Column
-	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public Member(String name, String password, String email, String phoneNumber, Roles role,
@@ -73,18 +75,15 @@ public class Member extends BaseEntity implements UserDetails {
 		this.profileImageFile = profileImageFile;
 	}
 
-	public void logout() {
-		this.refreshToken = "";
+	public void encodePassword(PasswordEncoder passwordEncoder) {
+		this.password = passwordEncoder.encode(password);
 	}
 
-	public void refresh(String refreshToken) {
-		this.refreshToken = refreshToken;
-	}
-
-	public void changeMemberInfo(Member member) {
-		this.name = member.getName();
-		this.password = member.getPassword();
-		this.phoneNumber = member.getPhoneNumber();
+	public void changeMemberProfile(Member requestMember, PasswordEncoder passwordEncoder) {
+		this.name = requestMember.getName();
+		this.password = requestMember.getPassword();
+		encodePassword(passwordEncoder);
+		this.phoneNumber = requestMember.getPhoneNumber();
 	}
 
 	public void deleteMember() {
@@ -97,6 +96,25 @@ public class Member extends BaseEntity implements UserDetails {
 		}
 
 		this.profileImageFile = profileImageFile;
+	}
+
+	public void changeMemberRole(Roles role) {
+		this.role = role;
+	}
+
+	public void refreshToken(String refreshToken) {
+		this.refreshToken = refreshToken;
+	}
+
+	public void authenticate(Member requestMember, PasswordEncoder passwordEncoder) {
+		String requestPassword = requestMember.getPassword();
+		if (!passwordEncoder.matches(requestPassword, this.password)) {
+			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
+		}
+	}
+
+	public void logout() {
+		this.refreshToken = "";
 	}
 
 	@Override
