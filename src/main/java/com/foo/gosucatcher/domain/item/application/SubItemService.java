@@ -2,13 +2,16 @@ package com.foo.gosucatcher.domain.item.application;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.SubItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
@@ -52,6 +55,13 @@ public class SubItemService {
 		List<SubItem> subItemList = subItemRepository.findAll();
 
 		return SubItemsResponse.from(subItemList);
+	}
+
+	@Transactional(readOnly = true)
+	public SubItemsSliceResponse findAllByMainItemName(String mainItemName, Pageable pageable) {
+		Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, pageable);
+
+		return SubItemsSliceResponse.from(subItems);
 	}
 
 	public Long update(Long id, SubItemUpdateRequest request) {
