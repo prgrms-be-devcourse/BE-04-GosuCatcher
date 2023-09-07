@@ -20,15 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.member.application.MemberService;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
@@ -95,11 +96,20 @@ public class MemberController {
 		return ResponseEntity.noContent().build();
 	}
 
+	@CurrentMemberId
 	@DeleteMapping("/me")
-	public ResponseEntity<Void> deleteMember(@PathVariable long memberId) {
+	public ResponseEntity<Void> deleteMember(Long memberId) {
 		memberService.deleteMember(memberId);
 
 		return ResponseEntity.ok(null);
+	}
+
+	@CurrentMemberId
+	@GetMapping("/me/profile")
+	public ResponseEntity<MemberProfileResponse> findMemberProfile(Long memberId) {
+		MemberProfileResponse response = memberService.findMemberProfile(memberId);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberId

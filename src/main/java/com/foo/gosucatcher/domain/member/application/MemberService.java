@@ -19,6 +19,7 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifie
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -118,6 +119,13 @@ public class MemberService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
 		member.deleteMember();
+	}
+
+	public MemberProfileResponse findMemberProfile(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		return MemberProfileResponse.from(member);
 	}
 
 	public MemberProfileChangeResponse changeMemberProfile(@Validated @Min(0) Long memberId,
