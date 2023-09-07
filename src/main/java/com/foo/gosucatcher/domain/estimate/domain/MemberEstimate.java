@@ -70,7 +70,7 @@ public class MemberEstimate extends BaseEntity {
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
 		if (LocalDateTime.now().isAfter(preferredStartDate)) {
-			throw new BusinessException(ErrorCode.INVALID_MEMBER_REQUEST_ESTIMATE_START_DATE);
+			throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
 		}
 
 		return preferredStartDate;

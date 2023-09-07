@@ -98,7 +98,7 @@ class ExpertEstimateControllerTest {
 
 		//given
 		given(expertEstimateService.create(anyLong(), any(ExpertEstimateCreateRequest.class))).willThrow(
-			new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/{id}", 1L).contentType(APPLICATION_JSON)

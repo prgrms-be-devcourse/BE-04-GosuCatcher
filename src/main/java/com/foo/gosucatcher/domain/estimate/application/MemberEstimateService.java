@@ -65,14 +65,14 @@ public class MemberEstimateService {
 	@Transactional(readOnly = true)
 	public MemberEstimateResponse findById(Long memberEstimateId) {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		return MemberEstimateResponse.from(memberEstimate);
 	}
 
 	public void delete(Long memberEstimateId) {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		memberEstimateRepository.delete(memberEstimate);
 	}
@@ -82,7 +82,7 @@ public class MemberEstimateService {
 			memberId, subItemId);
 
 		Optional.ofNullable(memberEstimatesForDuplicate).filter(result -> !result.isEmpty()).ifPresent(result -> {
-			throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_REQUEST_ESTIMATE);
+			throw new BusinessException(ErrorCode.DUPLICATE_MEMBER_ESTIMATE);
 		});
 	}
 }

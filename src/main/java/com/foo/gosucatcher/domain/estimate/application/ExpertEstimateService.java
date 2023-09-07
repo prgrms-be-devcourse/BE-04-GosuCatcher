@@ -37,7 +37,7 @@ public class ExpertEstimateService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(request.memberEstimateId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		SubItem subItem = subItemRepository.findById(request.subItemId())
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));

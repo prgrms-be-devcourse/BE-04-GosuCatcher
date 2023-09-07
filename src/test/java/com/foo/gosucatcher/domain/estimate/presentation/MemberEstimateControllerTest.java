@@ -207,7 +207,7 @@ class MemberEstimateControllerTest {
 	void findByIdFailed() throws Exception {
 		//given
 		when(memberEstimateService.findById(any(Long.class))).thenThrow(
-			new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		//when
 		//then
@@ -237,7 +237,7 @@ class MemberEstimateControllerTest {
 	@Test
 	void deleteFailed() throws Exception {
 		//given
-		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE)).when(
+		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE)).when(
 			memberEstimateService).delete(any(Long.class));
 
 		//when
