@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.foo.gosucatcher.aop.CurrentMemberEmail;
 import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberInfoChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLogInRequest;
@@ -26,12 +27,15 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpReq
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.util.ImageFileUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/members")
@@ -40,11 +44,20 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/signup")
-	public ResponseEntity<Void> signUp(
+	public ResponseEntity<MemberSignUpResponse> signUp(
 		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
-		memberService.signUp(memberSignUpRequest);
+		MemberSignUpResponse response = memberService.signUp(memberSignUpRequest);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(response);
+	}
+
+	@GetMapping("/signup")
+	public ResponseEntity<Void> checkDuplicatedEmail(@RequestParam @Validated @Email String email) {
+		memberService.checkDuplicatedEmail(email);
+
+		return ResponseEntity.ok()
+			.build();
 	}
 
 	@PostMapping("/login")
@@ -55,11 +68,13 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/signup")
-	public ResponseEntity<Void> checkDuplicatedEmail(@RequestParam @Validated @Email String email) {
-		memberService.checkDuplicatedEmail(email);
+	@CurrentMemberEmail
+	@DeleteMapping("/logout")
+	public ResponseEntity<Void> logOut(String memberEmail) {
+		memberService.logOut(memberEmail);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok()
+			.build();
 	}
 
 	@GetMapping("/{email}")
@@ -69,6 +84,7 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
+	@CurrentMemberEmail
 	@PatchMapping("/{memberId}")
 	public ResponseEntity<Long> changeMemberInfo(@PathVariable long memberId,
 		@RequestBody @Validated MemberInfoChangeRequest memberInfoChangeRequest) {
@@ -77,6 +93,7 @@ public class MemberController {
 		return ResponseEntity.ok(responseId);
 	}
 
+	@CurrentMemberEmail
 	@DeleteMapping("/{memberId}")
 	public ResponseEntity<Void> deleteMember(@PathVariable long memberId) {
 		memberService.deleteMember(memberId);

@@ -2,11 +2,12 @@ package com.foo.gosucatcher.domain.member.application.dto.request;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 
 import org.hibernate.validator.constraints.Length;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.domain.member.domain.Roles;
 
 public record MemberSignUpRequest(
 	@NotBlank(message = "이름은 비어있을 수 없습니다")
@@ -22,9 +23,10 @@ public record MemberSignUpRequest(
 
 	public static Member toMember(MemberSignUpRequest memberSignUpRequest) {
 		return Member.builder()
-			.name(memberSignUpRequest.name)
-			.email(memberSignUpRequest.email)
-			.password(memberSignUpRequest.password)
+			.name(memberSignUpRequest.name())
+			.email(memberSignUpRequest.email())
+			.password(memberSignUpRequest.password())
+			.role(Roles.USER)
 			.build();
 	}
 }

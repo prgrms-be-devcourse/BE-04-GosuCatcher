@@ -3,6 +3,7 @@ package com.foo.gosucatcher.domain.member.application;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -14,13 +15,16 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpReq
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberLogInResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberProfileRepository;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.domain.member.domain.Roles;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
+import com.foo.gosucatcher.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,30 +35,51 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 	private final MemberProfileRepository memberProfileRepository;
+	private final JwtTokenProvider jwtTokenProvider;
+	private final BCryptPasswordEncoder passwordEncoder;
 
-	public void signUp(@Validated MemberSignUpRequest memberSignUpRequest) {
-		Member member = MemberSignUpRequest.toMember(memberSignUpRequest);
+	public MemberSignUpResponse signUp(@Validated MemberSignUpRequest memberSignUpRequest) {
+		String signUpEmail = memberSignUpRequest.email();
+		String signUpPassword = memberSignUpRequest.password();
+		String signUpName = memberSignUpRequest.name();
 
-		String email = member.getEmail();
-		checkDuplicatedEmail(email);
+		checkDuplicatedEmail(signUpEmail);
 
-		Member savedMember = memberRepository.save(member);
+		String encodedPassword = passwordEncoder.encode(signUpPassword);
+		Member signUpMember = Member.builder()
+			.email(signUpEmail)
+			.password(encodedPassword)
+			.name(signUpName)
+			.role(Roles.USER)
+			.build();
+
+		Member savedMember = memberRepository.save(signUpMember);
 		memberProfileRepository.initializeMemberProfile(savedMember);
+
+		return MemberSignUpResponse.from(savedMember);
 	}
 
-	@Transactional(readOnly = true)
+	@Transactional
 	public MemberLogInResponse logIn(@Validated MemberLogInRequest memberLogInRequest) {
-		String email = memberLogInRequest.email();
-		Member logInMember = memberRepository.findByEmail(email)
+		String logInEmail = memberLogInRequest.email();
+		Member member = memberRepository.findByEmail(logInEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
 
-		String password = memberLogInRequest.password();
-		boolean isSuccess = logInMember.logIn(password);
-		if (!isSuccess) {
+		String logInPassword = memberLogInRequest.password();
+		String encodedPassword = member.getPassword();
+		boolean matches = passwordEncoder.matches(logInPassword, encodedPassword);
+		if (!matches) {
 			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
 		}
 
-		return MemberLogInResponse.from(logInMember);
+		return getMemberLogInResponse(member);
+	}
+
+	public void logOut(String memberEmail) {
+		Member member = memberRepository.findByEmail(memberEmail)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		member.logOut();
 	}
 
 	@Transactional(readOnly = true)
@@ -117,5 +142,15 @@ public class MemberService {
 
 		ImageFile profileImageFile = member.getProfileImageFile();
 		memberProfileRepository.deleteImage(profileImageFile);
+	}
+
+	private MemberLogInResponse getMemberLogInResponse(Member member) {
+		String memberEmail = member.getEmail();
+		String accessToken = jwtTokenProvider.createAccessToken(memberEmail);
+		String refreshToken = jwtTokenProvider.createRefreshToken(memberEmail);
+
+		member.refresh(refreshToken);
+
+		return MemberLogInResponse.from(accessToken, refreshToken);
 	}
 }
