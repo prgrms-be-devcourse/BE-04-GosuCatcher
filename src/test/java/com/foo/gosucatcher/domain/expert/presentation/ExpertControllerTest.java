@@ -1,11 +1,25 @@
 package com.foo.gosucatcher.domain.expert.presentation;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.doNothing;
+import static org.mockito.BDDMockito.doThrow;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +30,10 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +43,13 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateReq
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
+import com.foo.gosucatcher.domain.image.infrastructure.FileSystemExpertImageService;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 @WebMvcTest(ExpertController.class)
 class ExpertControllerTest {
@@ -45,6 +65,12 @@ class ExpertControllerTest {
 
 	@MockBean
 	MemberRepository memberRepository;
+
+	@MockBean
+	ExpertRepository expertRepository;
+
+	@MockBean
+	FileSystemExpertImageService imageService;
 
 	@Mock
 	private Member member;
@@ -153,6 +179,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 전체 조회 성공")
 	void getAllExpertsSuccessTest() throws Exception {
 		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
+
 		ExpertsResponse expertsResponse = ExpertsResponse.from(expertList);
 		given(expertService.findAll()).willReturn(expertsResponse);
 
@@ -219,4 +246,142 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
 			.andDo(print());
 	}
+
+	@Test
+	@DisplayName("이미지 업로드 성공")
+	void uploadImageSuccessTest() throws Exception {
+		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
+
+		given(imageService.store(any())).willReturn("test.jpg");
+
+		mockMvc.perform(multipart("/api/v1/experts/1/images")
+				.file(multipartFile))
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$.id").value(1L))
+			.andExpect(jsonPath("$.filename").value("test.jpg"))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("이미지 업로드 실패 - 비어있는 파일")
+	void uploadImageFailureEmptyFileTest() throws Exception {
+		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
+
+		given(imageService.store(any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
+
+		mockMvc.perform(multipart("/api/v1/experts/1/images")
+				.file(emptyFile))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("F002"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("지원하지 않는 이미지 파일 형식입니다."))
+			.andDo(print());
+	}
+
+
+	@Test
+	@DisplayName("이미지 업로드 실패 - Expert 없음")
+	void uploadImageFailureNoExpertTest() throws Exception {
+		MockMultipartFile validFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test image content".getBytes());
+
+		given(imageService.store(any())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+
+		mockMvc.perform(multipart("/api/v1/experts/1/images")
+				.file(validFile))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("E001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
+			.andDo(print());
+	}
+
+
+	@Test
+	@DisplayName("이미지 가져오기 성공")
+	void getImageSuccessTest() throws Exception {
+		Resource resource = new ByteArrayResource("test image content".getBytes());
+
+		given(imageService.loadAsResource(1L, "test.jpg")).willReturn(resource);
+
+		mockMvc.perform(get("/api/v1/experts/1/images/test.jpg"))
+			.andExpect(status().isOk())
+			.andExpect(content().bytes("test image content".getBytes()))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("이미지 가져오기 실패: 이미지 없음")
+	void getImageFailureNotFoundTest() throws Exception {
+		given(imageService.loadAsResource(anyLong(), anyString())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE));
+
+		mockMvc.perform(get("/api/v1/experts/1/images/test.jpg"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("F001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 이미지 입니다.")) 
+			.andDo(print());
+	}
+
+
+	@Test
+	@DisplayName("이미지 삭제 성공")
+	void deleteImageSuccessTest() throws Exception {
+		doNothing().when(imageService).delete(1L, "test.jpg");
+
+		mockMvc.perform(delete("/api/v1/experts/1/images/test.jpg"))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("이미지 삭제 실패: 이미지 없음")
+	void deleteImageFailureNotFoundTest() throws Exception {
+		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE)).when(imageService).delete(anyLong(), anyString());
+
+		mockMvc.perform(delete("/api/v1/experts/1/images/test.jpg"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("F001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 이미지 입니다."))
+			.andDo(print());
+	}
+
+
+	@Test
+	@DisplayName("모든 이미지 가져오기 성공")
+	void getImagesSuccessTest() throws Exception {
+		List<Path> paths = List.of(Paths.get("test1.jpg"), Paths.get("test2.jpg"));
+
+		given(imageService.loadAll(1L)).willReturn(paths.stream());
+
+		mockMvc.perform(get("/api/v1/experts/1/images"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$", hasSize(2)))
+			.andExpect(jsonPath("$[0].filename").value("test1.jpg"))
+			.andExpect(jsonPath("$[0].url").value("http://localhost/api/v1/experts/1/images/test1.jpg"))
+			.andExpect(jsonPath("$[0].size").value(0))
+			.andExpect(jsonPath("$[1].filename").value("test2.jpg"))
+			.andExpect(jsonPath("$[1].url").value("http://localhost/api/v1/experts/1/images/test2.jpg"))
+			.andExpect(jsonPath("$[1].size").value(0))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("모든 이미지 가져오기 실패: 전문가 아이디 없음")
+	void getImagesFailureNotFoundTest() throws Exception {
+		given(imageService.loadAll(anyLong())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+
+		mockMvc.perform(get("/api/v1/experts/1/images"))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("E001"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
+			.andDo(print());
+	}
+
 }
