@@ -4,12 +4,10 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.validator.constraints.Length;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.foo.gosucatcher.domain.member.domain.Member;
-import com.foo.gosucatcher.domain.member.domain.Roles;
 
-public record MemberSignUpRequest(
+public record MemberSignupRequest(
 	@NotBlank(message = "이름은 비어있을 수 없습니다")
 	@Length(min = 2, max = 20, message = "이름은 2자 이상 20자 이하로 입력 가능합니다")
 	String name,
@@ -21,7 +19,7 @@ public record MemberSignUpRequest(
 	String password
 ) {
 
-	public static Member toMember(MemberSignUpRequest memberSignUpRequest) {
+	public static Member toMember(MemberSignupRequest memberSignUpRequest) {
 		return Member.builder()
 			.name(memberSignUpRequest.name())
 			.email(memberSignUpRequest.email())

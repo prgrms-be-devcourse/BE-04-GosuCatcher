@@ -2,15 +2,15 @@ package com.foo.gosucatcher.domain.member.application.dto.response;
 
 import com.foo.gosucatcher.domain.member.domain.Member;
 
-public record MemberSignUpResponse(
+public record MemberSignupResponse(
 	String email,
 	String name
 ) {
 
-	public static MemberSignUpResponse from(Member member) {
+	public static MemberSignupResponse from(Member member) {
 		String memberEmail = member.getEmail();
 		String memberName = member.getName();
 
-		return new MemberSignUpResponse(memberEmail, memberName);
+		return new MemberSignupResponse(memberEmail, memberName);
 	}
 }

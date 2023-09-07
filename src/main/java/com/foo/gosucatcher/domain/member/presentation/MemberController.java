@@ -23,14 +23,14 @@ import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.aop.CurrentMemberEmail;
@@ -64,9 +64,9 @@ public class MemberController {
 	}
 
 	@PostMapping("/signup")
-	public ResponseEntity<MemberSignUpResponse> signUp(
-		@RequestBody @Validated MemberSignUpRequest memberSignUpRequest) {
-		MemberSignUpResponse response = memberService.signup(memberSignUpRequest);
+	public ResponseEntity<MemberSignupResponse> signup(
+		@RequestBody @Validated MemberSignupRequest memberSignUpRequest) {
+		MemberSignupResponse response = memberService.signup(memberSignUpRequest);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(response);
@@ -101,7 +101,7 @@ public class MemberController {
 	public ResponseEntity<Void> deleteMember(Long memberId) {
 		memberService.deleteMember(memberId);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent().build();
 	}
 
 	@CurrentMemberId

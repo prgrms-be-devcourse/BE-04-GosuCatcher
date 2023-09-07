@@ -13,14 +13,14 @@ import org.springframework.web.multipart.MultipartFile;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignUpRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignUpResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberProfileRepository;
@@ -63,8 +63,8 @@ public class MemberService {
 		return MemberEmailDuplicateResponse.from(email);
 	}
 
-	public MemberSignUpResponse signup(@Validated MemberSignUpRequest memberSignUpRequest) {
-		Member signupMember = MemberSignUpRequest.toMember(memberSignUpRequest);
+	public MemberSignupResponse signup(@Validated MemberSignupRequest memberSignUpRequest) {
+		Member signupMember = MemberSignupRequest.toMember(memberSignUpRequest);
 		String signupEmail = signupMember.getEmail();
 
 		checkDuplicatedEmail(signupEmail);
@@ -75,7 +75,7 @@ public class MemberService {
 
 		memberProfileRepository.initializeMemberProfile(savedMember);
 
-		return MemberSignUpResponse.from(savedMember);
+		return MemberSignupResponse.from(savedMember);
 	}
 
 	@Transactional
