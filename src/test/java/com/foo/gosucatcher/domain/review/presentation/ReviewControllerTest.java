@@ -185,6 +185,24 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.ReviewsSliceResponse[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
+		@DisplayName("성공 - 특정 고수에 대한 리뷰의 개수를 조회할 수 있다")
+		@Test
+		void getCounts() throws Exception {
+			// given
+			long expertId = 1L;
+
+			given(reviewService.countByExpertId(any(Long.class)))
+				.willReturn(2L);
+
+			// when
+			// then
+			mockMvc.perform(get(apiBaseUrl + "/experts/" + expertId + "/counts")
+					.contentType(MediaType.APPLICATION_JSON))
+
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").value(2L));
+		}
+
 		@DisplayName("성공 - 리뷰를 모두 조회할 수 있다")
 		@Test
 		void findAll() throws Exception {
@@ -258,6 +276,7 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.content").value(reviewResponse.content()))
 				.andExpect(jsonPath("$.rating").value(reviewResponse.rating()));
 		}
+
 	}
 
 	@Nested

@@ -157,4 +157,12 @@ public class ReviewService {
 		);
 	}
 
+	public long countByExpertId(Long expertId) {
+		expertRepository.findById(expertId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+
+		long count = reviewRepository.countByExpertId(expertId);
+
+		return count;
+	}
 }

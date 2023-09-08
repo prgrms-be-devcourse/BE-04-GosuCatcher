@@ -63,6 +63,13 @@ public class ReviewController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/experts/{expertId}/counts")
+	public ResponseEntity<Long> countByExpertId(@PathVariable Long expertId) {
+		long count = reviewService.countByExpertId(expertId);
+
+		return ResponseEntity.ok(count);
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<ReviewResponse> findById(@PathVariable Long id) {
 		ReviewResponse reviewResponse = reviewService.findById(id);

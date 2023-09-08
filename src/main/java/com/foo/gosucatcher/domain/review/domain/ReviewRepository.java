@@ -16,4 +16,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 	Optional<Review> findById(Long id);
 
 	Slice<Review> findAllByExpertIdAndSubItemId(Long expertId, Long subItemId, Pageable pageable);
+
+	Long countByExpertId(Long expertId);
 }
