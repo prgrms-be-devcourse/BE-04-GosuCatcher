@@ -48,7 +48,7 @@ public class ExpertEstimateService {
 		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(memberEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
 
-		checkAlreadyResponded(expert, memberRequestEstimate);
+		checkAlreadyResponded(memberRequestEstimate);
 
 		ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
 			request, memberRequestEstimate, expert);
@@ -58,8 +58,6 @@ public class ExpertEstimateService {
 
 		return ExpertNormalEstimateResponse.from(expertNormalEstimate);
 	}
-
-
 
 	public ExpertAutoEstimateResponse createAuto(Long expertId, ExpertAutoEstimateCreateRequest request) {
 		Expert expert = expertRepository.findById(expertId)
@@ -79,8 +77,7 @@ public class ExpertEstimateService {
 
 	@Transactional(readOnly = true)
 	public ExpertEstimatesResponse findAll() {
-		List<ExpertEstimate> expertEstimateList = expertEstimateRepository.findAll();
-
+		List<ExpertEstimate> expertEstimateList = expertEstimateRepository.findAllWithFetchJoin();
 		return ExpertEstimatesResponse.from(expertEstimateList);
 	}
 
@@ -99,7 +96,7 @@ public class ExpertEstimateService {
 		expertEstimateRepository.delete(expertEstimate);
 	}
 
-	private void checkAlreadyResponded(Expert expert, MemberRequestEstimate memberRequestEstimate) {
+	private void checkAlreadyResponded(MemberRequestEstimate memberRequestEstimate) {
 		List<ExpertEstimate> expertEstimateList = memberRequestEstimate.getExpertEstimateList();
 		expertEstimateList.stream()
 			.filter(expertEstimate -> {
@@ -113,7 +110,7 @@ public class ExpertEstimateService {
 	}
 
 	private void checkAlreadyRegisteredByExpertWithSubItem(Expert expert, SubItem subItem) {
-		if (expertEstimateRepository.existsByExpertAndSubItem(expert, subItem)) {
+		if (expertEstimateRepository.existsByExpertAndSubItemAndMemberRequestEstimateIsNull(expert, subItem)) {
 			throw new BusinessException(ALREADY_REGISTERED_SUB_ITEMS);
 		}
 	}
