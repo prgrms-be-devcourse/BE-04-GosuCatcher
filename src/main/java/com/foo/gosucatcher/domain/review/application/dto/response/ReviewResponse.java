@@ -1,8 +1,8 @@
 package com.foo.gosucatcher.domain.review.application.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.foo.gosucatcher.domain.review.domain.Review;
 
@@ -14,13 +14,13 @@ public record ReviewResponse(
 	String content,
 	int rating,
 	boolean replyExisted,
-	Dictionary<String, String> reply,
+	Map<String, String> reply,
 	LocalDateTime createdAt,
 	LocalDateTime updatedAt
 ) {
 
 	public static ReviewResponse from(Review review) {
-		Dictionary<String, String> reply = new Hashtable<>();
+		Map<String, String> reply = new HashMap<>();
 		boolean replyExisted = review.getReply() != null;
 
 		if (replyExisted) {

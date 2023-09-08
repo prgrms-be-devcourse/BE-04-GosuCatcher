@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -67,7 +67,7 @@ class ReviewControllerTest {
 
 			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
 			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, false,
-				new Hashtable<>(), localDateTime, localDateTime);
+				new HashMap<>(), localDateTime, localDateTime);
 			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
 				.willReturn(reviewResponse);
 
@@ -145,9 +145,9 @@ class ReviewControllerTest {
 
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
 				List.of(
-					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new Hashtable<>(), localDateTime,
+					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new HashMap<>(), localDateTime,
 						localDateTime),
-					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new Hashtable<>(), localDateTime,
+					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new HashMap<>(), localDateTime,
 						localDateTime)),
 				true
 			);
@@ -196,9 +196,9 @@ class ReviewControllerTest {
 
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
 				List.of(
-					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new Hashtable<>(), localDateTime,
+					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new HashMap<>(), localDateTime,
 						localDateTime),
-					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new Hashtable<>(), localDateTime,
+					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new HashMap<>(), localDateTime,
 						localDateTime)),
 				true
 			);
@@ -239,7 +239,7 @@ class ReviewControllerTest {
 			// given
 			LocalDateTime localDateTime = LocalDateTime.now();
 			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false,
-				new Hashtable<>(), localDateTime,
+				new HashMap<>(), localDateTime,
 				localDateTime);
 
 			long id = 1L;
