@@ -54,6 +54,12 @@ public class Expert extends BaseEntity {
 	@Column(name = "is_auto", nullable = false)
 	private boolean isAuto;
 
+	@Column(nullable = false, columnDefinition = "double default 0.0")
+	private double rating;
+
+	@Column(nullable = false, columnDefinition = "int default 0")
+	private int reviewCount;
+
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
@@ -64,6 +70,8 @@ public class Expert extends BaseEntity {
 		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isAuto = false;
+		this.rating = 0.0;
+		this.reviewCount = 0;
 	}
 
 	public void updateIsAuto(boolean isAuto) {
@@ -75,5 +83,9 @@ public class Expert extends BaseEntity {
 		this.location = updatedExpert.getLocation();
 		this.maxTravelDistance = updatedExpert.getMaxTravelDistance();
 		this.description = updatedExpert.getDescription();
+	}
+
+	public void updateRating(double newRating) {
+		this.rating = newRating;
 	}
 }
