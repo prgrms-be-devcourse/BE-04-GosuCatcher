@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
@@ -61,7 +61,7 @@ public class ExpertEstimateService {
 
 
 
-	public ExpertAutoEstimatesResponse createAuto(Long expertId, ExpertAutoEstimateCreateRequest request) {
+	public ExpertAutoEstimateResponse createAuto(Long expertId, ExpertAutoEstimateCreateRequest request) {
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
@@ -74,7 +74,7 @@ public class ExpertEstimateService {
 
 		expertEstimateRepository.save(expertAutoEstimate);
 
-		return ExpertAutoEstimatesResponse.from(expertAutoEstimate);
+		return ExpertAutoEstimateResponse.from(expertAutoEstimate);
 	}
 
 	@Transactional(readOnly = true)

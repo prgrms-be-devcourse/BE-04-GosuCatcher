@@ -3,7 +3,7 @@ package com.foo.gosucatcher.domain.estimate.application.dto.response;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 
-public record ExpertAutoEstimatesResponse(
+public record ExpertAutoEstimateResponse(
 	Long id,
 	ExpertResponse expert,
 	Long subItemId,
@@ -12,8 +12,8 @@ public record ExpertAutoEstimatesResponse(
 	String description
 ) {
 
-	public static ExpertAutoEstimatesResponse from(ExpertEstimate expertEstimate) {
-		return new ExpertAutoEstimatesResponse(
+	public static ExpertAutoEstimateResponse from(ExpertEstimate expertEstimate) {
+		return new ExpertAutoEstimateResponse(
 			expertEstimate.getId(),
 			ExpertResponse.from(expertEstimate.getExpert()),
 			expertEstimate.getSubItem().getId(),

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
@@ -37,11 +37,11 @@ public class ExpertEstimateController {
 	}
 
 	@PostMapping("/auto/{expertId}")
-	public ResponseEntity<ExpertAutoEstimatesResponse> createAuto(@PathVariable Long expertId,
-																  @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
-		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.createAuto(expertId, request);
+	public ResponseEntity<ExpertAutoEstimateResponse> createAuto(@PathVariable Long expertId,
+																 @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
+		ExpertAutoEstimateResponse expertAutoEstimateResponse = expertEstimateService.createAuto(expertId, request);
 
-		return ResponseEntity.ok(expertAutoEstimatesResponse);
+		return ResponseEntity.ok(expertAutoEstimateResponse);
 	}
 
 	@GetMapping
