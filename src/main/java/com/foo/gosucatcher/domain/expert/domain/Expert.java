@@ -11,6 +11,9 @@ import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
 
@@ -19,6 +22,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE experts SET is_deleted = true WHERE id = ?")
 @Getter
 @Entity
 @Table(name = "experts")
@@ -59,10 +64,6 @@ public class Expert extends BaseEntity {
 		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isAuto = false;
-	}
-
-	public void deleteExpert() {
-		this.isDeleted = Boolean.TRUE;
 	}
 
 	public void updateIsAuto(boolean isAuto) {

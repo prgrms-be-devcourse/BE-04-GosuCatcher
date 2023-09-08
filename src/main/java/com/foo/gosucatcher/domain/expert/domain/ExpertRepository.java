@@ -9,5 +9,5 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
 
 	Optional<Expert> findByStoreName(String storeName);
 
-	List<Expert> findAllByIsDeletedFalse();
+	List<Expert> findAll();
 }
