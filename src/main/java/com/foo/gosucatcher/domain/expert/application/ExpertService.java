@@ -55,7 +55,7 @@ public class ExpertService {
 
 	@Transactional(readOnly = true)
 	public ExpertsResponse findAll() {
-		List<Expert> experts = expertRepository.findAllByIsDeletedFalse();
+		List<Expert> experts = expertRepository.findAll();
 		ExpertsResponse expertsResponse = ExpertsResponse.from(experts);
 
 		return expertsResponse;
@@ -78,7 +78,7 @@ public class ExpertService {
 		Expert expert = expertRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		expert.deleteExpert();
+		expertRepository.delete(expert);
 	}
 
 	private void duplicatedStoreNameCheck(String storeName) {
