@@ -1,7 +1,10 @@
 package com.foo.gosucatcher.domain.estimate.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -47,6 +51,9 @@ public class MemberRequestEstimate extends BaseEntity {
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
+	@OneToMany(mappedBy = "memberRequestEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
+
 	@Column(nullable = false)
 	private String location;
 
@@ -60,7 +67,7 @@ public class MemberRequestEstimate extends BaseEntity {
 
 	@Builder
 	public MemberRequestEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
-		String detailedDescription) {
+								 String detailedDescription) {
 		this.member = member;
 		this.subItem = subItem;
 		this.location = location;
@@ -73,6 +80,11 @@ public class MemberRequestEstimate extends BaseEntity {
 		this.location = memberRequestEstimate.getLocation();
 		this.preferredStartDate = validatePreferredStartDate(memberRequestEstimate.getPreferredStartDate());
 		this.detailedDescription = memberRequestEstimate.getDetailedDescription();
+	}
+
+	public void addExpertEstimate(ExpertEstimate expertEstimate) {
+		expertEstimateList.add(expertEstimate);
+		expertEstimate.addMemberRequest(this);
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {

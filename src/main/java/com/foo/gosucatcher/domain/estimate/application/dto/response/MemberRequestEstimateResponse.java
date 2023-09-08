@@ -15,6 +15,10 @@ public record MemberRequestEstimateResponse(
 
 	public static MemberRequestEstimateResponse from(MemberRequestEstimate memberRequestEstimate) {
 
+		if (memberRequestEstimate == null) {
+			return new MemberRequestEstimateResponse(null, null, null, null, null, null);
+		}
+
 		return new MemberRequestEstimateResponse(memberRequestEstimate.getId(),
 			memberRequestEstimate.getMember().getId(), memberRequestEstimate.getSubItem().getId(),
 			memberRequestEstimate.getLocation(), memberRequestEstimate.getPreferredStartDate(),

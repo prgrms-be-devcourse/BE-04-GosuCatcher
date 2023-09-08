@@ -1,14 +1,23 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REGISTERED_SUB_ITEMS;
+import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REQUESTED_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateUpdateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
@@ -17,7 +26,7 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
-import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -27,62 +36,85 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ExpertEstimateService {
 
-	private final ExpertEstimateRepository expertResponseRepository;
+	private final ExpertEstimateRepository expertEstimateRepository;
 	private final MemberRequestEstimateRepository memberRequestEstimateRepository;
 	private final ExpertRepository expertRepository;
 	private final SubItemRepository subItemRepository;
 
-	public ExpertEstimateResponse create(Long expertId, ExpertEstimateCreateRequest request) {
+	public ExpertNormalEstimateResponse createNormal(Long expertId, Long memberEstimateId, ExpertNormalEstimateCreateRequest request) {
 		Expert expert = expertRepository.findById(expertId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(
-				request.memberRequestEstimateId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+		MemberRequestEstimate memberRequestEstimate = memberRequestEstimateRepository.findById(memberEstimateId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+
+		checkAlreadyResponded(expert, memberRequestEstimate);
+
+		ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
+			request, memberRequestEstimate, expert);
+
+
+		expertEstimateRepository.save(expertNormalEstimate);
+
+		return ExpertNormalEstimateResponse.from(expertNormalEstimate);
+	}
+
+
+
+	public ExpertAutoEstimatesResponse createAuto(Long expertId, ExpertAutoEstimateCreateRequest request) {
+		Expert expert = expertRepository.findById(expertId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		SubItem subItem = subItemRepository.findById(request.subItemId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
-		ExpertEstimate expertEstimate = ExpertEstimateCreateRequest.toExpertResponseEstimate(
-			request, memberRequestEstimate, expert, subItem);
+		checkAlreadyRegisteredByExpertWithSubItem(expert, subItem);
 
-		expertResponseRepository.save(expertEstimate);
+		ExpertEstimate expertAutoEstimate = ExpertAutoEstimateCreateRequest.toExpertEstimate(request, expert, subItem);
 
-		return ExpertEstimateResponse.from(expertEstimate);
+		expertEstimateRepository.save(expertAutoEstimate);
+
+		return ExpertAutoEstimatesResponse.from(expertAutoEstimate);
 	}
 
 	@Transactional(readOnly = true)
 	public ExpertEstimatesResponse findAll() {
-		List<ExpertEstimate> expertEstimateList = expertResponseRepository.findAll();
+		List<ExpertEstimate> expertEstimateList = expertEstimateRepository.findAll();
 
 		return ExpertEstimatesResponse.from(expertEstimateList);
 	}
 
 	@Transactional(readOnly = true)
 	public ExpertEstimateResponse findById(Long id) {
-		ExpertEstimate expertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+		ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
 
 		return ExpertEstimateResponse.from(expertEstimate);
 	}
 
-	public Long update(Long id, ExpertEstimateUpdateRequest request) {
-		ExpertEstimate foundExpertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+	public void delete(Long id) {
+		ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
 
-		ExpertEstimate expertEstimate = ExpertEstimateUpdateRequest.toExpertResponseEstimate(
-			request, foundExpertEstimate.getExpert(),
-			foundExpertEstimate.getMemberRequestEstimate());
-
-		foundExpertEstimate.update(expertEstimate);
-
-		return foundExpertEstimate.getId();
+		expertEstimateRepository.delete(expertEstimate);
 	}
 
-	public void delete(Long id) {
-		ExpertEstimate expertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+	private void checkAlreadyResponded(Expert expert, MemberRequestEstimate memberRequestEstimate) {
+		List<ExpertEstimate> expertEstimateList = memberRequestEstimate.getExpertEstimateList();
+		expertEstimateList.stream()
+			.filter(expertEstimate -> {
+				Long registeredEstimateId = expertEstimate.getMemberRequestEstimate().getId();
+				Long requestedEstimateId = memberRequestEstimate.getId();
+				return registeredEstimateId.equals(requestedEstimateId);
+			})
+			.forEach(expertEstimate -> {
+				throw new BusinessException(ALREADY_REQUESTED_ESTIMATE);
+			});
+	}
 
-		expertResponseRepository.delete(expertEstimate);
+	private void checkAlreadyRegisteredByExpertWithSubItem(Expert expert, SubItem subItem) {
+		if (expertEstimateRepository.existsByExpertAndSubItem(expert, subItem)) {
+			throw new BusinessException(ALREADY_REGISTERED_SUB_ITEMS);
+		}
 	}
 }

@@ -56,29 +56,29 @@ public class ExpertEstimate extends BaseEntity {
 	@Column(nullable = false)
 	private String description;
 
-	private boolean isAuto;
-
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public ExpertEstimate(Expert expert, MemberRequestEstimate memberRequestEstimate, SubItem subItem, int totalCost,
-						  String activityLocation, String description, boolean isAuto) {
+						  String activityLocation, String description) {
 		this.expert = expert;
 		this.memberRequestEstimate = memberRequestEstimate;
 		this.subItem = subItem;
 		this.totalCost = checkInvalidTotalCost(totalCost);
 		this.activityLocation = activityLocation;
 		this.description = description;
-		this.isAuto = isAuto;
 	}
 
-	public void update(ExpertEstimate expertEstimate) {
-		this.expert = expertEstimate.getExpert();
-		this.memberRequestEstimate = expertEstimate.getMemberRequestEstimate();
-		this.subItem = expertEstimate.getSubItem();
-		this.totalCost = checkInvalidTotalCost(expertEstimate.getTotalCost());
-		this.activityLocation = expertEstimate.getActivityLocation();
-		this.description = expertEstimate.getDescription();
+	public void addSubItem(SubItem subItem) {
+		this.subItem = subItem;
+	}
+
+	public void addMemberRequest(MemberRequestEstimate memberRequestEstimate) {
+		this.memberRequestEstimate = memberRequestEstimate;
+	}
+
+	public boolean isAuto() {
+		return memberRequestEstimate == null;
 	}
 
 	private int checkInvalidTotalCost(int totalCost) {
