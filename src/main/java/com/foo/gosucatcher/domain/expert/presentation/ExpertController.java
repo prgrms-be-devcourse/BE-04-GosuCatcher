@@ -87,7 +87,8 @@ public class ExpertController {
 		String uploadedFilename = imageService.store(request);
 
 		ImageUploadResponse response = new ImageUploadResponse(expertId, uploadedFilename);
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(response);
 	}
 
 	@GetMapping("/{expertId}/images/{filename}")
@@ -123,7 +124,6 @@ public class ExpertController {
 			})
 			.collect(Collectors.toList());
 
-		return ResponseEntity.status(HttpStatus.OK).body(fileInfos);
+		return ResponseEntity.ok(fileInfos);
 	}
-
 }
