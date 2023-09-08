@@ -16,5 +16,7 @@ public abstract class Image {
 		this.url = url;
 		this.size = size;
 	}
-	public Image() {}
+
+	public Image() {
+	}
 }

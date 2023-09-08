@@ -1,9 +1,7 @@
 package com.foo.gosucatcher.domain.expert.presentation;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
@@ -109,21 +106,7 @@ public class ExpertController {
 
 	@GetMapping("{expertId}/images")
 	public ResponseEntity<List<ImageResponse>> getAllImages(@PathVariable Long expertId) {
-		List<ImageResponse> fileInfos = imageService.loadAll(expertId)
-			.map(path -> {
-				String filename = path.getFileName().toString();
-				String url = MvcUriComponentsBuilder.fromMethodName(ExpertController.class,
-					"getImage", expertId, filename).build().toString();
-				Long size;
-				try {
-					size = Files.size(path);
-				} catch (IOException e) {
-					size = 0L;
-				}
-				return new ImageResponse(filename, url, size);
-			})
-			.collect(Collectors.toList());
-
+		List<ImageResponse> fileInfos = imageService.loadAll(expertId);
 		return ResponseEntity.ok(fileInfos);
 	}
 }
