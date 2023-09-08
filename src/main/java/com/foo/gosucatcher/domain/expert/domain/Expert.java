@@ -46,8 +46,8 @@ public class Expert extends BaseEntity {
 	@Lob
 	private String description;
 
-	@Column(name = "is_baro_estimate", nullable = false)
-	private boolean isBaroEstimate;
+	@Column(name = "is_auto", nullable = false)
+	private boolean isAuto;
 
 	private boolean isDeleted = Boolean.FALSE;
 
@@ -58,15 +58,15 @@ public class Expert extends BaseEntity {
 		this.location = location;
 		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
-		this.isBaroEstimate = false;
+		this.isAuto = false;
 	}
 
 	public void deleteExpert() {
 		this.isDeleted = Boolean.TRUE;
 	}
 
-	public void updateIsBaroEstimate(boolean isBaroEstimate) {
-		this.isBaroEstimate = isBaroEstimate;
+	public void updateIsAuto(boolean isAuto) {
+		this.isAuto = isAuto;
 	}
 
 	public void updateExpert(Expert updatedExpert) {
