@@ -4,4 +4,5 @@ public record ImageResponse(
 	String filename,
 	String url,
 	Long size
-) { }
+) {
+}
