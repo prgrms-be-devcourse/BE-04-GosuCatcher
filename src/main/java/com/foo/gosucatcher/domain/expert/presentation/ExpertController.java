@@ -96,8 +96,8 @@ public class ExpertController {
 		@PathVariable String filename) {
 
 		Resource file = imageService.loadAsResource(expertId, filename);
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
-			"attachment; filename=\"" + file.getFilename() + "\"").body(file);
+		String responseHeader = "attachment; filename=\"" + file.getFilename() + "\"";
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, responseHeader).body(file);
 	}
 
 	@DeleteMapping("/{expertId}/images/{filename}")
@@ -108,7 +108,7 @@ public class ExpertController {
 	}
 
 	@GetMapping("{expertId}/images")
-	public ResponseEntity<List<ImageResponse>> getImages(@PathVariable Long expertId) {
+	public ResponseEntity<List<ImageResponse>> getAllImages(@PathVariable Long expertId) {
 		List<ImageResponse> fileInfos = imageService.loadAll(expertId)
 			.map(path -> {
 				String filename = path.getFileName().toString();
