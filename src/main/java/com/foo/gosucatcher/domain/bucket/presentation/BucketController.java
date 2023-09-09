@@ -59,7 +59,7 @@ public class BucketController {
 			.toUri();
 
 		return ResponseEntity.created(uri)
-			.build();
+			.body(bucketResponse);
 	}
 
 	@GetMapping("/status")

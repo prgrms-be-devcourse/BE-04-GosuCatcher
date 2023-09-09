@@ -29,8 +29,6 @@ import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
 @WebMvcTest(BucketController.class)
 class BucketControllerTest {
 
-	String apiBaseUrl = "/api/v1/buckets";
-
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -51,7 +49,7 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(get(apiBaseUrl)
+		mockMvc.perform(get("/api/v1/buckets")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.buckets[0].id").value(1L))
@@ -71,13 +69,13 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
+		mockMvc.perform(MockMvcRequestBuilders.post( "/api/v1/buckets")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bucketRequest)))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(0L))
-			.andExpect(jsonPath("$.expertId").value(1L))
-			.andExpect(jsonPath("$.memberId").value(2L));
+			.andExpect(status().isCreated())
+			.andExpect(jsonPath("$..id").value(0))
+			.andExpect(jsonPath("$..expertId").value(1))
+			.andExpect(jsonPath("$..memberId").value(2));
 	}
 
 	@Test
@@ -95,7 +93,7 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(get(apiBaseUrl + "/status")
+		mockMvc.perform(get("/api/v1/buckets/status")
 				.contentType(MediaType.APPLICATION_JSON)
 				.param("expertId", expertId)
 				.param("memberId", memberId)
@@ -116,7 +114,7 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
+		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/buckets/{id}", id)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isNoContent());
 	}
@@ -139,7 +137,7 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(get(apiBaseUrl + "/" + memberId)
+		mockMvc.perform(get("/api/v1/buckets/{memberId}", memberId)
 				// mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/buckets/3")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())

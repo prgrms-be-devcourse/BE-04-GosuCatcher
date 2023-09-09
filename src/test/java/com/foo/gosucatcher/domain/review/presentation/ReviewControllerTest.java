@@ -41,8 +41,6 @@ import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 @WebMvcTest(ReviewController.class)
 class ReviewControllerTest {
 
-	String apiBaseUrl = "/api/v1/reviews";
-
 	@Autowired
 	private MockMvc mockMvc;
 
@@ -73,7 +71,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + expertId)
+			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
 					.contentType(MediaType.APPLICATION_JSON)
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
@@ -98,7 +96,7 @@ class ReviewControllerTest {
 			long subItemId = 0L;
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + 0)
+			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{subItemId}", subItemId)
 					.contentType(MediaType.APPLICATION_JSON)
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
@@ -120,7 +118,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + expertId)
+			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
 					.contentType(MediaType.APPLICATION_JSON)
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
@@ -160,7 +158,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get(apiBaseUrl + "/experts/" + expertId)
+			mockMvc.perform(get("/api/v1/reviews/experts/{expertId}", expertId)
 					.param("subItemId", String.valueOf(subItemId))
 					.contentType(MediaType.APPLICATION_JSON))
 
@@ -196,7 +194,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get(apiBaseUrl + "/experts/" + expertId + "/counts")
+			mockMvc.perform(get("/api/v1/reviews/experts/{expertId}/counts", expertId)
 					.contentType(MediaType.APPLICATION_JSON))
 
 				.andExpect(status().isOk())
@@ -228,7 +226,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get(apiBaseUrl)
+			mockMvc.perform(get("/api/v1/reviews/")
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.reviews[0].id").value(1))
@@ -266,7 +264,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get(apiBaseUrl + "/" + id)
+			mockMvc.perform(get("/api/v1/reviews/{id}", id)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(1))
@@ -295,7 +293,7 @@ class ReviewControllerTest {
 			when(reviewService.update(id, reviewUpdateRequest))
 				.thenReturn(id);
 
-			mockMvc.perform(patch(apiBaseUrl + "/" + id)
+			mockMvc.perform(patch("/api/v1/reviews/{id}", id)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reviewUpdateRequest)))
 				.andExpect(status().isOk())
@@ -314,7 +312,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(patch(apiBaseUrl + "/" + id)
+			mockMvc.perform(patch("/api/v1/reviews/{id}", id)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reviewUpdateRequest)))
 				.andExpect(status().isNotFound())
@@ -337,7 +335,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
+			mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/reviews/{id}", id)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 		}
@@ -354,21 +352,22 @@ class ReviewControllerTest {
 			long reviewId = 0L;
 
 			LocalDateTime localDateTime = LocalDateTime.now();
-			ReplyRequest replyRequest = new ReplyRequest(0L, "리뷰에 대한 답글입니다");
-			ReplyResponse replyResponse = new ReplyResponse(0L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
+			ReplyRequest replyRequest = new ReplyRequest(1L, "리뷰에 대한 답글입니다");
+			ReplyResponse replyResponse = new ReplyResponse(1L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
 
 			given(reviewService.createReply(any(Long.class), any(ReplyRequest.class)))
 				.willReturn(replyResponse);
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl + "/" + reviewId + "/replies")
+			mockMvc.perform(MockMvcRequestBuilders.post( "/api/v1/reviews/{reviewId}/replies", reviewId)
 					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(reviewId))
 					.content(objectMapper.writeValueAsString(replyRequest)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(0L))
-				.andExpect(jsonPath("$.reviewId").value(reviewId))
-				.andExpect(jsonPath("$.content").value(replyRequest.content()));
+				.andExpect(status().isCreated())
+				.andExpect(MockMvcResultMatchers.jsonPath("$..id").value(1))
+				.andExpect(MockMvcResultMatchers.jsonPath("$..reviewId").value(replyResponse.reviewId().intValue()))
+				.andExpect(MockMvcResultMatchers.jsonPath("$..content").value(replyRequest.content()));
 		}
 
 		@DisplayName("성공 - 리뷰에 대한 답글을 수정할 수 있다")
@@ -385,7 +384,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.patch(apiBaseUrl + "/" + reviewId + "/replies/" + replyId)
+			mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(replyRequest)))
 				.andExpect(status().isOk())
@@ -406,7 +405,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get(apiBaseUrl + "/" + reviewId + "/replies/" + replyId)
+			mockMvc.perform(get("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$.id").value(0L))
@@ -427,7 +426,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(delete(apiBaseUrl + "/" + reviewId + "/replies/" + replyId)
+			mockMvc.perform(delete("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 

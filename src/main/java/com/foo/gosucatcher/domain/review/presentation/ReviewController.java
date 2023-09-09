@@ -108,8 +108,9 @@ public class ReviewController {
 			.toUri();
 
 		return ResponseEntity.created(uri)
-			.build();
+			.body(replyResponse);
 	}
+
 
 	@PatchMapping("/{reviewId}/replies/{replyId}")
 	public ResponseEntity<Long> updateReply(
