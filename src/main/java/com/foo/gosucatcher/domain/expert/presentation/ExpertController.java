@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -93,10 +93,9 @@ public class ExpertController {
 		@PathVariable String filename) {
 
 		Resource file = imageService.loadAsResource(expertId, filename);
-		String responseHeader = "attachment; filename=\"" + file.getFilename() + "\"";
-		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, responseHeader).body(file);
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(file);
 	}
-
+	
 	@DeleteMapping("/{expertId}/images/{filename}")
 	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
 		@PathVariable String filename) {
