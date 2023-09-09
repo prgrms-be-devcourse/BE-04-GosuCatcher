@@ -1,18 +1,15 @@
 package com.foo.gosucatcher.domain.image.infrastructure;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -29,9 +26,8 @@ import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
-import com.foo.gosucatcher.global.error.exception.InvalidValueException;
+import com.foo.gosucatcher.global.util.ImageFileUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,43 +38,8 @@ public class FileSystemExpertImageService implements ImageService {
 	private final ExpertImageRepository expertImageRepository;
 	private final ExpertRepository expertRepository;
 
-	// @Value("${spring.servlet.multipart.location}")
+	@Value("${spring.servlet.multipart.location}")
 	private String uploadPath;
-
-	private MultipartFile validateFile(MultipartFile file) {
-		if (file.isEmpty()) {
-			throw new InvalidValueException(ErrorCode.INVALID_IMAGE);
-		}
-
-		return file;
-	}
-
-	private Path ensureDirectoryExists(Long id) {
-		Path root = Paths.get(uploadPath, id.toString());
-		if (!Files.exists(root)) {
-			try {
-				Files.createDirectories(root);
-			} catch (IOException e) {
-				throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
-			}
-		}
-
-		return root;
-	}
-
-	private String saveFile(MultipartFile file, Path root) {
-		String originalFilename = file.getOriginalFilename();
-		String extension = FilenameUtils.getExtension(originalFilename);
-		String newFilename = UUID.randomUUID() + "." + extension;
-
-		try (InputStream inputStream = file.getInputStream()) {
-			Files.copy(inputStream, root.resolve(newFilename), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-			throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
-
-		return newFilename;
-	}
 
 	private Expert findExpert(Long id) {
 
@@ -97,17 +58,31 @@ public class FileSystemExpertImageService implements ImageService {
 		expertImageRepository.save(expertImage);
 	}
 
+	private ImageResponse toImageResponse(Path path, Long expertId) {
+		String filename = path.getFileName().toString();
+		String url = MvcUriComponentsBuilder.fromMethodName(ExpertController.class,
+			"getImage", expertId, filename).build().toString();
+		Long size;
+		try {
+			size = Files.size(path);
+		} catch (IOException e) {
+			size = 0L;
+		}
+
+		return new ImageResponse(filename, url, size);
+	}
+
 	private void throwEntityNotFoundException() {
 		throw new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE);
 	}
 
 	@Override
 	public String store(ImageUploadRequest request) {
-		MultipartFile file = validateFile(request.file());
+		MultipartFile file = ImageFileUtils.validateFile(request.file());
 
-		Path root = ensureDirectoryExists(request.id());
+		Path root = ImageFileUtils.ensureDirectoryExists(uploadPath, request.id());
 
-		String newFilename = saveFile(file, root);
+		String newFilename = ImageFileUtils.saveFile(file, root);
 
 		Expert expert = findExpert(request.id());
 
@@ -117,33 +92,22 @@ public class FileSystemExpertImageService implements ImageService {
 	}
 
 	@Override
+	public Path load(Long expertId, String filename) {
+
+		return Paths.get(uploadPath, expertId.toString()).resolve(filename);
+	}
+
+	@Override
 	public List<ImageResponse> loadAll(Long expertId) {
 		try {
 			Path root = Paths.get(uploadPath, expertId.toString());
 			return Files.walk(root, 1)
 				.filter(path -> !path.equals(root))
-				.map(path -> {
-					String filename = path.getFileName().toString();
-					String url = MvcUriComponentsBuilder.fromMethodName(ExpertController.class,
-						"getImage", expertId, filename).build().toString();
-					Long size;
-					try {
-						size = Files.size(path);
-					} catch (IOException e) {
-						size = 0L;
-					}
-					return new ImageResponse(filename, url, size);
-				})
+				.map(path -> toImageResponse(path, expertId))
 				.collect(Collectors.toList());
 		} catch (IOException e) {
 			throw new ExpertImageIOException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
-	}
-
-	@Override
-	public Path load(Long expertId, String filename) {
-
-		return Paths.get(uploadPath, expertId.toString()).resolve(filename);
 	}
 
 	@Override
