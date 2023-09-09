@@ -45,9 +45,9 @@ public enum ErrorCode {
 	DUPLICATE_MEMBER_REQUEST_ESTIMATE("MRE003", "회원 요청 견적서는 중복될 수 없습니다."),
 
 	//고수 응답 견적서
-	NOT_FOUND_EXPERT_RESPONSE_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
+	NOT_FOUND_EXPERT_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
 	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("EE002", "총 금액은 0원보다 적을 수 없습니다."),
-	ALREADY_REGISTERED_SUB_ITEMS("EE004", "이미 해당 서비스로 바로 견적이 등록되어 있습니다."),
+	ALREADY_REGISTERED_BY_SUB_ITEMS("EE004", "이미 해당 서비스로 바로 견적이 등록되어 있습니다."),
 	ALREADY_REQUESTED_ESTIMATE("EE005", "이미 처리된 요청서 입니다."),
 
 	// 찜
