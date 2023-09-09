@@ -45,21 +45,6 @@ public class FileSystemExpertImageService implements ImageService {
 	// @Value("${spring.servlet.multipart.location}")
 	private String uploadPath;
 
-	@Override
-	public String store(ImageUploadRequest request) {
-		MultipartFile file = validateFile(request.file());
-
-		Path root = ensureDirectoryExists(request.id());
-
-		String newFilename = saveFile(file, root);
-
-		Expert expert = findExpert(request.id());
-
-		saveExpertImage(newFilename, file, expert, root);
-
-		return newFilename;
-	}
-
 	private MultipartFile validateFile(MultipartFile file) {
 		if (file.isEmpty()) {
 			throw new InvalidValueException(ErrorCode.INVALID_IMAGE);
@@ -112,6 +97,25 @@ public class FileSystemExpertImageService implements ImageService {
 		expertImageRepository.save(expertImage);
 	}
 
+	private void throwEntityNotFoundException() {
+		throw new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE);
+	}
+
+	@Override
+	public String store(ImageUploadRequest request) {
+		MultipartFile file = validateFile(request.file());
+
+		Path root = ensureDirectoryExists(request.id());
+
+		String newFilename = saveFile(file, root);
+
+		Expert expert = findExpert(request.id());
+
+		saveExpertImage(newFilename, file, expert, root);
+
+		return newFilename;
+	}
+
 	@Override
 	public List<ImageResponse> loadAll(Long expertId) {
 		try {
@@ -149,9 +153,9 @@ public class FileSystemExpertImageService implements ImageService {
 			Resource resource = new UrlResource(file.toUri());
 			if (resource.exists() || resource.isReadable()) {
 				return resource;
-			} else {
-				throw new ExpertImageIOException(ErrorCode.INVALID_IMAGE);
 			}
+			throw new ExpertImageIOException(ErrorCode.INVALID_IMAGE);
+
 		} catch (MalformedURLException e) {
 			throw new ExpertImageIOException(ErrorCode.INVALID_IMAGE);
 		}
@@ -168,11 +172,10 @@ public class FileSystemExpertImageService implements ImageService {
 
 			Optional<ExpertImage> expertImage = expertImageRepository.findByFilename(filename);
 
-			if (expertImage.isPresent()) {
-				expertImageRepository.delete(expertImage.get());
-			} else {
-				throw new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE);
-			}
+			expertImage.ifPresentOrElse(
+				expertImageRepository::delete,
+				this::throwEntityNotFoundException
+			);
 
 			Files.delete(root.resolve(filename));
 		} catch (EntityNotFoundException e) {
