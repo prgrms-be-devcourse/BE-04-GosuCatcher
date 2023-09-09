@@ -120,4 +120,37 @@ class BucketControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(MockMvcResultMatchers.status().isNoContent());
 	}
+
+	@Test
+	@DisplayName("사용자가 찜한 고수의 목록을 알 수 있다")
+	void findAllByMemberId() throws Exception {
+
+		// given
+		long memberId = 3L;
+		BucketsResponse bucketsResponse = new BucketsResponse(
+			List.of(
+				new BucketResponse(1L, 2L, 3L),
+				new BucketResponse(2L, 1L, 3L)
+			),
+			false);
+
+		given(bucketService.findAllByMemberId(any(Long.class), any(PageRequest.class)))
+			.willReturn(bucketsResponse);
+
+		// when
+		// then
+		mockMvc.perform(get(apiBaseUrl + "/" + memberId)
+				// mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/buckets/3")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.buckets[0].id").value(1L))
+			.andExpect(jsonPath("$.buckets[0].expertId").value(2L))
+			.andExpect(
+				jsonPath("$.buckets[0].memberId").value(3L))
+			.andExpect(jsonPath("$.buckets[1].id").value(2L))
+			.andExpect(jsonPath("$.buckets[1].expertId").value(1L))
+			.andExpect(
+				jsonPath("$.buckets[1].memberId").value(3L));
+	}
+
 }

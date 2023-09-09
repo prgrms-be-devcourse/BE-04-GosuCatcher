@@ -68,7 +68,19 @@ public class BucketService {
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		return bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
-				.isPresent();
+		boolean status = bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
+			.isPresent();
+
+		return status;
+	}
+
+	@Transactional(readOnly = true)
+	public BucketsResponse findAllByMemberId(Long memberId, Pageable pageable) {
+		memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+
+		Slice<Bucket> bucket = bucketRepository.findAllByMemberId(memberId, pageable);
+
+		return BucketsResponse.from(bucket);
 	}
 }

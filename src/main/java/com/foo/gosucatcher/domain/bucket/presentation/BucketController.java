@@ -35,6 +35,13 @@ public class BucketController {
 		return ResponseEntity.ok(bucketsResponse);
 	}
 
+	@GetMapping("/{memberId}")
+	public ResponseEntity<BucketsResponse> findAllByMemberId(@PathVariable Long memberId, Pageable pageable) {
+		BucketsResponse bucketsResponse = bucketService.findAllByMemberId(memberId, pageable);
+
+		return ResponseEntity.ok(bucketsResponse);
+	}
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		bucketService.deleteById(id);
