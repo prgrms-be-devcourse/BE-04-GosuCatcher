@@ -13,7 +13,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -43,47 +42,74 @@ public class FileSystemExpertImageService implements ImageService {
 	private final ExpertImageRepository expertImageRepository;
 	private final ExpertRepository expertRepository;
 
-	@Value("${spring.servlet.multipart.location}")
+	// @Value("${spring.servlet.multipart.location}")
 	private String uploadPath;
 
 	@Override
 	public String store(ImageUploadRequest request) {
-		try {
-			MultipartFile file = request.file();
-			if (file.isEmpty()) {
-				throw new InvalidValueException(ErrorCode.INVALID_IMAGE);
-			}
+		MultipartFile file = validateFile(request.file());
 
-			Path root = Paths.get(uploadPath, request.id().toString());
-			if (!Files.exists(root)) {
+		Path root = ensureDirectoryExists(request.id());
+
+		String newFilename = saveFile(file, root);
+
+		Expert expert = findExpert(request.id());
+
+		saveExpertImage(newFilename, file, expert, root);
+
+		return newFilename;
+	}
+
+	private MultipartFile validateFile(MultipartFile file) {
+		if (file.isEmpty()) {
+			throw new InvalidValueException(ErrorCode.INVALID_IMAGE);
+		}
+
+		return file;
+	}
+
+	private Path ensureDirectoryExists(Long id) {
+		Path root = Paths.get(uploadPath, id.toString());
+		if (!Files.exists(root)) {
+			try {
 				Files.createDirectories(root);
+			} catch (IOException e) {
+				throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
 			}
+		}
 
-			String originalFilename = file.getOriginalFilename();
-			String extension = FilenameUtils.getExtension(originalFilename);
-			String newFilename = UUID.randomUUID() + "." + extension;
+		return root;
+	}
 
-			try (InputStream inputStream = file.getInputStream()) {
-				Files.copy(inputStream, root.resolve(newFilename), StandardCopyOption.REPLACE_EXISTING);
-			}
+	private String saveFile(MultipartFile file, Path root) {
+		String originalFilename = file.getOriginalFilename();
+		String extension = FilenameUtils.getExtension(originalFilename);
+		String newFilename = UUID.randomUUID() + "." + extension;
 
-			Expert expert = expertRepository.findById(request.id())
-				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
-
-			ExpertImage expertImage = ExpertImage.builder()
-				.filename(newFilename)
-				.url(root.resolve(newFilename).toString())
-				.size(file.getSize())
-				.expert(expert)
-				.build();
-
-			expertImageRepository.save(expertImage);
-			return newFilename;
-		} catch (EntityNotFoundException e) {
-			throw e;
-		} catch (Exception e) {
+		try (InputStream inputStream = file.getInputStream()) {
+			Files.copy(inputStream, root.resolve(newFilename), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
 			throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
+
+		return newFilename;
+	}
+
+	private Expert findExpert(Long id) {
+
+		return expertRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+	}
+
+	private void saveExpertImage(String filename, MultipartFile file, Expert expert, Path root) {
+		ExpertImage expertImage = ExpertImage.builder()
+			.filename(filename)
+			.url(root.resolve(filename).toString())
+			.size(file.getSize())
+			.expert(expert)
+			.build();
+
+		expertImageRepository.save(expertImage);
 	}
 
 	@Override
@@ -112,6 +138,7 @@ public class FileSystemExpertImageService implements ImageService {
 
 	@Override
 	public Path load(Long expertId, String filename) {
+
 		return Paths.get(uploadPath, expertId.toString()).resolve(filename);
 	}
 

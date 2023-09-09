@@ -57,7 +57,7 @@ public class Expert extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "double default 0.0")
 	private double rating;
 
-	@Column(nullable = false, columnDefinition = "int default 0")
+	@Column(name = "review_count", nullable = false, columnDefinition = "int default 0")
 	private int reviewCount;
 
 	private boolean isDeleted = Boolean.FALSE;
