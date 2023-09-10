@@ -39,7 +39,10 @@ public class SubItemService {
 		duplicatedNameCheck(request.name());
 
 		SubItem subItem = SubItemCreateRequest.toSubItem(mainItem, request);
+
 		subItemRepository.save(subItem);
+
+		mainItem.addSubItem(subItem);
 
 		return SubItemResponse.from(subItem);
 	}
@@ -83,7 +86,11 @@ public class SubItemService {
 		SubItem subItem = subItemRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
+		MainItem mainItem = subItem.getMainItem();
+
 		subItemRepository.delete(subItem);
+
+		mainItem.removeSubItem(subItem);
 	}
 
 	private void duplicatedNameCheck(String name) {
