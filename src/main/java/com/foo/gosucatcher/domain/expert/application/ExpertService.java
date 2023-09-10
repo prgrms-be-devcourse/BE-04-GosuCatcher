@@ -1,7 +1,11 @@
 package com.foo.gosucatcher.domain.expert.application;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REGISTERED_BY_SUB_ITEM;
+import static com.foo.gosucatcher.global.error.ErrorCode.DUPLICATED_EXPERT_STORENAME;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_ITEM;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +28,6 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
-import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -92,7 +95,7 @@ public class ExpertService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		SubItem subItem = subItemRepository.findByName(addSubItemRequest.subItemName())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
 		checkAlreadyRegisteredSubItem(expert, subItem);
 
@@ -113,10 +116,10 @@ public class ExpertService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		SubItem subItem = subItemRepository.findByName(removeSubItemRequest.subItemName())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
 		ExpertItem expertItem = expertItemRepository.findByExpertAndSubItem(expert, subItem)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_ITEM));
 
 		expert.removeExpertItem(expertItem);
 
@@ -126,7 +129,7 @@ public class ExpertService {
 	@Transactional(readOnly = true)
 	public SubItemsResponse getExpertSubItems(Long id) {
 		Expert expert = expertRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
 		List<SubItem> subItemList = expert.getExpertItemList().stream()
 			.map(ExpertItem::getSubItem)
@@ -144,14 +147,14 @@ public class ExpertService {
 				return registeredSubItemId.equals(requestedSubItemId);
 			})
 			.forEach(expertItem -> {
-				throw new BusinessException(ErrorCode.ALREADY_REGISTERED_BY_SUB_ITEM);
+				throw new BusinessException(ALREADY_REGISTERED_BY_SUB_ITEM);
 			});
 	}
 
 	private void duplicatedStoreNameCheck(String storeName) {
 		Optional<Expert> existingExpert = expertRepository.findByStoreName(storeName);
 		if (existingExpert.isPresent()) {
-			throw new BusinessException(ErrorCode.DUPLICATED_EXPERT_STORENAME);
+			throw new BusinessException(DUPLICATED_EXPERT_STORENAME);
 		}
 	}
 }
