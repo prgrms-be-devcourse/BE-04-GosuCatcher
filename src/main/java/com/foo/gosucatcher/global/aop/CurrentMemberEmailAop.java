@@ -36,7 +36,7 @@ public class CurrentMemberEmailAop {
 		HttpServletRequest request = requestAttributes.getRequest();
 
 		String token = jwtTokenProvider.resolveAccessToken(request);
-		token = jwtTokenProvider.bearerRemove(token);
+		token = jwtTokenProvider.removeBearer(token);
 
 		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
 		String memberEmail = authentication.getPrincipal().toString();

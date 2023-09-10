@@ -1,7 +1,6 @@
 package com.foo.gosucatcher.domain.member.presentation;
 
-import javax.validation.constraints.Email;
-
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
@@ -35,6 +33,8 @@ import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUp
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.aop.CurrentMemberEmail;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import com.foo.gosucatcher.global.util.ImageFileUtils;
 
 import lombok.RequiredArgsConstructor;
@@ -46,18 +46,18 @@ public class MemberController {
 
 	private final MemberService memberService;
 
-	@PostMapping("/recovery/password")
-	public ResponseEntity<MemberPasswordFoundResponse> findPassword(
-		@RequestBody @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+	@GetMapping("/recovery/password")
+	public ResponseEntity<MemberPasswordFoundResponse> findPassword(@RequestParam String email) {
 		//todo: 이메일 인증 시스템 만들기
+		isValidEmail(email);
 		MemberPasswordFoundResponse response = memberService.findPassword(email);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/signup")
-	public ResponseEntity<MemberEmailDuplicateResponse> checkDuplicatedEmail(
-		@RequestParam @Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+	public ResponseEntity<MemberEmailDuplicateResponse> checkDuplicatedEmail(@RequestParam String email) {
+		isValidEmail(email);
 		MemberEmailDuplicateResponse response = memberService.checkDuplicatedEmail(email);
 
 		return ResponseEntity.ok(response);
@@ -80,42 +80,42 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	@PostMapping("/refresh-token")
-	public ResponseEntity<MemberCertifiedResponse> refreshToken(
-		@RequestBody @Validated MemberRefreshRequest memberRefreshRequest) {
-		MemberCertifiedResponse response = memberService.refresh(memberRefreshRequest);
-
-		return ResponseEntity.ok(response);
-	}
-
 	@CurrentMemberEmail
 	@DeleteMapping("/logout")
 	public ResponseEntity<Void> logout(String memberEmail) {
+		isValidEmail(memberEmail);
+
 		memberService.logout(memberEmail);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@CurrentMemberId
-	@DeleteMapping("/me")
-	public ResponseEntity<Void> deleteMember(Long memberId) {
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteMember(@PathVariable Long id, Long memberId) {
+		isAuthenticatedMemberPath(id, memberId);
+
 		memberService.deleteMember(memberId);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@CurrentMemberId
-	@GetMapping("/me/profile")
-	public ResponseEntity<MemberProfileResponse> findMemberProfile(Long memberId) {
+	@GetMapping("/{id}/profiles")
+	public ResponseEntity<MemberProfileResponse> findMemberProfile(@PathVariable Long id, Long memberId) {
+		isAuthenticatedMemberPath(id, memberId);
+
 		MemberProfileResponse response = memberService.findMemberProfile(memberId);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberId
-	@PatchMapping("/me/profile")
-	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(Long memberId,
+	@PatchMapping("/{id}/profiles")
+	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(@PathVariable Long id, Long memberId,
 		@RequestBody @Validated MemberProfileChangeRequest memberProfileChangeRequest) {
+		isAuthenticatedMemberPath(id, memberId);
+
 		MemberProfileChangeResponse response = memberService.changeMemberProfile(memberId,
 			memberProfileChangeRequest);
 
@@ -123,9 +123,12 @@ public class MemberController {
 	}
 
 	//todo: 리팩토링 예정
-	@PostMapping("/me/profile/image")
-	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(@PathVariable long memberId,
+	@CurrentMemberId
+	@PostMapping("/{id}/profiles/image")
+	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(@PathVariable Long id, Long memberId,
 		@RequestParam MultipartFile file) {
+		isAuthenticatedMemberPath(id, memberId);
+
 		ProfileImageUploadRequest request = new ProfileImageUploadRequest(memberId, file);
 		memberService.uploadProfileImage(request);
 
@@ -135,9 +138,9 @@ public class MemberController {
 			.body(response);
 	}
 
-	@GetMapping("/me/profile/image")
-	public ResponseEntity<Resource> findProfileImage(@PathVariable long memberId) {
-		ImageFile profileImage = memberService.findProfileImage(memberId);
+	@GetMapping("/{id}/profiles/image")
+	public ResponseEntity<Resource> findProfileImage(@PathVariable Long id) {
+		ImageFile profileImage = memberService.findProfileImage(id);
 
 		String contentDisposition = ImageFileUtils.makeImageFileContentDisposition(profileImage);
 		UrlResource resource = ImageFileUtils.makeImageFileUrlResource(profileImage);
@@ -147,10 +150,26 @@ public class MemberController {
 			.body(resource);
 	}
 
-	@DeleteMapping("/me/profile/image")
-	public ResponseEntity<Void> deleteProfileImage(@PathVariable long memberId) {
+	@CurrentMemberId
+	@DeleteMapping("/{id}/profiles/image")
+	public ResponseEntity<Void> deleteProfileImage(@PathVariable Long id, Long memberId) {
+		isAuthenticatedMemberPath(id, memberId);
+
 		memberService.deleteProfileImage(memberId);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent().build();
+	}
+
+	private void isValidEmail(String email) {
+		EmailValidator emailValidator = new EmailValidator();
+		if (!emailValidator.isValid(email, null)) {
+			throw new InvalidValueException(ErrorCode.INVALID_EMAIL_FORMAT);
+		}
+	}
+
+	private void isAuthenticatedMemberPath(Long pathId, Long memberId) {
+		if (!memberId.equals(pathId)) {
+			throw new InvalidValueException(ErrorCode.UNAUTHENTICATED_MEMBER);
+		}
 	}
 }

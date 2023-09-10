@@ -32,7 +32,6 @@ public class SecurityConfigure {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			.antMatchers("/**")
 			.antMatchers("/h2-console/**");
 	}
 

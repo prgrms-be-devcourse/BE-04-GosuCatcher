@@ -14,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +32,8 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Where(clause = "is_deleted = false")
+@SQLDelete(sql = "UPDATE members SET is_deleted = true WHERE id = ?")
 @Table(name = "members")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity implements UserDetails {
@@ -38,30 +42,30 @@ public class Member extends BaseEntity implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(length = 50, nullable = false, unique = true)
+	@Column(nullable = false, unique = true)
 	private String email;
 
 	@Column(nullable = false)
 	private String password;
 
-	@Column(length = 20, nullable = false)
+	@Column(nullable = false)
 	private String name;
 
-	@Column(length = 20, unique = true)
+	@Column(name = "phone_number", unique = true)
 	private String phoneNumber;
 
-	@Column
+	@Column(name = "is_deleted")
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Embedded
-	@Column(nullable = false)
+	@Column(name = "profile_image_file", nullable = false)
 	private ImageFile profileImageFile;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Roles role;
 
-	@Column
+	@Column(name = "refresh_token")
 	private String refreshToken;
 
 	@Builder
@@ -79,18 +83,14 @@ public class Member extends BaseEntity implements UserDetails {
 		this.password = passwordEncoder.encode(password);
 	}
 
-	public void changeMemberProfile(Member requestMember, PasswordEncoder passwordEncoder) {
+	public void updateProfile(Member requestMember, PasswordEncoder passwordEncoder) {
 		this.name = requestMember.getName();
 		this.password = requestMember.getPassword();
 		encodePassword(passwordEncoder);
 		this.phoneNumber = requestMember.getPhoneNumber();
 	}
 
-	public void deleteMember() {
-		this.isDeleted = true;
-	}
-
-	public void changeProfileImageFile(ImageFile profileImageFile) {
+	public void updateProfileImageFile(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
 			throw new BusinessException(ErrorCode.INVALID_IMAGE);
 		}
@@ -98,7 +98,7 @@ public class Member extends BaseEntity implements UserDetails {
 		this.profileImageFile = profileImageFile;
 	}
 
-	public void changeMemberRole(Roles role) {
+	public void updateMemberRole(Roles role) {
 		this.role = role;
 	}
 
@@ -108,7 +108,10 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void authenticate(Member requestMember, PasswordEncoder passwordEncoder) {
 		String requestPassword = requestMember.getPassword();
-		if (!passwordEncoder.matches(requestPassword, this.password)) {
+		boolean isMatchedPassword = passwordEncoder.matches(requestPassword, this.password);
+		boolean isWithdrawnMember = isDeleted;
+
+		if (isWithdrawnMember || !isMatchedPassword) {
 			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
 		}
 	}

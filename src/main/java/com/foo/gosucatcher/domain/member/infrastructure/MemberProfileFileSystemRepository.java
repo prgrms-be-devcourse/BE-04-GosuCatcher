@@ -30,7 +30,7 @@ public class MemberProfileFileSystemRepository implements MemberProfileRepositor
 
 		ImageFile defaultImageFile = createDefaultImageFile();
 		defaultImageFile.changePathToDefault();
-		member.changeProfileImageFile(defaultImageFile);
+		member.updateProfileImageFile(defaultImageFile);
 	}
 
 	private ImageFile createDefaultImageFile() {

@@ -35,7 +35,7 @@ public class CurrentMemberIdAop {
 		HttpServletRequest request = requestAttributes.getRequest();
 
 		String token = jwtTokenProvider.resolveAccessToken(request);
-		token = jwtTokenProvider.bearerRemove(token);
+		token = jwtTokenProvider.removeBearer(token);
 
 		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberId(token);
 		Long memberId = Long.parseLong(authentication.getPrincipal().toString());

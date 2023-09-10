@@ -21,9 +21,7 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -89,15 +87,15 @@ public class JwtTokenProvider {
 		return request.getHeader("AccessToken");
 	}
 
-	public boolean validateAccessToken(String token) {
-		return extracted(token, accessTokenSecretKey);
+	public boolean isValidAccessToken(String token) {
+		return isValidToken(token, accessTokenSecretKey);
 	}
 
-	public boolean validateRefreshToken(String token) {
-		return extracted(token, refreshTokenSecretKey);
+	public boolean isValidRefreshToken(String token) {
+		return isValidToken(token, refreshTokenSecretKey);
 	}
 
-	public String bearerRemove(String token) {
+	public String removeBearer(String token) {
 		return token.substring("Bearer ".length());
 	}
 
@@ -120,7 +118,6 @@ public class JwtTokenProvider {
 	}
 
 	private String getMemberEmail(String token, String secretKey) {
-		log.warn("token : {}", token);
 		return Jwts.parser()
 			.setSigningKey(secretKey)
 			.parseClaimsJws(token)
@@ -130,7 +127,6 @@ public class JwtTokenProvider {
 	}
 
 	private Long getMemberId(String token, String secretKey) {
-		log.warn("token : {}", token);
 		String memberId = Jwts.parser()
 			.setSigningKey(secretKey)
 			.parseClaimsJws(token)
@@ -141,8 +137,8 @@ public class JwtTokenProvider {
 		return Long.parseLong(memberId);
 	}
 
-	private boolean extracted(String token, String secretKey) {
-		token = bearerRemove(token);
+	private boolean isValidToken(String token, String secretKey) {
+		token = removeBearer(token);
 		try {
 			Jws<Claims> claims = Jwts.parser()
 				.setSigningKey(secretKey)
@@ -156,9 +152,8 @@ public class JwtTokenProvider {
 		}
 	}
 
-	private static String getTokenSecretKey(String accessTokenSecretKey) {
-		return Base64
-			.getEncoder()
+	private String getTokenSecretKey(String accessTokenSecretKey) {
+		return Base64.getEncoder()
 			.encodeToString(accessTokenSecretKey.getBytes());
 	}
 }

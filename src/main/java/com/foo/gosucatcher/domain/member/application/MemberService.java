@@ -1,8 +1,5 @@
 package com.foo.gosucatcher.domain.member.application;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -45,16 +42,15 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional(readOnly = true)
-	public MemberPasswordFoundResponse findPassword(@Validated @Email String email) {
+	public MemberPasswordFoundResponse findPassword(String email) {
 		Member member = memberRepository.findByEmail(email)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		return MemberPasswordFoundResponse.from(member);
 	}
 
 	@Transactional(readOnly = true)
-	public MemberEmailDuplicateResponse checkDuplicatedEmail(
-		@Validated @Email(message = "올바른 이메일 형식을 입력하세요") String email) {
+	public MemberEmailDuplicateResponse checkDuplicatedEmail(String email) {
 		memberRepository.findByEmail(email)
 			.ifPresent((member) -> {
 				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER_EMAIL);
@@ -63,14 +59,14 @@ public class MemberService {
 		return MemberEmailDuplicateResponse.from(email);
 	}
 
-	public MemberSignupResponse signup(@Validated MemberSignupRequest memberSignUpRequest) {
+	public MemberSignupResponse signup(MemberSignupRequest memberSignUpRequest) {
 		Member signupMember = MemberSignupRequest.toMember(memberSignUpRequest);
 		String signupEmail = signupMember.getEmail();
 
 		checkDuplicatedEmail(signupEmail);
 
 		signupMember.encodePassword(passwordEncoder);
-		signupMember.changeMemberRole(Roles.ROLE_USER);
+		signupMember.updateMemberRole(Roles.ROLE_USER);
 		Member savedMember = memberRepository.save(signupMember);
 
 		memberProfileRepository.initializeMemberProfile(savedMember);
@@ -79,10 +75,10 @@ public class MemberService {
 	}
 
 	@Transactional
-	public MemberCertifiedResponse login(@Validated MemberLoginRequest memberLoginRequest) {
+	public MemberCertifiedResponse login(MemberLoginRequest memberLoginRequest) {
 		String loginRequestEmail = memberLoginRequest.email();
 		Member member = memberRepository.findByEmail(loginRequestEmail)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		Member loginRequestMember = MemberLoginRequest.toMember(memberLoginRequest);
 		member.authenticate(loginRequestMember, passwordEncoder);
@@ -93,7 +89,7 @@ public class MemberService {
 	public MemberCertifiedResponse refresh(MemberRefreshRequest memberRefreshRequest) {
 		String refreshToken = memberRefreshRequest.refreshToken();
 
-		if (jwtTokenProvider.validateRefreshToken(refreshToken)) {
+		if (jwtTokenProvider.isValidRefreshToken(refreshToken)) {
 			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
 		}
 
@@ -114,11 +110,11 @@ public class MemberService {
 		member.logout();
 	}
 
-	public void deleteMember(@Validated @Min(0) long memberId) {
+	public void deleteMember(Long memberId) {
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_EMAIL));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		member.deleteMember();
+		memberRepository.delete(member);
 	}
 
 	public MemberProfileResponse findMemberProfile(Long memberId) {
@@ -128,19 +124,19 @@ public class MemberService {
 		return MemberProfileResponse.from(member);
 	}
 
-	public MemberProfileChangeResponse changeMemberProfile(@Validated @Min(0) Long memberId,
+	public MemberProfileChangeResponse changeMemberProfile(Long memberId,
 		@Validated MemberProfileChangeRequest memberProfileChangeRequest) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		//todo:휴대폰 인증 시스템 만들기
 		Member changedMember = MemberProfileChangeRequest.toMember(memberProfileChangeRequest);
-		member.changeMemberProfile(changedMember, passwordEncoder);
+		member.updateProfile(changedMember, passwordEncoder);
 
 		return MemberProfileChangeResponse.from(member);
 	}
 
-	public void uploadProfileImage(@Validated ProfileImageUploadRequest profileImageUploadRequest) {
+	public void uploadProfileImage(ProfileImageUploadRequest profileImageUploadRequest) {
 		long memberId = profileImageUploadRequest.memberId();
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
@@ -148,18 +144,18 @@ public class MemberService {
 		MultipartFile file = profileImageUploadRequest.file();
 		ImageFile imageFile = memberProfileRepository.uploadImage(member, file);
 
-		member.changeProfileImageFile(imageFile);
+		member.updateProfileImageFile(imageFile);
 	}
 
 	@Transactional(readOnly = true)
-	public ImageFile findProfileImage(@Validated @Min(0) long memberId) {
+	public ImageFile findProfileImage(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		return memberProfileRepository.findImage(member);
 	}
 
-	public void deleteProfileImage(@Validated @Min(0) long memberId) {
+	public void deleteProfileImage(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
