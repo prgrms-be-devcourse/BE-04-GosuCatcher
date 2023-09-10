@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.*;
+
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -32,10 +34,10 @@ public class ChattingMessageService {
 
     public ChattingMessageResponse create(Long senderId, Long chattingRoomId, String message) {
         Member sender = memberRepository.findById(senderId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
         ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_CHATTING_ROOM));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
         ChattingMessage chattingMessage = ChattingMessageRequest.toChattingMessage(sender, chattingRoom, message);
         chattingMessageRepository.save(chattingMessage);
@@ -46,16 +48,23 @@ public class ChattingMessageService {
     @Transactional(readOnly = true)
     public ChattingMessagesResponse findAllByChattingRoomId(Long chattingRoomId) {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_CHATTING_ROOM));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
         List<ChattingMessage> chattingMessages = chattingMessageRepository.findAllByChattingRoom(chattingRoom);
 
         return ChattingMessagesResponse.from(chattingMessages);
     }
 
+    public void delete(Long chattingMessageId) {
+        ChattingMessage chattingMessage = chattingMessageRepository.findById(chattingMessageId)
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_MESSAGE));
+
+        chattingMessageRepository.delete(chattingMessage);
+    }
+
     public ChattingMessagesResponse sendExpertEstimateMessage(List<ChattingRoomResponse> chattingRoomResponses, List<ExpertAutoEstimateResponse> expertAutoEstimateResponses) {
         if (chattingRoomResponses.size() != expertAutoEstimateResponses.size()) {
-            throw new BusinessException(ErrorCode.CHATTING_ROOM_ASSIGNMENT_FAILED);
+            throw new BusinessException(CHATTING_ROOM_ASSIGNMENT_FAILED);
         }
 
         List<ChattingMessageResponse> chattingMessageResponses = new ArrayList<>();
