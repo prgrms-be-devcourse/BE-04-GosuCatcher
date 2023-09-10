@@ -55,7 +55,11 @@ public enum ErrorCode {
 	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
 
 	//채팅방
-	NOT_FOUND_CHATTING_ROOM("CR001", "채팅방이 존재하지 않습니다.");
+	NOT_FOUND_CHATTING_ROOM("CR001", "채팅방이 존재하지 않습니다."),
+	CHATTING_ROOM_ASSIGNMENT_FAILED("CR002", "채팅방 할당에 실패했습니다."),
+
+	//채팅 메시지
+	NOT_FOUND_CHATTING_MESSAGE("CM001", "채팅 메시지가 존재하지 않습니다.");
 
 	private final String code;
 	private final String message;

@@ -14,4 +14,9 @@ public record ChattingMessagesResponse(
                 .map(ChattingMessageResponse::from)
                 .toList());
     }
+
+    public static ChattingMessagesResponse valueOf(List<ChattingMessageResponse> chattingMessageResponses) {
+
+        return new ChattingMessagesResponse(chattingMessageResponses);
+    }
 }
