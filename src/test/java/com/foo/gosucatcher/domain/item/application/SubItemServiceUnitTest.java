@@ -283,36 +283,4 @@ class SubItemServiceUnitTest {
 		//then
 		verify(subItemRepository, times(1)).delete(subItem);
 	}
-
-	@Test
-	@DisplayName("고수 서브 아이템 조회 성공")
-	void findAllByExpertIdSuccessTest() {
-		// given
-		when(expertRepository.findExpertWithSubItemsById(1L))
-			.thenReturn(Optional.of(expert));
-
-		expert.addExpertItem(expertItem);
-
-		// when
-		SubItemsResponse subItemsResponse = subItemService.findAllByExpertId(1L);
-
-		// then
-		List<SubItemResponse> subItemResponses = subItemsResponse.subItemsResponse();
-		assertThat(subItemResponses).hasSize(1);
-		assertThat(subItemResponses.get(0).name()).isEqualTo(subItem.getName());
-		assertThat(subItemResponses.get(0).description()).isEqualTo(subItem.getDescription());
-	}
-
-	@Test
-	@DisplayName("고수 서브 아이템 조회 실패 - 고수가 없는 경우")
-	void findAllByExpertIdFailTest_notFoundExpert() {
-		// given
-		when(expertRepository.findExpertWithSubItemsById(1L))
-			.thenReturn(Optional.empty());
-
-		// when -> then
-		assertThrows(EntityNotFoundException.class, () -> {
-			subItemService.findAllByExpertId(1L);
-		});
-	}
 }

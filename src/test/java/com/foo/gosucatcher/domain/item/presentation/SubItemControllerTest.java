@@ -229,26 +229,4 @@ class SubItemControllerTest {
 			.andExpect(status().isOk())
 			.andDo(print());
 	}
-
-	@Test
-	@DisplayName("해당 고수가 가진 세부 서비스 조회")
-	void getSubItemsByExpertIdSuccessTest() throws Exception {
-
-		//given
-		Long id = 1L;
-		SubItemsResponse subItemsResponse = new SubItemsResponse(
-			List.of(new SubItemResponse(1L, "알바", "청소 알바", "청소 알바 설명")));
-		given(subItemService.findAll()).willReturn(subItemsResponse);
-
-		given(subItemService.findAllByExpertId(id))
-			.willReturn(subItemsResponse);
-
-		//when -> then
-		mockMvc.perform(get("/api/v1/sub-items/expert")
-				.param("id", id.toString()))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.subItemsResponse.[0].id").value(1))
-			.andExpect(jsonPath("$.subItemsResponse.[0].name").value("청소 알바"))
-			.andDo(print());
-	}
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItem;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItemRepository;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -176,5 +179,37 @@ class ExpertServiceTest {
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
 			() -> expertService.removeSubItem(expert.getId(), removeSubItemRequest));
+	}
+
+	@Test
+	@DisplayName("고수 서브 아이템 조회 성공")
+	void findAllByExpertIdSuccessTest() {
+		// given
+		when(expertRepository.findExpertWithSubItemsById(1L))
+			.thenReturn(Optional.of(expert));
+
+		expert.addExpertItem(expertItem);
+
+		//when
+		SubItemsResponse subItemsResponse = expertService.getSubItemsByExpertId(1L);
+
+		//then
+		List<SubItemResponse> subItemResponses = subItemsResponse.subItemsResponse();
+		assertThat(subItemResponses).hasSize(1);
+		assertThat(subItemResponses.get(0).name()).isEqualTo(subItem.getName());
+		assertThat(subItemResponses.get(0).description()).isEqualTo(subItem.getDescription());
+	}
+
+	@Test
+	@DisplayName("고수 서브 아이템 조회 실패 - 고수가 없는 경우")
+	void findAllByExpertIdFailTest_notFoundExpert() {
+		//given
+		when(expertRepository.findExpertWithSubItemsById(1L))
+			.thenReturn(Optional.empty());
+
+		//when -> then
+		assertThrows(EntityNotFoundException.class, () -> {
+			expertService.getSubItemsByExpertId(1L);
+		});
 	}
 }
