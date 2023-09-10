@@ -6,6 +6,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.foo.gosucatcher.domain.chat.application.ChattingMessageService;
+import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessageResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessagesResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
+import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,9 +50,18 @@ class MemberEstimateControllerTest {
 	@MockBean
 	private MemberEstimateService memberEstimateService;
 
-	@DisplayName("회원 요청 견적서 등록 성공 테스트")
+	@MockBean
+	private ExpertEstimateService expertEstimateService;
+
+	@MockBean
+	private ChattingRoomService chattingRoomService;
+
+	@MockBean
+	private ChattingMessageService chattingMessageService;
+
+	@DisplayName("회원 바로 견적 등록 성공 테스트")
 	@Test
-	void create() throws Exception {
+	void createAutoEstimate() throws Exception {
 		//given
 		Long memberId = 1L;
 		Long subItemId = 1L;
@@ -53,23 +72,39 @@ class MemberEstimateControllerTest {
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
 			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
-		when(memberEstimateService.create(memberId, memberEstimateRequest)).thenReturn(
-			memberEstimateResponse);
+		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description");
+
+		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, subItemId, 10000, "서울 강남구", "고수 견적서 내용입니다.");
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = new ExpertAutoEstimatesResponse(List.of(expertAutoEstimateResponse));
+
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		ChattingMessageResponse chattingMessageResponse = new ChattingMessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
+
+		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+		when(expertEstimateService.match(anyLong(), anyString())).thenReturn(expertAutoEstimatesResponse);
+		when(memberEstimateService.updateExpertEstimates(anyLong(), anyList())).thenReturn(memberEstimateResponse.id());
+		when(chattingRoomService.create(anyLong())).thenReturn(new ChattingRoomsResponse(List.of(chattingRoomResponse)));
+		when(chattingMessageService.sendExpertEstimateMessage(any(), any())).thenReturn(new ChattingMessagesResponse(List.of(chattingMessageResponse)));
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/{memberEstimateId}", 1L)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(1L))
-			.andExpect(jsonPath("$.memberId").value(memberEstimateResponse.memberId()))
-			.andExpect(jsonPath("$.subItemId").value(memberEstimateResponse.subItemId()))
-			.andExpect(jsonPath("$.location").value(memberEstimateResponse.location()))
-			.andExpect(jsonPath("$.detailedDescription").value(memberEstimateResponse.detailedDescription()));
+			.andExpect(jsonPath("$.chattingMessagesResponse").isArray())
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].id").value(1L))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].senderId").value(expertResponse.id()))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.id").value(1L))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.id").value(memberEstimateResponse.id()))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.memberId").value(memberId))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.chattingMessagesResponse[0].message").value("고수 견적서 내용입니다."));
 	}
 
-	@DisplayName("회원 요청 견적서 등록 실패 테스트")
+	@DisplayName("회원 바로 견적 등록 실패 테스트")
 	@Test
 	void createFailed() throws Exception {
 		//given
@@ -86,7 +121,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/{memberEstimateId}", 1L)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
