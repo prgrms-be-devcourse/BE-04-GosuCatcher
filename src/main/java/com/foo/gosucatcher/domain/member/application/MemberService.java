@@ -53,7 +53,7 @@ public class MemberService {
 	public MemberEmailDuplicateResponse checkDuplicatedEmail(String email) {
 		memberRepository.findByEmail(email)
 			.ifPresent((member) -> {
-				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER_EMAIL);
+				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER);
 			});
 
 		return MemberEmailDuplicateResponse.from(email);
@@ -144,7 +144,7 @@ public class MemberService {
 		MultipartFile file = profileImageUploadRequest.file();
 		ImageFile imageFile = memberProfileRepository.uploadImage(member, file);
 
-		member.updateProfileImageFile(imageFile);
+		member.updateProfileImage(imageFile);
 	}
 
 	@Transactional(readOnly = true)

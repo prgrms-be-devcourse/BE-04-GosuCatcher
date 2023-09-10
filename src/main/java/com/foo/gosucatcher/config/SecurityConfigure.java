@@ -25,11 +25,6 @@ public class SecurityConfigure {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Bean
-	BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
-
-	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
 			.antMatchers("/h2-console/**");
@@ -57,5 +52,10 @@ public class SecurityConfigure {
 		AuthenticationConfiguration authenticationConfiguration
 	) throws Exception {
 		return authenticationConfiguration.getAuthenticationManager();
+	}
+
+	@Bean
+	BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
 	}
 }

@@ -90,7 +90,7 @@ public class Member extends BaseEntity implements UserDetails {
 		this.phoneNumber = requestMember.getPhoneNumber();
 	}
 
-	public void updateProfileImageFile(ImageFile profileImageFile) {
+	public void updateProfileImage(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
 			throw new BusinessException(ErrorCode.INVALID_IMAGE);
 		}

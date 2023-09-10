@@ -31,7 +31,7 @@ public enum ErrorCode {
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
-	DUPLICATED_MEMBER_EMAIL("M002", "중복된 이메일입니다."),
+	DUPLICATED_MEMBER("M002", "이미 가입된 회원입니다."),
 	LOG_IN_FAILURE("M003", "로그인에 실패했습니다."),
 	CERTIFICATION_FAIL("M004", "회원인증에 실패했습니다."),
 	ALREADY_CERTIFIED("M005", "이미 인증된 회원입니다."),
