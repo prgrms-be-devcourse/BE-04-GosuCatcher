@@ -6,13 +6,8 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEs
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
-import com.foo.gosucatcher.domain.item.domain.SubItem;
-import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.util.RandomElementSelector;
 
 import lombok.RequiredArgsConstructor;
