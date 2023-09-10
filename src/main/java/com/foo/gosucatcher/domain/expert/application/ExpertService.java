@@ -22,10 +22,12 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItem;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItemRepository;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -122,6 +124,14 @@ public class ExpertService {
 		expert.removeExpertItem(expertItem);
 
 		expertItemRepository.delete(expertItem);
+	}
+
+	@Transactional(readOnly = true)
+	public SubItemsResponse getSubItemsByExpertId(Long id) {
+		Expert foundExpert = expertRepository.findExpertWithSubItemsById(id)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+
+		return SubItemsResponse.from(foundExpert);
 	}
 
 	private void checkAlreadyRegisteredSubItem(Expert expert, SubItem subItem) {

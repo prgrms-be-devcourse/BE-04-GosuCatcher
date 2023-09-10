@@ -7,7 +7,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
@@ -65,14 +64,6 @@ public class SubItemService {
 		Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, pageable);
 
 		return SubItemsSliceResponse.from(subItems);
-	}
-
-	@Transactional(readOnly = true)
-	public SubItemsResponse findAllByExpertId(Long id) {
-		Expert foundExpert = expertRepository.findExpertWithSubItemsById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
-
-		return SubItemsResponse.from(foundExpert);
 	}
 
 	public Long update(Long id, SubItemUpdateRequest request) {

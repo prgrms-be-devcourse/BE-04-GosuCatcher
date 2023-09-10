@@ -60,13 +60,6 @@ public class SubItemController {
 		return ResponseEntity.ok(sliceResponse);
 	}
 
-	@GetMapping("/expert")
-	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(@RequestParam Long id) {
-		SubItemsResponse response = subItemService.findAllByExpertId(id);
-
-		return ResponseEntity.ok(response);
-	}
-
 	@PatchMapping("/{id}")
 	public ResponseEntity<Long> update(@PathVariable Long id,
 									   @Validated @RequestBody SubItemUpdateRequest subItemUpdateRequest) {

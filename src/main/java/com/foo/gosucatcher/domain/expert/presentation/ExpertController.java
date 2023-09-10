@@ -18,6 +18,7 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRe
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -77,5 +78,12 @@ public class ExpertController {
 
 		return ResponseEntity.noContent()
 			.build();
+	}
+
+	@GetMapping("/{id}/sub-items")
+	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(@PathVariable Long id) {
+		SubItemsResponse response = expertService.getSubItemsByExpertId(id);
+
+		return ResponseEntity.ok(response);
 	}
 }
