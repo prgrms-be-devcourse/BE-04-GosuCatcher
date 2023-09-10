@@ -9,7 +9,6 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItem;
 import com.foo.gosucatcher.domain.expert.domain.ExpertItemRepository;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -126,20 +124,9 @@ public class ExpertService {
 		expertItemRepository.delete(expertItem);
 	}
 
-	@Transactional(readOnly = true)
-	public SubItemsResponse getExpertSubItems(Long id) {
-		Expert expert = expertRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
-
-		List<SubItem> subItemList = expert.getExpertItemList().stream()
-			.map(ExpertItem::getSubItem)
-			.collect(Collectors.toList());
-
-		return SubItemsResponse.from(subItemList);
-	}
-
 	private void checkAlreadyRegisteredSubItem(Expert expert, SubItem subItem) {
 		List<ExpertItem> expertItemList = expert.getExpertItemList();
+
 		expertItemList.stream()
 			.filter(expertItem -> {
 				Long registeredSubItemId = expertItem.getSubItem().getId();

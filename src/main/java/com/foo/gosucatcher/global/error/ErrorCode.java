@@ -41,13 +41,13 @@ public enum ErrorCode {
 	INVALID_IMAGE("F002", "지원하지 않는 이미지 파일 형식입니다."),
 
 	//회원 요청 견적서
-	NOT_FOUND_MEMBER_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),
-	INVALID_MEMBER_ESTIMATE_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
-	DUPLICATE_MEMBER_ESTIMATE("MRE003", "회원 요청 견적서는 중복될 수 없습니다."),
+	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
+	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
+	DUPLICATE_MEMBER_ESTIMATE("ME003", "회원 요청 견적서는 중복될 수 없습니다."),
 
 	//고수 응답 견적서
-	NOT_FOUND_EXPERT_RESPONSE_ESTIMATE("ERE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
-	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("ERE002", "총 금액은 0원보다 적을 수 없습니다."),
+	NOT_FOUND_EXPERT_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
+	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("EE002", "총 금액은 0원보다 적을 수 없습니다."),
 
 	//찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),

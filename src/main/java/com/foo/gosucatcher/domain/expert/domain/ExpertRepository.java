@@ -11,5 +11,5 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
 	Optional<Expert> findByStoreName(String storeName);
 
 	@Query("SELECT e FROM Expert e JOIN FETCH e.expertItemList ei JOIN FETCH ei.subItem WHERE e.id = :id")
-	Optional<Expert> findExpertWithSubItemsById(@Param("expertId") Long id);
+	Optional<Expert> findExpertWithSubItemsById(@Param("id") Long id);
 }

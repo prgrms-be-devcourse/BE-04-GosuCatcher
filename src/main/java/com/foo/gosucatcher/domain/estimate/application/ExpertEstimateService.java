@@ -60,14 +60,14 @@ public class ExpertEstimateService {
 	@Transactional(readOnly = true)
 	public ExpertEstimateResponse findById(Long id) {
 		ExpertEstimate expertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ESTIMATE));
 
 		return ExpertEstimateResponse.from(expertEstimate);
 	}
 
 	public Long update(Long id, ExpertEstimateUpdateRequest request) {
 		ExpertEstimate foundExpertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ESTIMATE));
 
 		ExpertEstimate expertEstimate = ExpertEstimateUpdateRequest.toExpertResponseEstimate(request,
 			foundExpertEstimate.getExpert(), foundExpertEstimate.getMemberEstimate());
@@ -79,7 +79,7 @@ public class ExpertEstimateService {
 
 	public void delete(Long id) {
 		ExpertEstimate expertEstimate = expertResponseRepository.findById(id)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ESTIMATE));
 
 		expertResponseRepository.delete(expertEstimate);
 	}
