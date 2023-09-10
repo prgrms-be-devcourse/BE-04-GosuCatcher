@@ -170,7 +170,7 @@ class ExpertEstimateControllerTest {
 
 		//given
 		given(expertEstimateService.findById(anyLong())).willThrow(
-			new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ESTIMATE));
 
 		//when -> then
 		mockMvc.perform(get(baseUrl + "/{id}", 1L))
