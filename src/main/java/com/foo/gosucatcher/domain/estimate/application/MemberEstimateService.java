@@ -3,6 +3,9 @@ package com.foo.gosucatcher.domain.estimate.application;
 import java.util.List;
 import java.util.Optional;
 
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class MemberEstimateService {
 	private final MemberEstimateRepository memberEstimateRepository;
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
+	private final ExpertEstimateRepository expertEstimateRepository;
 
 	public MemberEstimateResponse create(Long memberId, MemberEstimateRequest memberEstimateRequest) {
 		Member member = memberRepository.findById(memberId)
@@ -75,6 +79,24 @@ public class MemberEstimateService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		memberEstimateRepository.delete(memberEstimate);
+	}
+
+	public Long updateExpertEstimates(Long memberEstimateId, List<ExpertAutoEstimateResponse> expertAutoEstimateResponses) {
+		expertAutoEstimateResponses.stream()
+				.map(ExpertAutoEstimateResponse::id)
+				.forEach(expertEstimateId -> addExpertEstimateToMemberEstimate(memberEstimateId, expertEstimateId));
+
+		return memberEstimateId;
+	}
+
+	public void addExpertEstimateToMemberEstimate(Long memberEstimateId, Long expertEstimateId) {
+		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
+
+		ExpertEstimate expertEstimate = expertEstimateRepository.findById(expertEstimateId)
+				.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
+
+		memberEstimate.addExpertEstimate(expertEstimate);
 	}
 
 	private void checkDuplicatedMemberEstimate(Long memberId, Long subItemId) {

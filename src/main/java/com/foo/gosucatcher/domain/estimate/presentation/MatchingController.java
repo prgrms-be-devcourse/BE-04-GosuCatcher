@@ -29,6 +29,9 @@ public class MatchingController {
 		//매칭된 바로 견적 리스트
 		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = matchingService.match(memberEstimateResponse.subItemId(), memberEstimateResponse.location());
 
+		//요청 견적서에 매칭된 바로 견적들 삽입 (update)
+		Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
+
 		return ResponseEntity.ok(expertAutoEstimatesResponse);
 	}
 }
