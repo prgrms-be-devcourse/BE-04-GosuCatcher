@@ -47,11 +47,11 @@ public class Bucket extends BaseEntity {
 
 	@Builder
 	public Bucket(Expert expert, Member member) {
-		Long expertMemberId = expert.getMember().getId();
-		Long memberId = member.getId();
+		long expertMemberId = expert.getMember().getId();
+		long memberId = member.getId();
 
-		if (memberId.equals(expertMemberId)) {
-			throw new NotSupportedBucketException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
+		if (memberId == expertMemberId) {
+			throw new NotSupportedBucketException(ErrorCode.UNSUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;

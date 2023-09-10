@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.foo.gosucatcher.domain.review.application.ReviewService;
+import com.foo.gosucatcher.domain.review.application.dto.request.ReplyRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReplyResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 
@@ -33,9 +35,9 @@ public class ReviewController {
 
 	@PostMapping("/{expertId}")
 	public ResponseEntity<ReviewResponse> create(
-			@PathVariable Long expertId,
-			@RequestParam Long subItemId,
-			@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
+		@PathVariable Long expertId,
+		@RequestParam Long subItemId,
+		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
 		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
 
 		return ResponseEntity.ok(reviewResponse);
@@ -43,8 +45,8 @@ public class ReviewController {
 
 	@GetMapping
 	public ResponseEntity<ReviewsResponse> findAll(
-			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-			Pageable pageable) {
+		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+		Pageable pageable) {
 		ReviewsResponse response = reviewService.findAll(pageable);
 
 		return ResponseEntity.ok(response);
@@ -52,10 +54,11 @@ public class ReviewController {
 
 	@GetMapping("/experts/{expertId}")
 	public ResponseEntity<ReviewsResponse> findAllByExpertId(@PathVariable Long expertId,
-			@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-			Pageable pageable) {
+		@RequestParam(required = false) Long subItemId,
+		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
+		Pageable pageable) {
 
-		ReviewsResponse response = reviewService.findAllByExpertId(pageable, expertId);
+		ReviewsResponse response = reviewService.findAllByExpertIdAndSubItem(pageable, expertId, subItemId);
 
 		return ResponseEntity.ok(response);
 	}
@@ -75,9 +78,43 @@ public class ReviewController {
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> delete(@PathVariable Long id) {
+	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		reviewService.delete(id);
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/{reviewId}/replies")
+	public ResponseEntity<ReplyResponse> createReply(
+		@PathVariable Long reviewId,
+		@Validated @RequestBody ReplyRequest replyRequest) {
+		ReplyResponse replyResponse = reviewService.createReply(reviewId, replyRequest);
+
+		return ResponseEntity.ok(replyResponse);
+	}
+
+	@PatchMapping("/{reviewId}/replies/{replyId}")
+	public ResponseEntity<Long> updateReply(
+		@PathVariable Long reviewId,
+		@PathVariable Long replyId,
+		@Validated @RequestBody ReplyRequest replyRequest) {
+
+		long updatedId = reviewService.updateReply(reviewId, replyId, replyRequest);
+
+		return ResponseEntity.ok(updatedId);
+	}
+
+	@GetMapping("/{reviewId}/replies/{replyId}")
+	public ResponseEntity<ReplyResponse> findReplyByID(@PathVariable Long reviewId, @PathVariable Long replyId) {
+		ReplyResponse replyResponse = reviewService.findReplyById(reviewId, replyId);
+
+		return ResponseEntity.ok(replyResponse);
+	}
+
+	@DeleteMapping("/{reviewId}/replies/{replyId}")
+	public ResponseEntity<Object> deleteReply(@PathVariable Long reviewId, @PathVariable Long replyId) {
+		reviewService.deleteReply(reviewId, replyId);
+
+		return ResponseEntity.noContent().build();
 	}
 }

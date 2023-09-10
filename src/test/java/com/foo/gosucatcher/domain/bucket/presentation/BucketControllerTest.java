@@ -119,7 +119,7 @@ class BucketControllerTest {
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
 						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isOk());
+				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_BUCKET)).
 				when(bucketService)
