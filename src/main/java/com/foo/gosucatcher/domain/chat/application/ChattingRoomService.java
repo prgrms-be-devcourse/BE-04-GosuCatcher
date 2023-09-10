@@ -25,16 +25,10 @@ public class ChattingRoomService {
     private final MemberEstimateRepository memberEstimateRepository;
     private final ChattingRoomRepository chattingRoomRepository;
 
-    /***
-     * 채팅방 1개 이상 생성 (memberEstimate와 연관되어 있는 모든 ExpertEstimate에 대한 채팅방 생성, 최대 10개)
-     * @param memberEstimateId
-     * @return ChattingRoomsResponse
-     */
     public ChattingRoomsResponse create(Long memberEstimateId) {
         MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
-        //고객 요청서에 매칭된 바로 견적서 개수와 동일한 개수의 채팅방 생성
         List<ChattingRoom> chattingRooms = memberEstimate.getExpertEstimateList()
                 .stream()
                 .map(x -> ChattingRoomRequest.toChattingRoom(memberEstimate))

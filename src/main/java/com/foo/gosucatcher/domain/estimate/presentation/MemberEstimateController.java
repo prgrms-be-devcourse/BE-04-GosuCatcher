@@ -1,5 +1,11 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
+import com.foo.gosucatcher.domain.chat.application.ChattingMessageService;
+import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessagesResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
+import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,41 +28,52 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class MemberEstimateController {
 
-	private final MemberEstimateService memberEstimateService;
+    private final MemberEstimateService memberEstimateService;
+    private final ExpertEstimateService expertEstimateService;
+    private final ChattingRoomService chattingRoomService;
+    private final ChattingMessageService chattingMessageService;
 
-	@PostMapping("/{memberId}")
-	public ResponseEntity<MemberEstimateResponse> create(@PathVariable Long memberId,
-		@Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+    @PostMapping("/auto/{memberId}")
+    public ResponseEntity<ChattingMessagesResponse> createAutoEstimate(@PathVariable Long memberId,
+                                                                       @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+        MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
-		return ResponseEntity.ok(memberEstimateResponse);
-	}
+        ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.match(memberEstimateResponse.subItemId(), memberEstimateResponse.location());
 
-	@GetMapping
-	public ResponseEntity<MemberEstimatesResponse> findAll() {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
+        Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
-		return ResponseEntity.ok(memberEstimatesResponse);
-	}
+        ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
 
-	@GetMapping("/members/{memberId}")
-	public ResponseEntity<MemberEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
+        ChattingMessagesResponse chattingMessagesResponse = chattingMessageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
-		return ResponseEntity.ok(memberEstimatesResponse);
-	}
+        return ResponseEntity.ok(chattingMessagesResponse);
+    }
 
-	@GetMapping("/{memberEstimateId}")
-	public ResponseEntity<MemberEstimateResponse> findById(@PathVariable Long memberEstimateId) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.findById(memberEstimateId);
+    @GetMapping
+    public ResponseEntity<MemberEstimatesResponse> findAll() {
+        MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
 
-		return ResponseEntity.ok(memberEstimateResponse);
-	}
+        return ResponseEntity.ok(memberEstimatesResponse);
+    }
 
-	@DeleteMapping("/{memberEstimateId}")
-	public ResponseEntity<Void> delete(@PathVariable Long memberEstimateId) {
-		memberEstimateService.delete(memberEstimateId);
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<MemberEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
+        MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
 
-		return ResponseEntity.ok(null);
-	}
+        return ResponseEntity.ok(memberEstimatesResponse);
+    }
+
+    @GetMapping("/{memberEstimateId}")
+    public ResponseEntity<MemberEstimateResponse> findById(@PathVariable Long memberEstimateId) {
+        MemberEstimateResponse memberEstimateResponse = memberEstimateService.findById(memberEstimateId);
+
+        return ResponseEntity.ok(memberEstimateResponse);
+    }
+
+    @DeleteMapping("/{memberEstimateId}")
+    public ResponseEntity<Void> delete(@PathVariable Long memberEstimateId) {
+        memberEstimateService.delete(memberEstimateId);
+
+        return ResponseEntity.ok(null);
+    }
 }
