@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.estimate.application;
 
 import java.util.List;
 
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,19 +22,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class MatchingService {
 
-	private final SubItemRepository subItemRepository;
 	private final ExpertEstimateRepository expertEstimateRepository;
 
 	@Transactional(readOnly = true)
-	public ExpertEstimatesResponse match(Long subItemId, String activityLocation) {
-		SubItem subItem = subItemRepository.findById(subItemId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
-
+	public ExpertAutoEstimatesResponse match(Long subItemId, String activityLocation) {
 		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllBySubItemIdAndLocationAndIsAuto(
-			subItem.getId(), activityLocation);
+				subItemId, activityLocation);
 
 		List<ExpertEstimate> randomExpertEstimates = RandomElementSelector.selectRandomElements(expertEstimates, 10);
 
-		return ExpertEstimatesResponse.from(randomExpertEstimates);
+		return ExpertAutoEstimatesResponse.from(randomExpertEstimates);
 	}
 }
