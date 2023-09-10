@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -38,7 +37,7 @@ public class FileSystemExpertImageService implements ImageService {
 	private final ExpertImageRepository expertImageRepository;
 	private final ExpertRepository expertRepository;
 
-	@Value("${spring.servlet.multipart.location}")
+	// @Value("${spring.servlet.multipart.location}")
 	private String uploadPath;
 
 	private Expert findExpert(Long id) {
@@ -70,10 +69,6 @@ public class FileSystemExpertImageService implements ImageService {
 		}
 
 		return new ImageResponse(filename, url, size);
-	}
-
-	private void throwEntityNotFoundException() {
-		throw new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE);
 	}
 
 	@Override
@@ -138,7 +133,9 @@ public class FileSystemExpertImageService implements ImageService {
 
 			expertImage.ifPresentOrElse(
 				expertImageRepository::delete,
-				this::throwEntityNotFoundException
+				() -> {
+					throw new EntityNotFoundException(ErrorCode.NOT_FOUND_IMAGE);
+				}
 			);
 
 			Files.delete(root.resolve(filename));
