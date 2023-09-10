@@ -7,6 +7,7 @@ import lombok.Getter;
 @MappedSuperclass
 @Getter
 public abstract class Image {
+
 	private String filename;
 	private String url;
 	private Long size;
