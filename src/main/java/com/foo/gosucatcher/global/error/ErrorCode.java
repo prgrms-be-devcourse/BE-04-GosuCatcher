@@ -25,6 +25,7 @@ public enum ErrorCode {
 	NOT_FOUND_EXPERT("E001", "존재하지 않는 고수입니다."),
 	DUPLICATED_EXPERT_STORENAME("E002", "상점명이 중복될 수 없습니다."),
 	INVALID_MAX_TRAVEL_DISTANCE("E003", "최대 이동거리는 0 이상이어야 합니다."),
+	ALREADY_REGISTERED_BY_SUB_ITEM("E004", "해당 서비스로는 이미 등록되어있습니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
@@ -48,9 +49,12 @@ public enum ErrorCode {
 	NOT_FOUND_EXPERT_RESPONSE_ESTIMATE("ERE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
 	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("ERE002", "총 금액은 0원보다 적을 수 없습니다."),
 
-	// 찜
+	//찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
-	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다.");
+	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
+
+	//고수&서비스
+	NOT_FOUND_EXPERT_ITEM("EI001", "해당 고수는 요청한 서비스를 등록하지 않았습니다.");
 
 	private final String code;
 	private final String message;

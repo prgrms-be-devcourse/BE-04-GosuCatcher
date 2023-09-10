@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
+import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
@@ -29,7 +30,7 @@ public class ExpertController {
 
 	@PostMapping
 	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request,
-		@RequestParam Long memberId) {
+												 @RequestParam Long memberId) {
 		ExpertResponse expertResponse = expertService.create(request, memberId);
 
 		return ResponseEntity.ok(expertResponse);
@@ -61,5 +62,20 @@ public class ExpertController {
 		expertService.delete(id);
 
 		return ResponseEntity.ok(null);
+	}
+
+	@PostMapping("/{id}/sub-items")
+	public ResponseEntity<Long> addSubItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
+		Long expertId = expertService.addSubItem(id, request);
+
+		return ResponseEntity.ok(expertId);
+	}
+
+	@DeleteMapping("/{id}/sub-items")
+	public ResponseEntity<Object> removeItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
+		expertService.removeSubItem(id, request);
+
+		return ResponseEntity.noContent()
+			.build();
 	}
 }

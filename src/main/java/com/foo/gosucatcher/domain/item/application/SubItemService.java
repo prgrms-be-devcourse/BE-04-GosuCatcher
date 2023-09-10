@@ -1,12 +1,16 @@
 package com.foo.gosucatcher.domain.item.application;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertItem;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
@@ -29,6 +33,7 @@ public class SubItemService {
 
 	private final SubItemRepository subItemRepository;
 	private final MainItemRepository mainItemRepository;
+	private final ExpertRepository expertRepository;
 
 	public SubItemResponse create(SubItemCreateRequest request) {
 		MainItem mainItem = mainItemRepository.findById(request.mainItemId())
@@ -62,6 +67,18 @@ public class SubItemService {
 		Slice<SubItem> subItems = subItemRepository.findAllByMainItemName(mainItemName, pageable);
 
 		return SubItemsSliceResponse.from(subItems);
+	}
+
+	@Transactional(readOnly = true)
+	public SubItemsResponse findAllByExpertId(Long id) {
+		Expert expert = expertRepository.findExpertWithSubItemsById(id)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+
+		List<SubItem> subItemList = expert.getExpertItemList().stream()
+			.map(ExpertItem::getSubItem)
+			.collect(Collectors.toList());
+
+		return SubItemsResponse.from(subItemList);
 	}
 
 	public Long update(Long id, SubItemUpdateRequest request) {
