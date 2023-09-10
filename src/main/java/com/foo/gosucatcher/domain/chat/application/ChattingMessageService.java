@@ -40,9 +40,9 @@ public class ChattingMessageService {
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
         ChattingMessage chattingMessage = ChattingMessageRequest.toChattingMessage(sender, chattingRoom, message);
-        chattingMessageRepository.save(chattingMessage);
+        ChattingMessage savedChattingMessage = chattingMessageRepository.save(chattingMessage);
 
-        return ChattingMessageResponse.from(chattingMessage);
+        return ChattingMessageResponse.from(savedChattingMessage);
     }
 
     @Transactional(readOnly = true)

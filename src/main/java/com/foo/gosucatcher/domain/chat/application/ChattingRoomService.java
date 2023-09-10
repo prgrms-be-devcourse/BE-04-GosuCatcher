@@ -35,9 +35,9 @@ public class ChattingRoomService {
                 .map(x -> ChattingRoomRequest.toChattingRoom(memberEstimate))
                 .toList();
 
-        chattingRoomRepository.saveAll(chattingRooms);
+        List<ChattingRoom> savedChattingRooms = chattingRoomRepository.saveAll(chattingRooms);
 
-        return ChattingRoomsResponse.from(chattingRooms);
+        return ChattingRoomsResponse.from(savedChattingRooms);
     }
 
     @Transactional(readOnly = true)
