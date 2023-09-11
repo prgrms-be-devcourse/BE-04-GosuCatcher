@@ -39,52 +39,52 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEstimate extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sub_item_id")
-    private SubItem subItem;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sub_item_id")
+	private SubItem subItem;
 
-    @OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
+	@OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
 
-    @Column(nullable = false)
-    private String location;
+	@Column(nullable = false)
+	private String location;
 
-    @Column(nullable = false)
-    private LocalDateTime preferredStartDate;
+	@Column(nullable = false)
+	private LocalDateTime preferredStartDate;
 
-    @Column(length = 500)
-    private String detailedDescription;
+	@Column(length = 500)
+	private String detailedDescription;
 
-    private boolean isClosed = Boolean.FALSE;
+	private boolean isClosed = Boolean.FALSE;
 
-    @Builder
-    public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
-                          String detailedDescription) {
-        this.member = member;
-        this.subItem = subItem;
-        this.location = location;
-        this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
-        this.detailedDescription = detailedDescription;
-    }
+	@Builder
+	public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
+						  String detailedDescription) {
+		this.member = member;
+		this.subItem = subItem;
+		this.location = location;
+		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
+		this.detailedDescription = detailedDescription;
+	}
 
-    public void addExpertEstimate(ExpertEstimate expertEstimate) {
-        expertEstimateList.add(expertEstimate);
-        expertEstimate.addMemberEstimate(this);
-    }
+	public void addExpertEstimate(ExpertEstimate expertEstimate) {
+		expertEstimateList.add(expertEstimate);
+		expertEstimate.addMemberEstimate(this);
+	}
 
-    private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
-        if (LocalDateTime.now().isAfter(preferredStartDate)) {
-            throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
-        }
+	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
+		if (LocalDateTime.now().isAfter(preferredStartDate)) {
+			throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
+		}
 
-        return preferredStartDate;
-    }
+		return preferredStartDate;
+	}
 }

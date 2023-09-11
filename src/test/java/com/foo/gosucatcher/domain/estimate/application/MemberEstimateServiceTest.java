@@ -1,20 +1,19 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
-import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
-import com.foo.gosucatcher.domain.expert.domain.Expert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,10 +23,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -167,15 +171,15 @@ class MemberEstimateServiceTest {
 	@DisplayName("회원 요청 견적서 삭제 테스트")
 	@Test
 	void delete() {
-        //given
-        when(memberEstimateRepository.findById(null)).thenReturn(Optional.of(memberEstimate));
+		//given
+		when(memberEstimateRepository.findById(null)).thenReturn(Optional.of(memberEstimate));
 
-        //when
-        assertDoesNotThrow(() -> memberEstimateService.delete(memberEstimate.getId()));
+		//when
+		assertDoesNotThrow(() -> memberEstimateService.delete(memberEstimate.getId()));
 
-        //then
-        verify(memberEstimateRepository, times(1)).delete(memberEstimate);
-    }
+		//then
+		verify(memberEstimateRepository, times(1)).delete(memberEstimate);
+	}
 
 	@DisplayName("회원이 요청한 바로 견적서에 매칭된 고수 응답 견적서를 요청 바로 견적서 정보에 업데이트하는 테스트")
 	@Test
@@ -184,12 +188,12 @@ class MemberEstimateServiceTest {
 		Long memberEstimateId = 1L;
 
 		Expert expert = Expert.builder()
-				.member(member)
-				.storeName("업체명")
-				.location("강남구")
-				.maxTravelDistance(5)
-				.description("설명")
-				.build();
+			.member(member)
+			.storeName("업체명")
+			.location("강남구")
+			.maxTravelDistance(5)
+			.description("설명")
+			.build();
 
 		ExpertResponse expertResponse = ExpertResponse.from(expert);
 
@@ -203,14 +207,13 @@ class MemberEstimateServiceTest {
 		when(memberEstimateRepository.findById(memberEstimateId)).thenReturn(Optional.of(memberEstimate));
 
 		ExpertEstimate expertEstimate = ExpertEstimate.builder()
-				.expert(expert)
-				.memberEstimate(memberEstimate)
-				.subItem(subItem)
-				.totalCost(10000)
-				.activityLocation("강남구")
-				.description("견적서입니다.")
-				.isAuto(true)
-				.build();
+			.expert(expert)
+			.memberEstimate(memberEstimate)
+			.subItem(subItem)
+			.totalCost(10000)
+			.activityLocation("강남구")
+			.description("견적서입니다.")
+			.build();
 
 		when(expertEstimateRepository.findById(anyLong())).thenReturn(Optional.of(expertEstimate));
 
