@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +16,7 @@ import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,41 +25,44 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class MemberEstimateController {
 
-	private final MemberEstimateService memberEstimateService;
+    private final MemberEstimateService memberEstimateService;
+    private final MatchingService matchingService;
 
-	@PostMapping("/{memberId}")
-	public ResponseEntity<MemberEstimateResponse> create(@PathVariable Long memberId,
-		@Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+    @PostMapping("/auto/{memberId}")
+    public ResponseEntity<MessagesResponse> createAutoEstimate(@PathVariable Long memberId,
+                                                               @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+        MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
-		return ResponseEntity.ok(memberEstimateResponse);
-	}
+        MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);
 
-	@GetMapping
-	public ResponseEntity<MemberEstimatesResponse> findAll() {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
+        return ResponseEntity.ok(messagesResponse);
+    }
 
-		return ResponseEntity.ok(memberEstimatesResponse);
-	}
+    @GetMapping
+    public ResponseEntity<MemberEstimatesResponse> findAll() {
+        MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
 
-	@GetMapping("/members/{memberId}")
-	public ResponseEntity<MemberEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
+        return ResponseEntity.ok(memberEstimatesResponse);
+    }
 
-		return ResponseEntity.ok(memberEstimatesResponse);
-	}
+    @GetMapping("/members/{memberId}")
+    public ResponseEntity<MemberEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
+        MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
 
-	@GetMapping("/{memberEstimateId}")
-	public ResponseEntity<MemberEstimateResponse> findById(@PathVariable Long memberEstimateId) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.findById(memberEstimateId);
+        return ResponseEntity.ok(memberEstimatesResponse);
+    }
 
-		return ResponseEntity.ok(memberEstimateResponse);
-	}
+    @GetMapping("/{memberEstimateId}")
+    public ResponseEntity<MemberEstimateResponse> findById(@PathVariable Long memberEstimateId) {
+        MemberEstimateResponse memberEstimateResponse = memberEstimateService.findById(memberEstimateId);
 
-	@DeleteMapping("/{memberEstimateId}")
-	public ResponseEntity<Void> delete(@PathVariable Long memberEstimateId) {
-		memberEstimateService.delete(memberEstimateId);
+        return ResponseEntity.ok(memberEstimateResponse);
+    }
 
-		return ResponseEntity.ok(null);
-	}
+    @DeleteMapping("/{memberEstimateId}")
+    public ResponseEntity<Void> delete(@PathVariable Long memberEstimateId) {
+        memberEstimateService.delete(memberEstimateId);
+
+        return ResponseEntity.ok(null);
+    }
 }

@@ -1,14 +1,23 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,11 +33,12 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstima
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(MemberEstimateController.class)
+@WebMvcTest(value = {MemberEstimateController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class MemberEstimateControllerTest {
 
 	@Autowired
@@ -40,9 +50,12 @@ class MemberEstimateControllerTest {
 	@MockBean
 	private MemberEstimateService memberEstimateService;
 
-	@DisplayName("회원 요청 견적서 등록 성공 테스트")
+	@MockBean
+	private MatchingService matchingService;
+
+	@DisplayName("회원 바로 견적 등록 성공 테스트")
 	@Test
-	void create() throws Exception {
+	void createAutoEstimate() throws Exception {
 		//given
 		Long memberId = 1L;
 		Long subItemId = 1L;
@@ -53,23 +66,33 @@ class MemberEstimateControllerTest {
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
 			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
-		when(memberEstimateService.create(memberId, memberEstimateRequest)).thenReturn(
-			memberEstimateResponse);
+		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description");
+
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
+
+		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+		when(matchingService.match(any(MemberEstimateResponse.class))).thenReturn(new MessagesResponse(List.of(messageResponse)));
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/{memberEstimateId}", 1L)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.id").value(1L))
-			.andExpect(jsonPath("$.memberId").value(memberEstimateResponse.memberId()))
-			.andExpect(jsonPath("$.subItemId").value(memberEstimateResponse.subItemId()))
-			.andExpect(jsonPath("$.location").value(memberEstimateResponse.location()))
-			.andExpect(jsonPath("$.detailedDescription").value(memberEstimateResponse.detailedDescription()));
+			.andExpect(jsonPath("$.messagesResponse").isArray())
+			.andExpect(jsonPath("$.messagesResponse[0].id").value(1L))
+			.andExpect(jsonPath("$.messagesResponse[0].senderId").value(expertResponse.id()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.id").value(1L))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.id").value(memberEstimateResponse.id()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.memberId").value(memberId))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.messagesResponse[0].message").value("고수 견적서 내용입니다."));
 	}
 
-	@DisplayName("회원 요청 견적서 등록 실패 테스트")
+	@DisplayName("회원 바로 견적 등록 실패 테스트")
 	@Test
 	void createFailed() throws Exception {
 		//given
@@ -86,7 +109,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/{memberEstimateId}", 1L)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())

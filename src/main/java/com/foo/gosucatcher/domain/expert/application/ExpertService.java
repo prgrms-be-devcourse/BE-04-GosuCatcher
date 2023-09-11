@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.expert.application;
 
-import static com.foo.gosucatcher.global.error.ErrorCode.*;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 
 import java.util.List;
 import java.util.Optional;
