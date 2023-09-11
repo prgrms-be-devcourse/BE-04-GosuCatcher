@@ -28,8 +28,8 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstima
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
@@ -51,7 +51,7 @@ class ExpertEstimateServiceUnitTest {
 	private ExpertRepository expertRepository;
 
 	@Mock
-	private MemberRequestEstimateRepository memberRequestEstimateRepository;
+	private MemberEstimateRepository memberEstimateRepository;
 
 	@Mock
 	private SubItemRepository subItemRepository;
@@ -60,7 +60,7 @@ class ExpertEstimateServiceUnitTest {
 	private Member member;
 	private MainItem mainItem;
 	private SubItem subItem;
-	private MemberRequestEstimate memberRequestEstimate;
+	private MemberEstimate memberEstimate;
 	private ExpertEstimate expertEstimate;
 
 	@BeforeEach
@@ -91,7 +91,7 @@ class ExpertEstimateServiceUnitTest {
 			.description("축구 레슨 해드립니다.")
 			.build();
 
-		memberRequestEstimate = MemberRequestEstimate.builder()
+		memberEstimate = MemberEstimate.builder()
 			.member(member)
 			.subItem(subItem)
 			.preferredStartDate(LocalDateTime.now().plusDays(1))
@@ -101,7 +101,7 @@ class ExpertEstimateServiceUnitTest {
 		expertEstimate = ExpertEstimate.builder()
 			.totalCost(10000)
 			.expert(expert)
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.description("메시를 만들어 드립니다")
 			.build();
 	}
@@ -113,14 +113,14 @@ class ExpertEstimateServiceUnitTest {
 		//given
 		Long expertId = 1L;
 		ExpertEstimateCreateRequest request =
-			new ExpertEstimateCreateRequest(memberRequestEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
+			new ExpertEstimateCreateRequest(memberEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
 
 		when(expertEstimateRepository.save(any(ExpertEstimate.class)))
 			.thenReturn(expertEstimate);
 		when(expertRepository.findById(expertId))
 			.thenReturn(Optional.of(expert));
-		when(memberRequestEstimateRepository.findById(memberRequestEstimate.getId()))
-			.thenReturn(Optional.of(memberRequestEstimate));
+		when(memberEstimateRepository.findById(memberEstimate.getId()))
+			.thenReturn(Optional.of(memberEstimate));
 		when(subItemRepository.findById(subItem.getId()))
 			.thenReturn(Optional.of(subItem));
 
@@ -130,7 +130,7 @@ class ExpertEstimateServiceUnitTest {
 
 		//then
 		assertThat(expertEstimateResponse.totalCost()).isEqualTo(request.totalCost());
-		assertThat(expertEstimateResponse.memberRequestEstimateId()).isEqualTo(memberRequestEstimate.getId());
+		assertThat(expertEstimateResponse.memberEstimateId()).isEqualTo(memberEstimate.getId());
 	}
 
 	@Test
@@ -139,7 +139,7 @@ class ExpertEstimateServiceUnitTest {
 
 		//given
 		ExpertEstimateCreateRequest request =
-			new ExpertEstimateCreateRequest(memberRequestEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
+			new ExpertEstimateCreateRequest(memberEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
 
 		when(expertRepository.findById(anyLong()))
 			.thenReturn(Optional.empty());
@@ -159,7 +159,7 @@ class ExpertEstimateServiceUnitTest {
 
 		when(expertRepository.findById(anyLong()))
 			.thenReturn(Optional.of(expert));
-		when(memberRequestEstimateRepository.findById(request.memberRequestEstimateId()))
+		when(memberEstimateRepository.findById(request.memberEstimateId()))
 			.thenReturn(Optional.empty());
 
 		//when -> then
@@ -203,8 +203,8 @@ class ExpertEstimateServiceUnitTest {
 		assertThat(estimateResponse.id()).isEqualTo(expertEstimate.getId());
 		assertThat(estimateResponse.totalCost()).isEqualTo(expertEstimate.getTotalCost());
 		assertThat(estimateResponse.expertId()).isEqualTo(expertEstimate.getExpert().getId());
-		assertThat(estimateResponse.memberRequestEstimateId()).isEqualTo(
-			expertEstimate.getMemberRequestEstimate().getId());
+		assertThat(estimateResponse.memberEstimateId()).isEqualTo(
+			expertEstimate.getMemberEstimate().getId());
 	}
 
 	@Test

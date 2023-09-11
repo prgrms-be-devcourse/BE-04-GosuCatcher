@@ -43,7 +43,7 @@ public class ExpertEstimate extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_request_estimate_id")
-	private MemberRequestEstimate memberRequestEstimate;
+	private MemberEstimate memberEstimate;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
@@ -61,10 +61,10 @@ public class ExpertEstimate extends BaseEntity {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public ExpertEstimate(Expert expert, MemberRequestEstimate memberRequestEstimate, SubItem subItem, int totalCost,
-						  String activityLocation, String description, boolean isAuto) {
+	public ExpertEstimate(Expert expert, MemberEstimate memberEstimate, SubItem subItem, int totalCost,
+		String activityLocation, String description, boolean isAuto) {
 		this.expert = expert;
-		this.memberRequestEstimate = memberRequestEstimate;
+		this.memberEstimate = memberEstimate;
 		this.subItem = subItem;
 		this.totalCost = checkInvalidTotalCost(totalCost);
 		this.activityLocation = activityLocation;
@@ -74,7 +74,7 @@ public class ExpertEstimate extends BaseEntity {
 
 	public void update(ExpertEstimate expertEstimate) {
 		this.expert = expertEstimate.getExpert();
-		this.memberRequestEstimate = expertEstimate.getMemberRequestEstimate();
+		this.memberEstimate = expertEstimate.getMemberEstimate();
 		this.subItem = expertEstimate.getSubItem();
 		this.totalCost = checkInvalidTotalCost(expertEstimate.getTotalCost());
 		this.activityLocation = expertEstimate.getActivityLocation();
