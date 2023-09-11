@@ -9,13 +9,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-	Page<Review> findAll(Pageable pageable);
+	Page<Review> findAllOrderByCreatedAt(Pageable pageable);
 
-	Slice<Review> findAllByExpertId(Long expertId, Pageable pageable);
+	Slice<Review> findAllByExpertIdOrderByCreatedAt(Long expertId, Pageable pageable);
 
 	Optional<Review> findById(Long id);
 
-	Slice<Review> findAllByExpertIdAndSubItemId(Long expertId, Long subItemId, Pageable pageable);
+	Slice<Review> findAllByExpertIdAndSubItemIdOrderByCreatedAt(Long expertId, Long subItemId, Pageable pageable);
 
 	Long countByExpertId(Long expertId);
+
+	Slice<Review> findByParentIdOrderByCreatedAt(Long parentId, Pageable pageable);
 }

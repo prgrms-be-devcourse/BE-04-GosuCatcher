@@ -50,8 +50,8 @@ public class Review extends BaseEntity {
 	private SubItem subItem;
 
 	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-	@JoinColumn(name = "reply_id")
-	private Reply reply;
+	@JoinColumn(name = "parent_id")
+	private Review parent;
 
 	private String content;
 
@@ -60,10 +60,11 @@ public class Review extends BaseEntity {
 	private boolean isDeleted = FALSE;
 
 	@Builder
-	public Review(Expert expert, Member member, SubItem subItem, String content, int rating) {
+	public Review(Expert expert, Member member, SubItem subItem, Review parent, String content, int rating) {
 		this.expert = expert;
 		this.member = member;
 		this.subItem = subItem;
+		this.parent = parent;
 		this.content = content;
 		this.rating = rating;
 		this.isDeleted = false;
@@ -74,7 +75,15 @@ public class Review extends BaseEntity {
 		rating = updatedReview.getRating();
 	}
 
-	public void updateReply(Reply reply) {
-		this.reply = reply;
+	public void updateParent(Review parent) {
+		this.parent = parent;
 	}
+
+	boolean isReply() {
+		return parent == null;
+	}
+
+	// public void updateReply(Reply reply) {
+	// 	this.reply = reply;
+	// }
 }
