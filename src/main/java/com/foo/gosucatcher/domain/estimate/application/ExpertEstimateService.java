@@ -9,6 +9,10 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
 
 import java.util.List;
 
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.util.RandomElementSelector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,18 +22,20 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEs
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
+
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
-import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
+
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
+
+import static com.foo.gosucatcher.global.error.ErrorCode.*;
 
 @RequiredArgsConstructor
 @Service
@@ -52,7 +58,6 @@ public class ExpertEstimateService {
 
         ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
                 request, memberEstimate, expert);
-
 
         expertEstimateRepository.save(expertNormalEstimate);
 
@@ -84,16 +89,26 @@ public class ExpertEstimateService {
     @Transactional(readOnly = true)
     public ExpertEstimateResponse findById(Long id) {
         ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_ESTIMATE));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
 
         return ExpertEstimateResponse.from(expertEstimate);
     }
 
     public void delete(Long id) {
         ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_ESTIMATE));
+                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_RESPONSE_ESTIMATE));
 
         expertEstimateRepository.delete(expertEstimate);
+    }
+
+    @Transactional(readOnly = true)
+    public ExpertAutoEstimatesResponse findAllByConditions(Long subItemId, String activityLocation) {
+        List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllBySubItemIdAndLocationAndIsAuto(
+                subItemId, activityLocation);
+
+        List<ExpertEstimate> randomExpertEstimates = RandomElementSelector.selectRandomElements(expertEstimates, 10);
+
+        return ExpertAutoEstimatesResponse.from(randomExpertEstimates);
     }
 
     private void checkAlreadyResponded(MemberEstimate memberEstimate) {
@@ -111,7 +126,8 @@ public class ExpertEstimateService {
 
     private void checkAlreadyRegisteredByExpertWithSubItem(Expert expert, SubItem subItem) {
         if (expertEstimateRepository.existsByExpertAndSubItemAndMemberEstimateIsNull(expert, subItem)) {
-            throw new BusinessException(ALREADY_REGISTERED_BY_SUB_ITEMS);
+          
+            throw new BusinessException(ALREADY_REGISTERED_SUB_ITEMS);
         }
     }
 }
