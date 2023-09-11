@@ -1,11 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
-import com.foo.gosucatcher.domain.chat.application.MessageService;
-import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
-import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +16,7 @@ import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,22 +26,14 @@ import lombok.RequiredArgsConstructor;
 public class MemberEstimateController {
 
     private final MemberEstimateService memberEstimateService;
-    private final ExpertEstimateService expertEstimateService;
-    private final ChattingRoomService chattingRoomService;
-    private final MessageService messageService;
+    private final MatchingService matchingService;
 
     @PostMapping("/auto/{memberId}")
     public ResponseEntity<MessagesResponse> createAutoEstimate(@PathVariable Long memberId,
                                                                @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
         MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
-        ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.match(memberEstimateResponse.subItemId(), memberEstimateResponse.location());
-
-        Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
-
-        ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
-
-        MessagesResponse messagesResponse = messageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
+        MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);
 
         return ResponseEntity.ok(messagesResponse);
     }

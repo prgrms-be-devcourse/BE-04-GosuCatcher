@@ -90,7 +90,7 @@ public class ExpertEstimateService {
     }
 
     @Transactional(readOnly = true)
-    public ExpertAutoEstimatesResponse match(Long subItemId, String activityLocation) {
+    public ExpertAutoEstimatesResponse findAllByConditions(Long subItemId, String activityLocation) {
         List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllBySubItemIdAndLocationAndIsAuto(
                 subItemId, activityLocation);
 

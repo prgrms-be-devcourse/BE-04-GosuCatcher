@@ -6,19 +6,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.foo.gosucatcher.domain.chat.application.MessageService;
-import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
-import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -34,11 +29,12 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstima
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(MemberEstimateController.class)
+@WebMvcTest(value = {MemberEstimateController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class MemberEstimateControllerTest {
 
 	@Autowired
@@ -51,13 +47,7 @@ class MemberEstimateControllerTest {
 	private MemberEstimateService memberEstimateService;
 
 	@MockBean
-	private ExpertEstimateService expertEstimateService;
-
-	@MockBean
-	private ChattingRoomService chattingRoomService;
-
-	@MockBean
-	private MessageService messageService;
+	private MatchingService matchingService;
 
 	@DisplayName("회원 바로 견적 등록 성공 테스트")
 	@Test
@@ -74,17 +64,11 @@ class MemberEstimateControllerTest {
 
 		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description");
 
-		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, subItemId, 10000, "서울 강남구", "고수 견적서 내용입니다.");
-		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = new ExpertAutoEstimatesResponse(List.of(expertAutoEstimateResponse));
-
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
 
 		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
-		when(expertEstimateService.match(anyLong(), anyString())).thenReturn(expertAutoEstimatesResponse);
-		when(memberEstimateService.updateExpertEstimates(anyLong(), anyList())).thenReturn(memberEstimateResponse.id());
-		when(chattingRoomService.create(anyLong())).thenReturn(new ChattingRoomsResponse(List.of(chattingRoomResponse)));
-		when(messageService.sendExpertEstimateMessage(any(), any())).thenReturn(new MessagesResponse(List.of(messageResponse)));
+		when(matchingService.match(any(MemberEstimateResponse.class))).thenReturn(new MessagesResponse(List.of(messageResponse)));
 
 		//when
 		//then
