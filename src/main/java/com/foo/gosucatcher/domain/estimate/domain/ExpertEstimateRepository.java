@@ -16,6 +16,6 @@ public interface ExpertEstimateRepository extends JpaRepository<ExpertEstimate, 
 
 	boolean existsByExpertAndSubItemAndMemberEstimateIsNull(Expert expert, SubItem subItem);
 
-	@Query("SELECT m FROM ExpertEstimate m WHERE m.subItem.id = :subItemId AND m.activityLocation LIKE %:activityLocation%")
+	@Query("SELECT m FROM ExpertEstimate m WHERE m.subItem.id = :subItemId AND m.activityLocation LIKE %:activityLocation% AND m.memberEstimate IS NULL")
 	List<ExpertEstimate> findAllBySubItemIdAndLocation(@Param("subItemId") Long subItemId, @Param("activityLocation") String activityLocation);
 }
