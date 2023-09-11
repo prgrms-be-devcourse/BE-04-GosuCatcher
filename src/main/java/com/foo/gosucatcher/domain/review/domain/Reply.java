@@ -32,7 +32,7 @@ public class Reply extends BaseEntity {
 
 	private String content;
 
-	private final boolean isDeleted = FALSE;
+	private boolean isDeleted = FALSE;
 
 	@Builder
 	public Reply(String content) {
