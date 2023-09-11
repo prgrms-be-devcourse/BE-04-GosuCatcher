@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -54,6 +55,9 @@ public class MemberEstimate extends BaseEntity {
 	@OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
 
+	@OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<ChattingRoom> chattingRoomList = new ArrayList<>();
+
 	@Column(nullable = false)
 	private String location;
 
@@ -78,6 +82,14 @@ public class MemberEstimate extends BaseEntity {
 	public void addExpertEstimate(ExpertEstimate expertEstimate) {
 		expertEstimateList.add(expertEstimate);
 		expertEstimate.addMemberEstimate(this);
+	}
+
+	public void addChattingRoom(ChattingRoom chattingRoom) {
+		chattingRoomList.add(chattingRoom);
+	}
+
+	public void removeChattingRoom(ChattingRoom chattingRoom) {
+		chattingRoomList.remove(chattingRoom);
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
