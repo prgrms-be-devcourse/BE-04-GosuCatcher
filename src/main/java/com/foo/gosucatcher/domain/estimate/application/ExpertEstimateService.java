@@ -1,10 +1,14 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REGISTERED_BY_SUB_ITEMS;
+import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REQUESTED_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
+
 import java.util.List;
 
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.*;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -12,12 +16,21 @@ import com.foo.gosucatcher.global.util.RandomElementSelector;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
+
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
+
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +58,6 @@ public class ExpertEstimateService {
 
         ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
                 request, memberEstimate, expert);
-
 
         expertEstimateRepository.save(expertNormalEstimate);
 
@@ -114,6 +126,7 @@ public class ExpertEstimateService {
 
     private void checkAlreadyRegisteredByExpertWithSubItem(Expert expert, SubItem subItem) {
         if (expertEstimateRepository.existsByExpertAndSubItemAndMemberEstimateIsNull(expert, subItem)) {
+          
             throw new BusinessException(ALREADY_REGISTERED_SUB_ITEMS);
         }
     }
