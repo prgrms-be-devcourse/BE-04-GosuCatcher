@@ -43,7 +43,7 @@ public class ExpertEstimate extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_request_estimate_id")
-	private MemberRequestEstimate memberRequestEstimate;
+	private MemberEstimate memberEstimate;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
@@ -59,10 +59,11 @@ public class ExpertEstimate extends BaseEntity {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public ExpertEstimate(Expert expert, MemberRequestEstimate memberRequestEstimate, SubItem subItem, int totalCost,
+
+	public ExpertEstimate(Expert expert, MemberEstimate memberEstimate, SubItem subItem, int totalCost,
 						  String activityLocation, String description) {
 		this.expert = expert;
-		this.memberRequestEstimate = memberRequestEstimate;
+		this.memberEstimate = memberEstimate;
 		this.subItem = subItem;
 		this.totalCost = checkInvalidTotalCost(totalCost);
 		this.activityLocation = activityLocation;
@@ -73,19 +74,28 @@ public class ExpertEstimate extends BaseEntity {
 		this.subItem = subItem;
 	}
 
-	public void addMemberRequest(MemberRequestEstimate memberRequestEstimate) {
-		this.memberRequestEstimate = memberRequestEstimate;
+	public void addMemberRequest(MemberEstimate memberRequestEstimate) {
+		this.memberEstimate = memberRequestEstimate;
 	}
 
 	public boolean isAuto() {
-		return memberRequestEstimate == null;
+		return memberEstimate == null;
+	}
+
+	public void update(ExpertEstimate expertEstimate) {
+		this.expert = expertEstimate.getExpert();
+		this.memberEstimate = expertEstimate.getMemberEstimate();
+		this.subItem = expertEstimate.getSubItem();
+		this.totalCost = checkInvalidTotalCost(expertEstimate.getTotalCost());
+		this.activityLocation = expertEstimate.getActivityLocation();
+		this.description = expertEstimate.getDescription();
+
 	}
 
 	private int checkInvalidTotalCost(int totalCost) {
 		if (totalCost <= 0) {
 			throw new BusinessException(ErrorCode.TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO);
 		}
-
 		return totalCost;
 	}
 }

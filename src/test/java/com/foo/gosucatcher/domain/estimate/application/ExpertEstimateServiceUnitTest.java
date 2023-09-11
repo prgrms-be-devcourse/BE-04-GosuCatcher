@@ -28,8 +28,8 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstima
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
@@ -51,7 +51,7 @@ class ExpertEstimateServiceUnitTest {
 	private ExpertRepository expertRepository;
 
 	@Mock
-	private MemberRequestEstimateRepository memberRequestEstimateRepository;
+	private MemberEstimateRepository memberEstimateRepository;
 
 	@Mock
 	private SubItemRepository subItemRepository;
@@ -60,7 +60,7 @@ class ExpertEstimateServiceUnitTest {
 	private Member member;
 	private MainItem mainItem;
 	private SubItem subItem;
-	private MemberRequestEstimate memberRequestEstimate;
+	private MemberEstimate memberEstimate;
 	private ExpertEstimate expertEstimate;
 
 	@BeforeEach
@@ -91,7 +91,7 @@ class ExpertEstimateServiceUnitTest {
 			.description("축구 레슨 해드립니다.")
 			.build();
 
-		memberRequestEstimate = MemberRequestEstimate.builder()
+		memberEstimate = memberEstimate.builder()
 			.member(member)
 			.subItem(subItem)
 			.preferredStartDate(LocalDateTime.now().plusDays(1))
@@ -101,7 +101,7 @@ class ExpertEstimateServiceUnitTest {
 		expertEstimate = ExpertEstimate.builder()
 			.totalCost(10000)
 			.expert(expert)
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.description("메시를 만들어 드립니다")
 			.build();
 	}
@@ -119,16 +119,16 @@ class ExpertEstimateServiceUnitTest {
 			.thenReturn(expertEstimate);
 		when(expertRepository.findById(expertId))
 			.thenReturn(Optional.of(expert));
-		when(memberRequestEstimateRepository.findById(memberRequestEstimate.getId()))
-			.thenReturn(Optional.of(memberRequestEstimate));
+		when(memberEstimateRepository.findById(memberEstimate.getId()))
+			.thenReturn(Optional.of(memberEstimate));
 
 		//when
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId,
-			memberRequestEstimate.getId(), request);
+			memberEstimate.getId(), request);
 
 		//then
 		assertThat(expertNormalEstimateResponse.totalCost()).isEqualTo(request.totalCost());
-		assertThat(expertNormalEstimateResponse.memberRequestEstimateResponse().id()).isEqualTo(memberRequestEstimate.getId());
+		assertThat(expertNormalEstimateResponse.memberRequestEstimateResponse().id()).isEqualTo(memberEstimate.getId());
 	}
 
 	@Test
@@ -144,7 +144,7 @@ class ExpertEstimateServiceUnitTest {
 
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
-			() -> expertEstimateService.createNormal(1L, memberRequestEstimate.getId(), request));
+			() -> expertEstimateService.createNormal(1L, memberEstimate.getId(), request));
 	}
 
 	@Test
@@ -157,12 +157,12 @@ class ExpertEstimateServiceUnitTest {
 
 		when(expertRepository.findById(anyLong()))
 			.thenReturn(Optional.of(expert));
-		when(memberRequestEstimateRepository.findById(null))
+		when(memberEstimateRepository.findById(null))
 			.thenReturn(Optional.empty());
 
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
-			() -> expertEstimateService.createNormal(1L, memberRequestEstimate.getId(), request));
+			() -> expertEstimateService.createNormal(1L, memberEstimate.getId(), request));
 	}
 
 	@Test

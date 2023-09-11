@@ -9,6 +9,10 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public record ExpertAutoEstimateCreateRequest(
+
+	@NotNull(message = "응답할 고객의 요청 견적서 ID를 입력해주세요.")
+	Long memberEstimateId,
+
 	@NotNull(message = "제공할 서비스 ID를 입력해주세요.")
 	Long subItemId,
 

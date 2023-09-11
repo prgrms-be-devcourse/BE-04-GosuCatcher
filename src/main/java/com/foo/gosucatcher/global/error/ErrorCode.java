@@ -27,22 +27,27 @@ public enum ErrorCode {
 	INVALID_MAX_TRAVEL_DISTANCE("E003", "최대 이동거리는 0 이상이어야 합니다."),
 
 	//리뷰
-	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
+	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다."),
+	UNSUPPORTED_REPLIER("R002", "리뷰에 대한 답장은 서비스를 제공한 고수만 가능합니다."),
+	NOT_FOUND_REPLY("R003", "존재하지 않는 리뷰에 대한 답장입니다."),
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
-	DUPLICATED_MEMBER_EMAIL("M002", "중복된 이메일입니다."),
-	NOT_FOUND_MEMBER_EMAIL("M003", "존재하지 않는 이메일입니다."),
-	LOG_IN_FAILURE("M004", "로그인에 실패했습니다."),
+	DUPLICATED_MEMBER("M002", "이미 가입된 회원입니다."),
+	LOG_IN_FAILURE("M003", "로그인에 실패했습니다."),
+	CERTIFICATION_FAIL("M004", "회원인증에 실패했습니다."),
+	ALREADY_CERTIFIED("M005", "이미 인증된 회원입니다."),
+	INVALID_EMAIL_FORMAT("M006", "올바르지 않은 이메일 형식입니다."),
+	UNAUTHENTICATED_MEMBER("M006", "인증되지 않은 회원입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
 	INVALID_IMAGE("F002", "지원하지 않는 이미지 파일 형식입니다."),
 
 	//회원 요청 견적서
-	NOT_FOUND_MEMBER_REQUEST_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),
-	INVALID_MEMBER_REQUEST_ESTIMATE_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
-	DUPLICATE_MEMBER_REQUEST_ESTIMATE("MRE003", "회원 요청 견적서는 중복될 수 없습니다."),
+	NOT_FOUND_MEMBER_ESTIMATE("MRE001", "존재하지 않는 회원 요청 견적서입니다."),
+	INVALID_MEMBER_ESTIMATE_START_DATE("MRE002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
+	DUPLICATE_MEMBER_ESTIMATE("MRE003", "회원 요청 견적서는 중복될 수 없습니다."),
 
 	//고수 응답 견적서
 	NOT_FOUND_EXPERT_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
@@ -52,7 +57,7 @@ public enum ErrorCode {
 
 	// 찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
-	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다.");
+	UNSUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다.");
 
 	private final String code;
 	private final String message;

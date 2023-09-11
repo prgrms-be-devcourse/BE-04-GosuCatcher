@@ -1,7 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.application.dto.response;
 
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 
 public record ExpertEstimateResponse(
@@ -14,13 +14,13 @@ public record ExpertEstimateResponse(
 ) {
 
 	public static ExpertEstimateResponse from(ExpertEstimate expertEstimate) {
-		MemberRequestEstimate memberRequestEstimate = expertEstimate.getMemberRequestEstimate() != null ?
-			expertEstimate.getMemberRequestEstimate() : null;
+		MemberEstimate memberEstimate = expertEstimate.getMemberEstimate() != null ?
+			expertEstimate.getMemberEstimate() : null;
 
 		return new ExpertEstimateResponse(
 			expertEstimate.getId(),
 			ExpertResponse.from(expertEstimate.getExpert()),
-			MemberRequestEstimateResponse.from(memberRequestEstimate),
+			MemberRequestEstimateResponse.from(memberEstimate),
 			expertEstimate.getTotalCost(),
 			expertEstimate.getActivityLocation(),
 			expertEstimate.getDescription());

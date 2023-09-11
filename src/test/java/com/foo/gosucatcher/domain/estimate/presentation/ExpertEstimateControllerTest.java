@@ -1,27 +1,5 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberRequestEstimateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
-import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -31,6 +9,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(ExpertEstimateController.class)
 class ExpertEstimateControllerTest {
@@ -46,7 +47,7 @@ class ExpertEstimateControllerTest {
 
 	private ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest;
 	private ExpertResponse expertResponse;
-	private MemberRequestEstimateRequest memberRequestEstimateRequest;
+	private MemberEstimateRequest memberEstimateRequest;
 	private MemberRequestEstimateResponse memberRequestEstimateResponse;
 	private String baseUrl = "/api/v1/expert-estimates";
 
@@ -57,7 +58,7 @@ class ExpertEstimateControllerTest {
 		expertResponse =
 			new ExpertResponse(1L, "상점이름입니다", "서울시 강남구", 10, "설명입니다여긴");
 
-		memberRequestEstimateRequest = new MemberRequestEstimateRequest(1L,
+		memberEstimateRequest = new MemberEstimateRequest(1L,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, 1L,
@@ -118,7 +119,7 @@ class ExpertEstimateControllerTest {
 
 		//given
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
-			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_REQUEST_ESTIMATE));
+			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)

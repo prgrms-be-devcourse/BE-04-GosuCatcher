@@ -10,13 +10,13 @@ public record ExpertNormalEstimateResponse(
 	int totalCost,
 	String activityLocation,
 	String description
-	) {
+) {
 
 	public static ExpertNormalEstimateResponse from(ExpertEstimate expertEstimate) {
 		return new ExpertNormalEstimateResponse(
 			expertEstimate.getId(),
 			ExpertResponse.from(expertEstimate.getExpert()),
-			MemberRequestEstimateResponse.from(expertEstimate.getMemberRequestEstimate()),
+			MemberRequestEstimateResponse.from(expertEstimate.getMemberEstimate()),
 			expertEstimate.getTotalCost(),
 			expertEstimate.getActivityLocation(),
 			expertEstimate.getDescription());

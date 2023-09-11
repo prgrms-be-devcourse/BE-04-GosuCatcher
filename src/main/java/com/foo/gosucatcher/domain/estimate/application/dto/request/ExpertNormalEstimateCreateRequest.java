@@ -5,7 +5,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 
 public record ExpertNormalEstimateCreateRequest(
@@ -20,9 +20,9 @@ public record ExpertNormalEstimateCreateRequest(
 	String description
 ) {
 
-	public static ExpertEstimate toExpertEstimate(ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest, MemberRequestEstimate memberRequestEstimate, Expert expert) {
+	public static ExpertEstimate toExpertEstimate(ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest, MemberEstimate memberRequestEstimate, Expert expert) {
 		ExpertEstimate expertEstimate = ExpertEstimate.builder()
-			.memberRequestEstimate(memberRequestEstimate)
+			.memberEstimate(memberRequestEstimate)
 			.expert(expert)
 			.totalCost(expertNormalEstimateCreateRequest.totalCost)
 			.activityLocation(expertNormalEstimateCreateRequest.activityLocation)

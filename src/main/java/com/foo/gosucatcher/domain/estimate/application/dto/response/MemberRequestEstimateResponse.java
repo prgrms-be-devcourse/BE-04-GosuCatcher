@@ -2,7 +2,7 @@ package com.foo.gosucatcher.domain.estimate.application.dto.response;
 
 import java.time.LocalDateTime;
 
-import com.foo.gosucatcher.domain.estimate.domain.MemberRequestEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 
 public record MemberRequestEstimateResponse(
 	Long id,
@@ -13,7 +13,7 @@ public record MemberRequestEstimateResponse(
 	String detailedDescription
 ) {
 
-	public static MemberRequestEstimateResponse from(MemberRequestEstimate memberRequestEstimate) {
+	public static MemberRequestEstimateResponse from(MemberEstimate memberRequestEstimate) {
 
 		if (memberRequestEstimate == null) {
 			return new MemberRequestEstimateResponse(null, null, null, null, null, null);

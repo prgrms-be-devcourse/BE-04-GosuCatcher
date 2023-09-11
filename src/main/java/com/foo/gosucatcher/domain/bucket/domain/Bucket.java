@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.bucket.domain;
 
+import static java.lang.Boolean.FALSE;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -31,24 +33,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends BaseEntity {
 
-	private final boolean isDeleted = false;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
+	private boolean isDeleted = FALSE;
+
 	@Builder
 	public Bucket(Expert expert, Member member) {
-		Long expertMemberId = expert.getMember().getId();
-		Long memberId = member.getId();
+		long expertMemberId = expert.getMember().getId();
+		long memberId = member.getId();
 
-		if (memberId.equals(expertMemberId)) {
-			throw new NotSupportedBucketException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
+		if (memberId == expertMemberId) {
+			throw new NotSupportedBucketException(ErrorCode.UNSUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;

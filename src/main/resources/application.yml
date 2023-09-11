@@ -1,1 +1,4 @@
-
+spring:
+  jwt:
+    accessTokenSecretKey: ODVERTNDMUQ0Rjg3QUY2RjRBQzJDRDRBRTgyRTY=
+    refreshTokenSecretKey: ODVERTNDMUQ0Rjg3QUY2RjRBQzJDRDRBRTgyRTY=
