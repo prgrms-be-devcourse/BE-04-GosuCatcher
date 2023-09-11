@@ -14,11 +14,11 @@ import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
-@Table(name = "chatting_messages")
-@SQLDelete(sql = "UPDATE chatting_messages SET is_deleted = TRUE WHERE id = ?")
+@Table(name = "messages")
+@SQLDelete(sql = "UPDATE messages SET is_deleted = TRUE WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChattingMessage extends BaseEntity {
+public class Message extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,14 +32,14 @@ public class ChattingMessage extends BaseEntity {
 	@JoinColumn(name = "chatting_room_id")
 	private ChattingRoom chattingRoom;
 
-	private String message;
+	private String content;
 
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public ChattingMessage(Member sender, ChattingRoom chattingRoom, String message) {
+	public Message(Member sender, ChattingRoom chattingRoom, String content) {
 		this.sender = sender;
 		this.chattingRoom = chattingRoom;
-		this.message = message;
+		this.content = content;
 	}
 }

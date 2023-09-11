@@ -6,10 +6,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.foo.gosucatcher.domain.chat.application.ChattingMessageService;
+import com.foo.gosucatcher.domain.chat.application.MessageService;
 import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessageResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessagesResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
@@ -57,7 +57,7 @@ class MemberEstimateControllerTest {
 	private ChattingRoomService chattingRoomService;
 
 	@MockBean
-	private ChattingMessageService chattingMessageService;
+	private MessageService messageService;
 
 	@DisplayName("회원 바로 견적 등록 성공 테스트")
 	@Test
@@ -78,13 +78,13 @@ class MemberEstimateControllerTest {
 		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = new ExpertAutoEstimatesResponse(List.of(expertAutoEstimateResponse));
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
-		ChattingMessageResponse chattingMessageResponse = new ChattingMessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
+		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
 
 		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 		when(expertEstimateService.match(anyLong(), anyString())).thenReturn(expertAutoEstimatesResponse);
 		when(memberEstimateService.updateExpertEstimates(anyLong(), anyList())).thenReturn(memberEstimateResponse.id());
 		when(chattingRoomService.create(anyLong())).thenReturn(new ChattingRoomsResponse(List.of(chattingRoomResponse)));
-		when(chattingMessageService.sendExpertEstimateMessage(any(), any())).thenReturn(new ChattingMessagesResponse(List.of(chattingMessageResponse)));
+		when(messageService.sendExpertEstimateMessage(any(), any())).thenReturn(new MessagesResponse(List.of(messageResponse)));
 
 		//when
 		//then
@@ -92,16 +92,16 @@ class MemberEstimateControllerTest {
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.chattingMessagesResponse").isArray())
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].id").value(1L))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].senderId").value(expertResponse.id()))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.id").value(1L))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.id").value(memberEstimateResponse.id()))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.memberId").value(memberId))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemId").value(subItemId))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
-			.andExpect(jsonPath("$.chattingMessagesResponse[0].message").value("고수 견적서 내용입니다."));
+			.andExpect(jsonPath("$.messagesResponse").isArray())
+			.andExpect(jsonPath("$.messagesResponse[0].id").value(1L))
+			.andExpect(jsonPath("$.messagesResponse[0].senderId").value(expertResponse.id()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.id").value(1L))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.id").value(memberEstimateResponse.id()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.memberId").value(memberId))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.messagesResponse[0].message").value("고수 견적서 내용입니다."));
 	}
 
 	@DisplayName("회원 바로 견적 등록 실패 테스트")

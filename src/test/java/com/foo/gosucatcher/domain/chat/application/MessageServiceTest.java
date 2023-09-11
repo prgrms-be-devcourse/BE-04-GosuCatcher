@@ -1,9 +1,9 @@
 package com.foo.gosucatcher.domain.chat.application;
 
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessageResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessagesResponse;
-import com.foo.gosucatcher.domain.chat.domain.ChattingMessage;
-import com.foo.gosucatcher.domain.chat.domain.ChattingMessageRepository;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
+import com.foo.gosucatcher.domain.chat.domain.Message;
+import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
@@ -28,10 +28,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ChattingMessageServiceTest {
+class MessageServiceTest {
 
     @Mock
-    private ChattingMessageRepository chattingMessageRepository;
+    private MessageRepository messageRepository;
 
     @Mock
     private ChattingRoomRepository chattingRoomRepository;
@@ -40,7 +40,7 @@ class ChattingMessageServiceTest {
     private MemberRepository memberRepository;
 
     @InjectMocks
-    private ChattingMessageService chattingMessageService;
+    private MessageService messageService;
 
     private Member member;
     private MainItem mainItem;
@@ -80,25 +80,25 @@ class ChattingMessageServiceTest {
         //given
         Long senderId = 1L;
         Long chattingRoomId = 2L;
-        String message = "요청서에 대한 견적서입니다.";
+        String content = "요청서에 대한 견적서입니다.";
 
-        ChattingMessage chattingMessage = ChattingMessage.builder()
+        Message message = Message.builder()
                 .sender(member)
                 .chattingRoom(chattingRoom)
-                .message(message)
+                .content(content)
                 .build();
 
         when(memberRepository.findById(senderId)).thenReturn(Optional.of(member));
         when(chattingRoomRepository.findById(chattingRoomId)).thenReturn(Optional.of(chattingRoom));
-        when(chattingMessageRepository.save(any(ChattingMessage.class))).thenReturn(chattingMessage);
-        when(chattingMessageRepository.findById(null)).thenReturn(Optional.ofNullable(chattingMessage));
+        when(messageRepository.save(any(Message.class))).thenReturn(message);
+        when(messageRepository.findById(null)).thenReturn(Optional.ofNullable(message));
 
         //when
-        ChattingMessageResponse chattingMessageResponse = chattingMessageService.create(senderId, chattingRoomId, message);
-        ChattingMessage result = chattingMessageRepository.findById(chattingMessageResponse.id()).get();
+        MessageResponse messageResponse = messageService.create(senderId, chattingRoomId, content);
+        Message result = messageRepository.findById(messageResponse.id()).get();
 
         //then
-        assertThat(result.getMessage()).isEqualTo(message);
+        assertThat(result.getContent()).isEqualTo(content);
         assertThat(result.getSender().getName()).isEqualTo(member.getName());
         assertThat(result.getChattingRoom().getMemberEstimate().getDetailedDescription()).isEqualTo(memberEstimate.getDetailedDescription());
     }
@@ -108,46 +108,46 @@ class ChattingMessageServiceTest {
     void findAllByChattingRoomId() {
         //given
         Long chattingRoomId = 1L;
-        String message = "요청서에 대한 견적서입니다.";
+        String content = "요청서에 대한 견적서입니다.";
 
-        ChattingMessage chattingMessage = ChattingMessage.builder()
+        Message message = Message.builder()
                 .sender(member)
                 .chattingRoom(chattingRoom)
-                .message(message)
+                .content(content)
                 .build();
 
-        List<ChattingMessage> messages = List.of(chattingMessage);
+        List<Message> messages = List.of(message);
 
         when(chattingRoomRepository.findById(chattingRoomId)).thenReturn(Optional.of(chattingRoom));
-        when(chattingMessageRepository.findAllByChattingRoom(chattingRoom)).thenReturn(messages);
+        when(messageRepository.findAllByChattingRoom(chattingRoom)).thenReturn(messages);
 
         //when
-        ChattingMessagesResponse chattingMessagesResponse = chattingMessageService.findAllByChattingRoomId(chattingRoomId);
+        MessagesResponse messagesResponse = messageService.findAllByChattingRoomId(chattingRoomId);
 
         //then
-        assertThat(chattingMessagesResponse).isNotNull();
-        assertThat(chattingMessagesResponse.chattingMessagesResponse().get(0).message()).isEqualTo("요청서에 대한 견적서입니다.");
+        assertThat(messagesResponse).isNotNull();
+        assertThat(messagesResponse.messagesResponse().get(0).message()).isEqualTo("요청서에 대한 견적서입니다.");
     }
 
     @DisplayName("채팅 메시지를 삭제하는 테스트")
     @Test
     void delete() {
         //given
-        Long chattingMessageId = 1L;
-        String message = "요청서에 대한 견적서입니다.";
+        Long messageId = 1L;
+        String content = "요청서에 대한 견적서입니다.";
 
-        ChattingMessage chattingMessage = ChattingMessage.builder()
+        Message message = Message.builder()
                 .sender(member)
                 .chattingRoom(chattingRoom)
-                .message(message)
+                .content(content)
                 .build();
 
-        when(chattingMessageRepository.findById(chattingMessageId)).thenReturn(Optional.of(chattingMessage));
+        when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
 
         //when
-        chattingMessageService.delete(chattingMessageId);
+        messageService.delete(messageId);
 
         //then
-        verify(chattingMessageRepository, times(1)).delete(chattingMessage);
+        verify(messageRepository, times(1)).delete(message);
     }
 }

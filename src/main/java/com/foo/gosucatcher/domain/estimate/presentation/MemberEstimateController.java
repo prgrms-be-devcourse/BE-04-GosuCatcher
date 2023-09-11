@@ -1,8 +1,8 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
-import com.foo.gosucatcher.domain.chat.application.ChattingMessageService;
+import com.foo.gosucatcher.domain.chat.application.MessageService;
 import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingMessagesResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
@@ -31,11 +31,11 @@ public class MemberEstimateController {
     private final MemberEstimateService memberEstimateService;
     private final ExpertEstimateService expertEstimateService;
     private final ChattingRoomService chattingRoomService;
-    private final ChattingMessageService chattingMessageService;
+    private final MessageService messageService;
 
     @PostMapping("/auto/{memberId}")
-    public ResponseEntity<ChattingMessagesResponse> createAutoEstimate(@PathVariable Long memberId,
-                                                                       @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+    public ResponseEntity<MessagesResponse> createAutoEstimate(@PathVariable Long memberId,
+                                                               @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
         MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
         ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.match(memberEstimateResponse.subItemId(), memberEstimateResponse.location());
@@ -44,9 +44,9 @@ public class MemberEstimateController {
 
         ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
 
-        ChattingMessagesResponse chattingMessagesResponse = chattingMessageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
+        MessagesResponse messagesResponse = messageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
-        return ResponseEntity.ok(chattingMessagesResponse);
+        return ResponseEntity.ok(messagesResponse);
     }
 
     @GetMapping
