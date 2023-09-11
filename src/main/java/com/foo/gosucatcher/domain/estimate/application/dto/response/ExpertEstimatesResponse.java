@@ -5,7 +5,7 @@ import java.util.List;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 
 public record ExpertEstimatesResponse(
-	List<ExpertEstimateResponse> expertResponseEstimatesResponse
+	List<ExpertEstimateResponse> expertEstimateResponseList
 ) {
 
 	public static ExpertEstimatesResponse from(

@@ -56,20 +56,30 @@ public class ExpertEstimate extends BaseEntity {
 	@Column(nullable = false)
 	private String description;
 
-	private boolean isAuto;
-
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
+
 	public ExpertEstimate(Expert expert, MemberEstimate memberEstimate, SubItem subItem, int totalCost,
-		String activityLocation, String description, boolean isAuto) {
+						  String activityLocation, String description) {
 		this.expert = expert;
 		this.memberEstimate = memberEstimate;
 		this.subItem = subItem;
 		this.totalCost = checkInvalidTotalCost(totalCost);
 		this.activityLocation = activityLocation;
 		this.description = description;
-		this.isAuto = isAuto;
+	}
+
+	public void addSubItem(SubItem subItem) {
+		this.subItem = subItem;
+	}
+
+	public void addMemberRequest(MemberEstimate memberRequestEstimate) {
+		this.memberEstimate = memberRequestEstimate;
+	}
+
+	public boolean isAuto() {
+		return memberEstimate == null;
 	}
 
 	public void update(ExpertEstimate expertEstimate) {
@@ -79,13 +89,13 @@ public class ExpertEstimate extends BaseEntity {
 		this.totalCost = checkInvalidTotalCost(expertEstimate.getTotalCost());
 		this.activityLocation = expertEstimate.getActivityLocation();
 		this.description = expertEstimate.getDescription();
+
 	}
 
 	private int checkInvalidTotalCost(int totalCost) {
 		if (totalCost <= 0) {
 			throw new BusinessException(ErrorCode.TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO);
 		}
-
 		return totalCost;
 	}
 }

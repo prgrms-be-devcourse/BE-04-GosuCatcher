@@ -1,26 +1,22 @@
 package com.foo.gosucatcher.domain.estimate.application.dto.response;
 
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
-import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 
-public record ExpertEstimateResponse(
+public record ExpertAutoEstimateResponse(
 	Long id,
 	ExpertResponse expert,
-	MemberRequestEstimateResponse memberRequestEstimate,
+	Long subItemId,
 	int totalCost,
 	String activityLocation,
 	String description
 ) {
 
-	public static ExpertEstimateResponse from(ExpertEstimate expertEstimate) {
-		MemberEstimate memberEstimate = expertEstimate.getMemberEstimate() != null ?
-			expertEstimate.getMemberEstimate() : null;
-
-		return new ExpertEstimateResponse(
+	public static ExpertAutoEstimateResponse from(ExpertEstimate expertEstimate) {
+		return new ExpertAutoEstimateResponse(
 			expertEstimate.getId(),
 			ExpertResponse.from(expertEstimate.getExpert()),
-			MemberRequestEstimateResponse.from(memberEstimate),
+			expertEstimate.getSubItem().getId(),
 			expertEstimate.getTotalCost(),
 			expertEstimate.getActivityLocation(),
 			expertEstimate.getDescription());

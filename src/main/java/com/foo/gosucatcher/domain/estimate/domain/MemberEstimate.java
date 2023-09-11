@@ -1,7 +1,10 @@
 package com.foo.gosucatcher.domain.estimate.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -30,49 +34,57 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Where(clause = "is_closed = false")
-@SQLDelete(sql = "UPDATE member_request_estimates SET is_closed = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE member_estimates SET is_closed = true WHERE id = ?")
 @Table(name = "member_estimates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEstimate extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
-	private Member member;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sub_item_id")
-	private SubItem subItem;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sub_item_id")
+    private SubItem subItem;
 
-	@Column(nullable = false)
-	private String location;
+    @OneToMany(mappedBy = "memberRequestEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
 
-	@Column(nullable = false)
-	private LocalDateTime preferredStartDate;
+    @Column(nullable = false)
+    private String location;
 
-	@Column(length = 500)
-	private String detailedDescription;
+    @Column(nullable = false)
+    private LocalDateTime preferredStartDate;
 
-	private boolean isClosed = Boolean.FALSE;
+    @Column(length = 500)
+    private String detailedDescription;
 
-	@Builder
-	public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
-		String detailedDescription) {
-		this.member = member;
-		this.subItem = subItem;
-		this.location = location;
-		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
-		this.detailedDescription = detailedDescription;
-	}
+    private boolean isClosed = Boolean.FALSE;
 
-	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
-		if (LocalDateTime.now().isAfter(preferredStartDate)) {
-			throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
-		}
+    @Builder
+    public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
+                          String detailedDescription) {
+        this.member = member;
+        this.subItem = subItem;
+        this.location = location;
+        this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
+        this.detailedDescription = detailedDescription;
+    }
 
-		return preferredStartDate;
-	}
+    public void addExpertEstimate(ExpertEstimate expertEstimate) {
+        expertEstimateList.add(expertEstimate);
+        expertEstimate.addMemberRequest(this);
+    }
+
+    private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
+        if (LocalDateTime.now().isAfter(preferredStartDate)) {
+            throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
+        }
+
+        return preferredStartDate;
+    }
 }
