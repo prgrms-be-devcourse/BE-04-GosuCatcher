@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
+import java.net.URI;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReplyRequest;
@@ -63,7 +66,7 @@ public class ReviewController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/experts/{expertId}/counts")
+	@GetMapping("/experts/{expertId}/counts") //평균 평점 반환 API 추가
 	public ResponseEntity<Long> countByExpertId(@PathVariable Long expertId) {
 		long count = reviewService.countByExpertId(expertId);
 
@@ -78,6 +81,7 @@ public class ReviewController {
 	}
 
 	@PatchMapping("/{id}")
+	//TODO : security 적용하여 수정자 == 원글 작성자 비교
 	public ResponseEntity<Long> update(@PathVariable Long id, @RequestBody ReviewUpdateRequest reviewUpdateRequest) {
 		Long updatedId = reviewService.update(id, reviewUpdateRequest);
 
@@ -97,7 +101,14 @@ public class ReviewController {
 		@Validated @RequestBody ReplyRequest replyRequest) {
 		ReplyResponse replyResponse = reviewService.createReply(reviewId, replyRequest);
 
-		return ResponseEntity.ok(replyResponse);
+		URI uri = ServletUriComponentsBuilder
+			.fromCurrentRequest()
+			.path("/{id}")
+			.buildAndExpand(replyResponse.id())
+			.toUri();
+
+		return ResponseEntity.created(uri)
+			.build();
 	}
 
 	@PatchMapping("/{reviewId}/replies/{replyId}")
@@ -120,7 +131,7 @@ public class ReviewController {
 
 	@DeleteMapping("/{reviewId}/replies/{replyId}")
 	public ResponseEntity<Object> deleteReply(@PathVariable Long reviewId, @PathVariable Long replyId) {
-		reviewService.deleteReply(reviewId, replyId);
+		reviewService.deleteReply(replyId);
 
 		return ResponseEntity.noContent().build();
 	}

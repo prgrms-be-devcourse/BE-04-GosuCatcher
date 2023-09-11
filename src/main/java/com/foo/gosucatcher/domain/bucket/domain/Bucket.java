@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.bucket.domain;
 
+import static java.lang.Boolean.FALSE;
+
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -30,20 +32,20 @@ import lombok.NoArgsConstructor;
 @SQLDelete(sql = "UPDATE buckets SET is_deleted = true WHERE id = ?")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Bucket extends BaseEntity {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
-	
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	private boolean isDeleted = false;
+	private final boolean isDeleted = FALSE;
 
 	@Builder
 	public Bucket(Expert expert, Member member) {

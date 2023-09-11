@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.review.domain;
 
+import static java.lang.Boolean.FALSE;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -55,7 +57,7 @@ public class Review extends BaseEntity {
 
 	private int rating;
 
-	private boolean isDeleted = false;
+	private boolean isDeleted = FALSE;
 
 	@Builder
 	public Review(Expert expert, Member member, SubItem subItem, String content, int rating) {

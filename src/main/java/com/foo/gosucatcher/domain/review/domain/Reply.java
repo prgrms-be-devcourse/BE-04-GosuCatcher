@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.review.domain;
 
+import static java.lang.Boolean.FALSE;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,7 +32,7 @@ public class Reply extends BaseEntity {
 
 	private String content;
 
-	private final boolean isDeleted = false;
+	private final boolean isDeleted = FALSE;
 
 	@Builder
 	public Reply(String content) {

@@ -2,7 +2,6 @@ package com.foo.gosucatcher.domain.bucket.presentation;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.doNothing;
-import static org.mockito.BDDMockito.doThrow;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -25,8 +25,6 @@ import com.foo.gosucatcher.domain.bucket.application.BucketService;
 import com.foo.gosucatcher.domain.bucket.dto.request.BucketRequest;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketResponse;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(BucketController.class)
 class BucketControllerTest {
@@ -46,18 +44,19 @@ class BucketControllerTest {
 	@DisplayName("찜 내역을 모두 조회할 수 있다")
 	void findAll() throws Exception {
 		// given
-		BucketsResponse bucketsResponse = new BucketsResponse(List.of(new BucketResponse(1L, 2L, 3L)));
-		given(bucketService.findAll())
-				.willReturn(bucketsResponse);
+		BucketsResponse bucketsResponse = new BucketsResponse(List.of(new BucketResponse(1L, 2L, 3L)),
+			false);
+		given(bucketService.findAll(any(PageRequest.class)))
+			.willReturn(bucketsResponse);
 
 		// when
 		// then
 		mockMvc.perform(get(apiBaseUrl)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.responses[0].id").value(1L))
-				.andExpect(jsonPath("$.responses[0].expertId").value(2L))
-				.andExpect(jsonPath("$.responses[0].memberId").value(3L));
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.buckets[0].id").value(1L))
+			.andExpect(jsonPath("$.buckets[0].expertId").value(2L))
+			.andExpect(jsonPath("$.buckets[0].memberId").value(3L));
 	}
 
 	@Test
@@ -68,17 +67,17 @@ class BucketControllerTest {
 		BucketRequest bucketRequest = new BucketRequest(1L, 2L);
 		BucketResponse bucketResponse = new BucketResponse(0L, 1L, 2L);
 		given(bucketService.create(any(BucketRequest.class)))
-				.willReturn(bucketResponse);
+			.willReturn(bucketResponse);
 
 		// when
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.post(apiBaseUrl)
-						.contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(bucketRequest)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(0L))
-				.andExpect(jsonPath("$.expertId").value(1L))
-				.andExpect(jsonPath("$.memberId").value(2L));
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(bucketRequest)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.id").value(0L))
+			.andExpect(jsonPath("$.expertId").value(1L))
+			.andExpect(jsonPath("$.memberId").value(2L));
 	}
 
 	@Test
@@ -92,17 +91,17 @@ class BucketControllerTest {
 		String expertId = "1";
 		String memberId = "2";
 		given(bucketService.checkStatus(any(Long.class), any(Long.class)))
-				.willReturn(Boolean.TRUE);
+			.willReturn(Boolean.TRUE);
 
 		// when
 		// then
 		mockMvc.perform(get(apiBaseUrl + "/status")
-						.contentType(MediaType.APPLICATION_JSON)
-						.param("expertId", expertId)
-						.param("memberId", memberId)
-						.content(objectMapper.writeValueAsString(bucketRequest)))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").value("true"));
+				.contentType(MediaType.APPLICATION_JSON)
+				.param("expertId", expertId)
+				.param("memberId", memberId)
+				.content(objectMapper.writeValueAsString(bucketRequest)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").value("true"));
 	}
 
 	@Test
@@ -112,17 +111,13 @@ class BucketControllerTest {
 		// given
 		long id = 0L;
 		doNothing()
-				.when(bucketService)
-				.deleteById(id);
+			.when(bucketService)
+			.deleteById(id);
 
 		// when
 		// then
 		mockMvc.perform(MockMvcRequestBuilders.delete(apiBaseUrl + "/" + id)
-						.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(MockMvcResultMatchers.status().isNoContent());
-
-		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_BUCKET)).
-				when(bucketService)
-				.deleteById(id);
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isNoContent());
 	}
 }

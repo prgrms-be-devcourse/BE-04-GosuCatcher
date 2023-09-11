@@ -165,24 +165,24 @@ class ReviewControllerTest {
 					.contentType(MediaType.APPLICATION_JSON))
 
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].id").value(1L))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].expertId").value(expertId))
+				.andExpect(jsonPath("$.reviews[0].id").value(1L))
+				.andExpect(jsonPath("$.reviews[0].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[0].writerId").value(firstReviewCreateRequest.writerId()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].subItemId").value(subItemId))
+					jsonPath("$.reviews[0].writerId").value(firstReviewCreateRequest.writerId()))
+				.andExpect(jsonPath("$.reviews[0].subItemId").value(subItemId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[0].content").value(
+					jsonPath("$.reviews[0].content").value(
 						firstReviewCreateRequest.content()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].rating").value(firstReviewCreateRequest.rating()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].id").value(2L))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].expertId").value(expertId))
+				.andExpect(jsonPath("$.reviews[0].rating").value(firstReviewCreateRequest.rating()))
+				.andExpect(jsonPath("$.reviews[1].id").value(2L))
+				.andExpect(jsonPath("$.reviews[1].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[1].writerId").value(secondReviewCreateRequest.writerId()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].subItemId").value(subItemId))
+					jsonPath("$.reviews[1].writerId").value(secondReviewCreateRequest.writerId()))
+				.andExpect(jsonPath("$.reviews[1].subItemId").value(subItemId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[1].content").value(
+					jsonPath("$.reviews[1].content").value(
 						secondReviewCreateRequest.content()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].rating").value(secondReviewCreateRequest.rating()));
+				.andExpect(jsonPath("$.reviews[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
 		@DisplayName("성공 - 특정 고수에 대한 리뷰의 개수를 조회할 수 있다")
@@ -231,24 +231,24 @@ class ReviewControllerTest {
 			mockMvc.perform(get(apiBaseUrl)
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].id").value(1))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].expertId").value(expertId))
+				.andExpect(jsonPath("$.reviews[0].id").value(1))
+				.andExpect(jsonPath("$.reviews[0].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[0].writerId").value(firstReviewCreateRequest.writerId()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].subItemId").value(subItemId))
+					jsonPath("$.reviews[0].writerId").value(firstReviewCreateRequest.writerId()))
+				.andExpect(jsonPath("$.reviews[0].subItemId").value(subItemId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[0].content").value(
+					jsonPath("$.reviews[0].content").value(
 						firstReviewCreateRequest.content()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[0].rating").value(firstReviewCreateRequest.rating()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].id").value(2))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].expertId").value(expertId))
+				.andExpect(jsonPath("$.reviews[0].rating").value(firstReviewCreateRequest.rating()))
+				.andExpect(jsonPath("$.reviews[1].id").value(2))
+				.andExpect(jsonPath("$.reviews[1].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[1].writerId").value(secondReviewCreateRequest.writerId()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].subItemId").value(subItemId))
+					jsonPath("$.reviews[1].writerId").value(secondReviewCreateRequest.writerId()))
+				.andExpect(jsonPath("$.reviews[1].subItemId").value(subItemId))
 				.andExpect(
-					jsonPath("$.ReviewsSliceResponse[1].content").value(
+					jsonPath("$.reviews[1].content").value(
 						secondReviewCreateRequest.content()))
-				.andExpect(jsonPath("$.ReviewsSliceResponse[1].rating").value(secondReviewCreateRequest.rating()));
+				.andExpect(jsonPath("$.reviews[1].rating").value(secondReviewCreateRequest.rating()));
 		}
 
 		@DisplayName("성공 - 리뷰를 아이디로 조회할 수 있다")
@@ -423,7 +423,7 @@ class ReviewControllerTest {
 
 			doNothing()
 				.when(reviewService)
-				.deleteReply(reviewId, replyId);
+				.deleteReply(replyId);
 
 			// when
 			// then

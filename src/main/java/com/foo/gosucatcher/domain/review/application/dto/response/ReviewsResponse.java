@@ -7,14 +7,14 @@ import org.springframework.data.domain.Slice;
 import com.foo.gosucatcher.domain.review.domain.Review;
 
 public record ReviewsResponse(
-		List<ReviewResponse> ReviewsSliceResponse,
-		boolean hasNext
+	List<ReviewResponse> reviews,
+	boolean hasNext
 ) {
 
 	public static ReviewsResponse from(Slice<Review> reviews) {
 		return new ReviewsResponse(
-				reviews.stream()
-						.map(ReviewResponse::from)
-						.toList(), reviews.hasNext());
+			reviews.stream()
+				.map(ReviewResponse::from)
+				.toList(), reviews.hasNext());
 	}
 }

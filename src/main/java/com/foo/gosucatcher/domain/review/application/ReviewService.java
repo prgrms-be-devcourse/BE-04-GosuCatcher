@@ -117,15 +117,6 @@ public class ReviewService {
 		return ReplyResponse.of(review.getId(), reply);
 	}
 
-	private void validateReplyWriter(Review review, ReplyRequest replyRequest) {
-		long expertId = review.getExpert().getId();
-		long writerId = replyRequest.writerId();
-
-		if (expertId != writerId) {
-			throw new UnsupportedReplierException(UNSUPPORTED_REPLIER);
-		}
-	}
-
 	public long updateReply(Long reviewId, long replyId, ReplyRequest replyRequest) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW));
@@ -141,6 +132,7 @@ public class ReviewService {
 		return replyId;
 	}
 
+	@Transactional(readOnly = true)
 	public ReplyResponse findReplyById(Long reviewId, Long replyId) {
 		Reply reply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_REPLY));
@@ -148,7 +140,7 @@ public class ReviewService {
 		return ReplyResponse.of(reviewId, reply);
 	}
 
-	public void deleteReply(Long reviewId, Long replyId) {
+	public void deleteReply(Long replyId) {
 		replyRepository.findById(replyId).ifPresentOrElse(
 			reply -> replyRepository.deleteById(replyId),
 			() -> {
@@ -157,6 +149,7 @@ public class ReviewService {
 		);
 	}
 
+	@Transactional(readOnly = true)
 	public long countByExpertId(Long expertId) {
 		expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
@@ -164,5 +157,14 @@ public class ReviewService {
 		long count = reviewRepository.countByExpertId(expertId);
 
 		return count;
+	}
+
+	private void validateReplyWriter(Review review, ReplyRequest replyRequest) {
+		long expertId = review.getExpert().getId();
+		long writerId = replyRequest.writerId();
+
+		if (expertId != writerId) {
+			throw new UnsupportedReplierException(UNSUPPORTED_REPLIER);
+		}
 	}
 }
