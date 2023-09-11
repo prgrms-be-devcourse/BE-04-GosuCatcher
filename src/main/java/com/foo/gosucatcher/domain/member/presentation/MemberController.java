@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.foo.gosucatcher.domain.member.application.MemberService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberPasswordFoundRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
@@ -48,16 +49,7 @@ public class MemberController {
 
 	private final MemberService memberService;
 
-	@GetMapping("/recovery/password")
-	public ResponseEntity<MemberPasswordFoundResponse> findPassword(@RequestParam String email) {
-		//todo: 이메일 인증 시스템 만들기
-		isValidEmail(email);
-		MemberPasswordFoundResponse response = memberService.findPassword(email);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@GetMapping("/signup")
+	@GetMapping("/signup/auth")
 	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestParam String email) {
 		isValidEmail(email);
 
@@ -101,6 +93,14 @@ public class MemberController {
 		memberService.logout(memberEmail);
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping("/recovery/password")
+	public ResponseEntity<MemberPasswordFoundResponse> findPassword(
+		@RequestBody @Validated MemberPasswordFoundRequest memberPasswordFoundRequest) {
+		MemberPasswordFoundResponse response = memberService.findPassword(memberPasswordFoundRequest);
+
+		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberId

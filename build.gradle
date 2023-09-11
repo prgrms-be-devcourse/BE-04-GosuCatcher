@@ -39,6 +39,8 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    implementation 'net.nurigo:sdk:4.2.7'
+
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.modelmapper:modelmapper:3.1.1'
 

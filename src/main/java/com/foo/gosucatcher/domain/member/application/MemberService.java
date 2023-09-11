@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberPasswordFoundRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
@@ -63,7 +64,6 @@ public class MemberService {
 		return MemberEmailSendResponse.from(message, expirationTime);
 	}
 
-	@Transactional
 	public MemberEmailAuthResponse authenticateMemberByEmail(MemberEmailAuthRequest memberEmailAuthRequest) {
 		String email = memberEmailAuthRequest.email();
 		String authNumber = redisUtil.get(email, String.class);
@@ -76,14 +76,23 @@ public class MemberService {
 		if (!authNumber.equals(requestAuthNumber)) {
 			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
 		}
+		redisUtil.delete(email);
 
 		return new MemberEmailAuthResponse(email, true);
 	}
 
-	@Transactional(readOnly = true)
-	public MemberPasswordFoundResponse findPassword(String email) {
-		Member member = memberRepository.findByEmail(email)
+	public MemberPasswordFoundResponse findPassword(MemberPasswordFoundRequest memberPasswordFoundRequest) {
+		String requestEmail = memberPasswordFoundRequest.email();
+		Member member = memberRepository.findByEmail(requestEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		String requestName = memberPasswordFoundRequest.name();
+		member.isSameMemberName(requestName);
+
+		String temporaryPassword = createTemporaryPassword();
+		member.changePassword(temporaryPassword, passwordEncoder);
+		MimeMessage recoveryEmail = createRecoveryEmail(temporaryPassword, requestEmail);
+		javaMailSender.send(recoveryEmail);
 
 		return MemberPasswordFoundResponse.from(member);
 	}
@@ -102,7 +111,8 @@ public class MemberService {
 
 		checkDuplicatedEmail(signupEmail);
 
-		signupMember.encodePassword(passwordEncoder);
+		String password = signupMember.getPassword();
+		signupMember.changePassword(password, passwordEncoder);
 		signupMember.updateMemberRole(Roles.ROLE_USER);
 		Member savedMember = memberRepository.save(signupMember);
 
@@ -238,6 +248,31 @@ public class MemberService {
 				<h1>%s</h1>
 				<h3>감사합니다.</h3>
 				""".formatted(AUTH_NUMBER);
+			message.setText(body, "UTF-8", "html");
+		} catch (MessagingException e) {
+			throw new RuntimeException("이메일 발송 실패임");
+		}
+
+		return message;
+	}
+
+	private String createTemporaryPassword() {
+		return String.valueOf((int)(Math.random() * (9_000_000)) + 10_000_000);
+	}
+
+	private MimeMessage createRecoveryEmail(String temporaryPassword, String email) {
+		MimeMessage message = javaMailSender.createMimeMessage();
+
+		try {
+			message.setFrom(senderEmail);
+			message.setRecipients(MimeMessage.RecipientType.TO, email);
+			message.setSubject("임시 비밀번호 발급");
+
+			String body = """
+				<h3>임시 비밀번호</h3>
+				<h1>%s</h1>
+				<h3>로그인 후 꼭 비밀번호를 변경해주세요! 감사합니다.</h3>
+				""".formatted(temporaryPassword);
 			message.setText(body, "UTF-8", "html");
 		} catch (MessagingException e) {
 			throw new RuntimeException("이메일 발송 실패임");

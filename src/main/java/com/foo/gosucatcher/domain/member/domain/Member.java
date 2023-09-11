@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.foo.gosucatcher.global.BaseEntity;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.AccessLevel;
@@ -79,15 +80,28 @@ public class Member extends BaseEntity implements UserDetails {
 		this.profileImageFile = profileImageFile;
 	}
 
-	public void encodePassword(PasswordEncoder passwordEncoder) {
-		this.password = passwordEncoder.encode(password);
+	public void authenticate(Member requestMember, PasswordEncoder passwordEncoder) {
+		String requestPassword = requestMember.getPassword();
+		boolean isMatchedPassword = passwordEncoder.matches(requestPassword, this.password);
+		boolean isWithdrawnMember = isDeleted;
+
+		if (isWithdrawnMember || !isMatchedPassword) {
+			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
+		}
+	}
+
+	public void changePassword(String password, PasswordEncoder passwordEncoder) {
+		this.password = encodePassword(password, passwordEncoder);
 	}
 
 	public void updateProfile(Member requestMember, PasswordEncoder passwordEncoder) {
 		this.name = requestMember.getName();
-		this.password = requestMember.getPassword();
-		encodePassword(passwordEncoder);
+		this.password = encodePassword(requestMember.getPassword(), passwordEncoder);
 		this.phoneNumber = requestMember.getPhoneNumber();
+	}
+
+	private String encodePassword(String password, PasswordEncoder passwordEncoder) {
+		return passwordEncoder.encode(password);
 	}
 
 	public void updateProfileImage(ImageFile profileImageFile) {
@@ -106,18 +120,14 @@ public class Member extends BaseEntity implements UserDetails {
 		this.refreshToken = refreshToken;
 	}
 
-	public void authenticate(Member requestMember, PasswordEncoder passwordEncoder) {
-		String requestPassword = requestMember.getPassword();
-		boolean isMatchedPassword = passwordEncoder.matches(requestPassword, this.password);
-		boolean isWithdrawnMember = isDeleted;
-
-		if (isWithdrawnMember || !isMatchedPassword) {
-			throw new InvalidValueException(ErrorCode.LOG_IN_FAILURE);
-		}
-	}
-
 	public void logout() {
 		this.refreshToken = "";
+	}
+
+	public void isSameMemberName(String requestName) {
+		if (!name.equals(requestName)) {
+			throw new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER);
+		}
 	}
 
 	@Override
