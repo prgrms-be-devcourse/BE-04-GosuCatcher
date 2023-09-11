@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,12 +29,12 @@ import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimat
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
-import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberRequestEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
-@WebMvcTest(ExpertEstimateController.class)
+@WebMvcTest(value = {ExpertEstimateController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class ExpertEstimateControllerTest {
 
 	@Autowired
@@ -48,7 +49,7 @@ class ExpertEstimateControllerTest {
 	private ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest;
 	private ExpertResponse expertResponse;
 	private MemberEstimateRequest memberEstimateRequest;
-	private MemberRequestEstimateResponse memberRequestEstimateResponse;
+	private MemberEstimateResponse memberEstimateResponse;
 	private String baseUrl = "/api/v1/expert-estimates";
 
 	@BeforeEach
@@ -61,7 +62,7 @@ class ExpertEstimateControllerTest {
 		memberEstimateRequest = new MemberEstimateRequest(1L,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
-		memberRequestEstimateResponse = new MemberRequestEstimateResponse(1L, 1L,
+		memberEstimateResponse = new MemberEstimateResponse(1L, 1L,
 			1L, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 	}
 
@@ -70,7 +71,7 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateSuccessTest() throws Exception {
 
 		//given
-		ExpertNormalEstimateResponse expertNormalEstimateResponse = new ExpertNormalEstimateResponse(1L, expertResponse, memberRequestEstimateResponse,
+		ExpertNormalEstimateResponse expertNormalEstimateResponse = new ExpertNormalEstimateResponse(1L, expertResponse, memberEstimateResponse,
 			100, "서울시 강남구", "상세설명을씁니다");
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
 			.willReturn(expertNormalEstimateResponse);
@@ -84,11 +85,11 @@ class ExpertEstimateControllerTest {
 			.andExpect(jsonPath("$.totalCost").value(100))
 			.andExpect(jsonPath("$.description").value("상세설명을씁니다"))
 			.andExpect(jsonPath("$.activityLocation").value("서울시 강남구"))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.id").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.subItemId").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.memberEstimateResponse.id").value(1))
+			.andExpect(jsonPath("$.memberEstimateResponse.memberId").value(1))
+			.andExpect(jsonPath("$.memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.memberEstimateResponse.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.memberEstimateResponse.detailedDescription").value("추가 내용"))
 			.andDo(print());
 	}
 
@@ -115,7 +116,7 @@ class ExpertEstimateControllerTest {
 
 	@Test
 	@DisplayName("고수 견적서 등록 실패 - 존재하지 않는 고객 요청 견적서")
-	void createExpertEstimateFailTest_notFoundMemberRequestEstimate() throws Exception {
+	void createExpertEstimateFailTest_notFoundMemberEstimate() throws Exception {
 
 		//given
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
@@ -159,7 +160,7 @@ class ExpertEstimateControllerTest {
 
 		//given
 		ExpertEstimatesResponse estimatesResponse = new ExpertEstimatesResponse(
-			List.of(new ExpertEstimateResponse(1L, expertResponse, memberRequestEstimateResponse, 100, "서울시 강남구", "설명을 적어보세요")
+			List.of(new ExpertEstimateResponse(1L, expertResponse, memberEstimateResponse, 100, "서울시 강남구", "설명을 적어보세요")
 			));
 		given(expertEstimateService.findAll()).willReturn(estimatesResponse);
 
@@ -176,22 +177,21 @@ class ExpertEstimateControllerTest {
 	void findExpertEstimateByIdSuccessTest() throws Exception {
 
 		//given
-		ExpertEstimateResponse expertNormalEstimateResponse = new ExpertEstimateResponse(1L, expertResponse, memberRequestEstimateResponse, 100, "서울시 강남구", "설명을 적어보세요");
+		ExpertEstimateResponse expertNormalEstimateResponse = new ExpertEstimateResponse(1L, expertResponse, memberEstimateResponse, 100, "서울시 강남구", "설명을 적어보세요");
 		given(expertEstimateService.findById(anyLong())).willReturn(expertNormalEstimateResponse);
 
 		//when -> then
 		mockMvc.perform(get(baseUrl + "/{id}", 1L))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(1))
-			.andExpect(jsonPath("$.expertResponse.id").value(1))
 			.andExpect(jsonPath("$.totalCost").value(100))
 			.andExpect(jsonPath("$.description").value("설명을 적어보세요"))
 			.andExpect(jsonPath("$.activityLocation").value("서울시 강남구"))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.id").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.subItemId").value(1))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberRequestEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.memberEstimate.id").value(1))
+			.andExpect(jsonPath("$.memberEstimate.memberId").value(1))
+			.andExpect(jsonPath("$.memberEstimate.subItemId").value(1))
+			.andExpect(jsonPath("$.memberEstimate.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.memberEstimate.detailedDescription").value("추가 내용"))
 			.andDo(print());
 	}
 

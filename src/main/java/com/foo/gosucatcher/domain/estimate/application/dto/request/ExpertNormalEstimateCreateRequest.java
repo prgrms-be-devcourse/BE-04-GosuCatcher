@@ -20,17 +20,17 @@ public record ExpertNormalEstimateCreateRequest(
 	String description
 ) {
 
-	public static ExpertEstimate toExpertEstimate(ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest, MemberEstimate memberRequestEstimate, Expert expert) {
+	public static ExpertEstimate toExpertEstimate(ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest, MemberEstimate memberEstimate, Expert expert) {
 		ExpertEstimate expertEstimate = ExpertEstimate.builder()
-			.memberEstimate(memberRequestEstimate)
+			.memberEstimate(memberEstimate)
 			.expert(expert)
 			.totalCost(expertNormalEstimateCreateRequest.totalCost)
 			.activityLocation(expertNormalEstimateCreateRequest.activityLocation)
 			.description(expertNormalEstimateCreateRequest.description)
 			.build();
 
-		memberRequestEstimate.addExpertEstimate(expertEstimate);
-		expertEstimate.addSubItem(memberRequestEstimate.getSubItem());
+		memberEstimate.addExpertEstimate(expertEstimate);
+		expertEstimate.addSubItem(memberEstimate.getSubItem());
 
 		return expertEstimate;
 	}

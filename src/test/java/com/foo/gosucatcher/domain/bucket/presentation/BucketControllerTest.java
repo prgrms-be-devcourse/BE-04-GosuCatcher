@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +27,7 @@ import com.foo.gosucatcher.domain.bucket.dto.request.BucketRequest;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketResponse;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
 
-@WebMvcTest(BucketController.class)
+@WebMvcTest(value = {BucketController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
 class BucketControllerTest {
 
 	@Autowired
@@ -69,7 +70,7 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(MockMvcRequestBuilders.post( "/api/v1/buckets")
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/buckets")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(bucketRequest)))
 			.andExpect(status().isCreated())

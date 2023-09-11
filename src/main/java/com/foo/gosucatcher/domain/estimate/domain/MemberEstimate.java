@@ -51,7 +51,7 @@ public class MemberEstimate extends BaseEntity {
     @JoinColumn(name = "sub_item_id")
     private SubItem subItem;
 
-    @OneToMany(mappedBy = "memberRequestEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
 
     @Column(nullable = false)
@@ -77,7 +77,7 @@ public class MemberEstimate extends BaseEntity {
 
     public void addExpertEstimate(ExpertEstimate expertEstimate) {
         expertEstimateList.add(expertEstimate);
-        expertEstimate.addMemberRequest(this);
+        expertEstimate.addMemberEstimate(this);
     }
 
     private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {

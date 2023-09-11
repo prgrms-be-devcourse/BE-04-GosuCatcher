@@ -42,7 +42,7 @@ public class ExpertEstimate extends BaseEntity {
 	private Expert expert;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_request_estimate_id")
+	@JoinColumn(name = "member_estimate_id")
 	private MemberEstimate memberEstimate;
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -74,8 +74,8 @@ public class ExpertEstimate extends BaseEntity {
 		this.subItem = subItem;
 	}
 
-	public void addMemberRequest(MemberEstimate memberRequestEstimate) {
-		this.memberEstimate = memberRequestEstimate;
+	public void addMemberEstimate(MemberEstimate memberEstimate) {
+		this.memberEstimate = memberEstimate;
 	}
 
 	public boolean isAuto() {

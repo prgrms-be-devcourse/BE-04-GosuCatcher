@@ -96,12 +96,12 @@ public class ExpertEstimateService {
         expertEstimateRepository.delete(expertEstimate);
     }
 
-    private void checkAlreadyResponded(MemberEstimate memberRequestEstimate) {
-        List<ExpertEstimate> expertEstimateList = memberRequestEstimate.getExpertEstimateList();
+    private void checkAlreadyResponded(MemberEstimate memberEstimate) {
+        List<ExpertEstimate> expertEstimateList = memberEstimate.getExpertEstimateList();
         expertEstimateList.stream()
                 .filter(expertEstimate -> {
                     Long registeredEstimateId = expertEstimate.getMemberEstimate().getId();
-                    Long requestedEstimateId = memberRequestEstimate.getId();
+                    Long requestedEstimateId = memberEstimate.getId();
                     return registeredEstimateId.equals(requestedEstimateId);
                 })
                 .forEach(expertEstimate -> {
@@ -110,7 +110,7 @@ public class ExpertEstimateService {
     }
 
     private void checkAlreadyRegisteredByExpertWithSubItem(Expert expert, SubItem subItem) {
-        if (expertEstimateRepository.existsByExpertAndSubItemAndMemberRequestEstimateIsNull(expert, subItem)) {
+        if (expertEstimateRepository.existsByExpertAndSubItemAndMemberEstimateIsNull(expert, subItem)) {
             throw new BusinessException(ALREADY_REGISTERED_BY_SUB_ITEMS);
         }
     }

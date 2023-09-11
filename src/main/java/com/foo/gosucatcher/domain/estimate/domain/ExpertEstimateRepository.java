@@ -10,8 +10,8 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public interface ExpertEstimateRepository extends JpaRepository<ExpertEstimate, Long> {
 
-	@Query("SELECT ee FROM ExpertEstimate ee JOIN FETCH ee.expert JOIN FETCH ee.memberRequestEstimate")
+	@Query("SELECT ee FROM ExpertEstimate ee JOIN FETCH ee.expert JOIN FETCH ee.memberEstimate")
 	List<ExpertEstimate> findAllWithFetchJoin();
 
-	boolean existsByExpertAndSubItemAndMemberRequestEstimateIsNull(Expert expert, SubItem subItem);
+	boolean existsByExpertAndSubItemAndMemberEstimateIsNull(Expert expert, SubItem subItem);
 }

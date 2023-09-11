@@ -6,7 +6,7 @@ import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse
 public record ExpertNormalEstimateResponse(
 	Long id,
 	ExpertResponse expertResponse,
-	MemberRequestEstimateResponse memberRequestEstimateResponse,
+	MemberEstimateResponse memberEstimateResponse,
 	int totalCost,
 	String activityLocation,
 	String description
@@ -16,7 +16,7 @@ public record ExpertNormalEstimateResponse(
 		return new ExpertNormalEstimateResponse(
 			expertEstimate.getId(),
 			ExpertResponse.from(expertEstimate.getExpert()),
-			MemberRequestEstimateResponse.from(expertEstimate.getMemberEstimate()),
+			MemberEstimateResponse.from(expertEstimate.getMemberEstimate()),
 			expertEstimate.getTotalCost(),
 			expertEstimate.getActivityLocation(),
 			expertEstimate.getDescription());

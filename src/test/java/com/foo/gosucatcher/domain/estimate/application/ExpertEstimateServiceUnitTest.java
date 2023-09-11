@@ -128,7 +128,7 @@ class ExpertEstimateServiceUnitTest {
 
 		//then
 		assertThat(expertNormalEstimateResponse.totalCost()).isEqualTo(request.totalCost());
-		assertThat(expertNormalEstimateResponse.memberRequestEstimateResponse().id()).isEqualTo(memberEstimate.getId());
+		assertThat(expertNormalEstimateResponse.memberEstimateResponse().id()).isEqualTo(memberEstimate.getId());
 	}
 
 	@Test
@@ -172,7 +172,8 @@ class ExpertEstimateServiceUnitTest {
 		//given
 		List<ExpertEstimate> estimates = Arrays.asList(expertEstimate);
 
-		when(expertEstimateRepository.findAll())
+		// Mock 객체 설정: findAllWithFetchJoin() 메서드 호출 시 estimates 리스트 반환하도록 설정
+		when(expertEstimateRepository.findAllWithFetchJoin())
 			.thenReturn(estimates);
 
 		//when
