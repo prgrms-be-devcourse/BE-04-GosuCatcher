@@ -1,5 +1,9 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -7,13 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
@@ -25,9 +31,11 @@ import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.member.domain.Roles;
 import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
 import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
+import com.foo.gosucatcher.global.util.RedisUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +48,37 @@ public class MemberService {
 	private final MemberProfileRepository memberProfileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final PasswordEncoder passwordEncoder;
+	private final JavaMailSender javaMailSender;
+	private final RedisUtils redisUtil;
+	private static final String senderEmail = "ysngisyosong@gmail.com";
+	private static final long expirationTime = 60 * 5L;
+	private static String AUTH_NUMBER;
+
+	public MemberEmailSendResponse sendAuthEmail(String email) {
+		MimeMessage message = createAuthenticationEmail(email);
+		javaMailSender.send(message);
+
+		redisUtil.put(email, AUTH_NUMBER, expirationTime);
+
+		return MemberEmailSendResponse.from(message, expirationTime);
+	}
+
+	@Transactional
+	public MemberEmailAuthResponse authenticateMemberByEmail(MemberEmailAuthRequest memberEmailAuthRequest) {
+		String email = memberEmailAuthRequest.email();
+		String authNumber = redisUtil.get(email, String.class);
+
+		if (authNumber == null) {
+			throw new BusinessException(ErrorCode.EXPIRED_AUTH_NUMBER);
+		}
+
+		String requestAuthNumber = memberEmailAuthRequest.authNumber();
+		if (!authNumber.equals(requestAuthNumber)) {
+			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
+		}
+
+		return new MemberEmailAuthResponse(email, true);
+	}
 
 	@Transactional(readOnly = true)
 	public MemberPasswordFoundResponse findPassword(String email) {
@@ -50,13 +89,11 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public MemberEmailDuplicateResponse checkDuplicatedEmail(String email) {
+	public void checkDuplicatedEmail(String email) {
 		memberRepository.findByEmail(email)
 			.ifPresent((member) -> {
 				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER);
 			});
-
-		return MemberEmailDuplicateResponse.from(email);
 	}
 
 	public MemberSignupResponse signup(MemberSignupRequest memberSignUpRequest) {
@@ -181,5 +218,31 @@ public class MemberService {
 
 		return memberRepository.findByEmail(memberEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	}
+
+	private void createAuthenticationNumber() {
+		AUTH_NUMBER = String.valueOf((int)(Math.random() * (90_000)) + 100_000);
+	}
+
+	private MimeMessage createAuthenticationEmail(String email) {
+		createAuthenticationNumber();
+		MimeMessage message = javaMailSender.createMimeMessage();
+
+		try {
+			message.setFrom(senderEmail);
+			message.setRecipients(MimeMessage.RecipientType.TO, email);
+			message.setSubject("이메일 인증");
+
+			String body = """
+				<h3>요청하신 인증 번호입니다</h3>
+				<h1>%s</h1>
+				<h3>감사합니다.</h3>
+				""".formatted(AUTH_NUMBER);
+			message.setText(body, "UTF-8", "html");
+		} catch (MessagingException e) {
+			throw new RuntimeException("이메일 발송 실패임");
+		}
+
+		return message;
 	}
 }

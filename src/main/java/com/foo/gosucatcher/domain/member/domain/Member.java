@@ -42,7 +42,7 @@ public class Member extends BaseEntity implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false)
 	private String email;
 
 	@Column(nullable = false)
@@ -51,14 +51,14 @@ public class Member extends BaseEntity implements UserDetails {
 	@Column(nullable = false)
 	private String name;
 
-	@Column(name = "phone_number", unique = true)
+	@Column(name = "phone_number")
 	private String phoneNumber;
 
 	@Column(name = "is_deleted")
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Embedded
-	@Column(name = "profile_image_file", nullable = false)
+	@Column(name = "profile_image_file")
 	private ImageFile profileImageFile;
 
 	@Column(nullable = false)

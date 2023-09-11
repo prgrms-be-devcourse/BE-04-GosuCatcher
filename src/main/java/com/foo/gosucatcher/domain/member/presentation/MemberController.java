@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.member.application.MemberService;
+import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
-import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailDuplicateResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
@@ -56,11 +58,22 @@ public class MemberController {
 	}
 
 	@GetMapping("/signup")
-	public ResponseEntity<MemberEmailDuplicateResponse> checkDuplicatedEmail(@RequestParam String email) {
+	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestParam String email) {
 		isValidEmail(email);
-		MemberEmailDuplicateResponse response = memberService.checkDuplicatedEmail(email);
 
-		return ResponseEntity.ok(response);
+		memberService.checkDuplicatedEmail(email);
+		MemberEmailSendResponse authenticateResponse = memberService.sendAuthEmail(email);
+
+		return ResponseEntity.ok(authenticateResponse);
+	}
+
+	@PostMapping("/signup/auth")
+	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(
+		@RequestBody @Validated MemberEmailAuthRequest memberEmailAuthRequest) {
+		MemberEmailAuthResponse memberEmailAuthResponse = memberService.authenticateMemberByEmail(
+			memberEmailAuthRequest);
+
+		return ResponseEntity.ok(memberEmailAuthResponse);
 	}
 
 	@PostMapping("/signup")
@@ -91,31 +104,25 @@ public class MemberController {
 	}
 
 	@CurrentMemberId
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> deleteMember(@PathVariable Long id, Long memberId) {
-		isAuthenticatedMemberPath(id, memberId);
-
+	@DeleteMapping
+	public ResponseEntity<Void> deleteMember(Long memberId) {
 		memberService.deleteMember(memberId);
 
 		return ResponseEntity.noContent().build();
 	}
 
 	@CurrentMemberId
-	@GetMapping("/{id}/profiles")
-	public ResponseEntity<MemberProfileResponse> findMemberProfile(@PathVariable Long id, Long memberId) {
-		isAuthenticatedMemberPath(id, memberId);
-
+	@GetMapping("/profiles")
+	public ResponseEntity<MemberProfileResponse> findMemberProfile(Long memberId) {
 		MemberProfileResponse response = memberService.findMemberProfile(memberId);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberId
-	@PatchMapping("/{id}/profiles")
-	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(@PathVariable Long id, Long memberId,
+	@PatchMapping("/profiles")
+	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(Long memberId,
 		@RequestBody @Validated MemberProfileChangeRequest memberProfileChangeRequest) {
-		isAuthenticatedMemberPath(id, memberId);
-
 		MemberProfileChangeResponse response = memberService.changeMemberProfile(memberId,
 			memberProfileChangeRequest);
 
@@ -124,11 +131,9 @@ public class MemberController {
 
 	//todo: 리팩토링 예정
 	@CurrentMemberId
-	@PostMapping("/{id}/profiles/image")
-	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(@PathVariable Long id, Long memberId,
+	@PostMapping("/profiles/image")
+	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(Long memberId,
 		@RequestParam MultipartFile file) {
-		isAuthenticatedMemberPath(id, memberId);
-
 		ProfileImageUploadRequest request = new ProfileImageUploadRequest(memberId, file);
 		memberService.uploadProfileImage(request);
 
@@ -151,10 +156,8 @@ public class MemberController {
 	}
 
 	@CurrentMemberId
-	@DeleteMapping("/{id}/profiles/image")
-	public ResponseEntity<Void> deleteProfileImage(@PathVariable Long id, Long memberId) {
-		isAuthenticatedMemberPath(id, memberId);
-
+	@DeleteMapping("/profiles/image")
+	public ResponseEntity<Void> deleteProfileImage(Long memberId) {
 		memberService.deleteProfileImage(memberId);
 
 		return ResponseEntity.noContent().build();
@@ -164,12 +167,6 @@ public class MemberController {
 		EmailValidator emailValidator = new EmailValidator();
 		if (!emailValidator.isValid(email, null)) {
 			throw new InvalidValueException(ErrorCode.INVALID_EMAIL_FORMAT);
-		}
-	}
-
-	private void isAuthenticatedMemberPath(Long pathId, Long memberId) {
-		if (!memberId.equals(pathId)) {
-			throw new InvalidValueException(ErrorCode.UNAUTHENTICATED_MEMBER);
 		}
 	}
 }

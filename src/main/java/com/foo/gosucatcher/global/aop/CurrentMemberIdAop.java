@@ -54,6 +54,7 @@ public class CurrentMemberIdAop {
 
 		for (int i = 0; i < methodParameters.length; i++) {
 			String parameterName = methodParameters[i].getName();
+			System.out.println("para name : " + parameterName);
 			if (parameterName.equals(MEMBER_ID)) {
 				parameters[i] = memberId;
 			}
