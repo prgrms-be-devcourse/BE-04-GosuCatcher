@@ -18,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1/members/auth/sms")
 public class MemberSmsAuthController {
 
 	private final MemberSmsAuthService memberSmsService;
 
 	@CurrentMemberId
-	@PostMapping("/profiles/auth/phone")
+	@PostMapping
 	public ResponseEntity<SmsSendResponse> sendAuthSms(Long memberId,
 		@RequestBody @Validated SmsSendRequest smsSendRequest) {
 		SmsSendResponse smsAuthResponse = memberSmsService.sendSms(memberId, smsSendRequest);
@@ -33,7 +33,7 @@ public class MemberSmsAuthController {
 	}
 
 	@CurrentMemberId
-	@PostMapping("/profiles/auth")
+	@PostMapping("/validation")
 	public ResponseEntity<SmsAuthResponse> authenticateSms(Long memberId,
 		@RequestBody @Validated SmsAuthRequest smsAuthRequest) {
 		SmsAuthResponse smsAuthResponse = memberSmsService.authenticateSms(memberId, smsAuthRequest);

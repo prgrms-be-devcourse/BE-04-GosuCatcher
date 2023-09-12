@@ -31,29 +31,13 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1/members/profile")
 public class MemberProfileController {
 
 	private final MemberProfileService memberProfileService;
 
 	@CurrentMemberId
-	@DeleteMapping
-	public ResponseEntity<Void> deleteMember(Long memberId) {
-		memberProfileService.deleteMember(memberId);
-
-		return ResponseEntity.noContent().build();
-	}
-
-	@CurrentMemberId
-	@GetMapping("/profiles")
-	public ResponseEntity<MemberProfileResponse> findMemberProfile(Long memberId) {
-		MemberProfileResponse response = memberProfileService.findMemberProfile(memberId);
-
-		return ResponseEntity.ok(response);
-	}
-
-	@CurrentMemberId
-	@PatchMapping("/profiles")
+	@PatchMapping
 	public ResponseEntity<MemberProfileChangeResponse> changeMemberProfile(Long memberId,
 		@RequestBody @Validated MemberProfileChangeRequest memberProfileChangeRequest) {
 		MemberProfileChangeResponse response = memberProfileService.changeMemberProfile(memberId,
@@ -62,9 +46,17 @@ public class MemberProfileController {
 		return ResponseEntity.ok(response);
 	}
 
+	@CurrentMemberId
+	@GetMapping
+	public ResponseEntity<MemberProfileResponse> findMemberProfile(Long memberId) {
+		MemberProfileResponse response = memberProfileService.findMemberProfile(memberId);
+
+		return ResponseEntity.ok(response);
+	}
+
 	//todo: 리팩토링 예정
 	@CurrentMemberId
-	@PostMapping("/profiles/image")
+	@PostMapping("/images")
 	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(Long memberId,
 		@RequestParam MultipartFile file) {
 		ProfileImageUploadRequest request = new ProfileImageUploadRequest(memberId, file);
@@ -76,7 +68,7 @@ public class MemberProfileController {
 			.body(response);
 	}
 
-	@GetMapping("/{id}/profiles/image")
+	@GetMapping("/{id}/images")
 	public ResponseEntity<Resource> findProfileImage(@PathVariable Long id) {
 		ImageFile profileImage = memberProfileService.findProfileImage(id);
 
@@ -89,7 +81,7 @@ public class MemberProfileController {
 	}
 
 	@CurrentMemberId
-	@DeleteMapping("/profiles/image")
+	@DeleteMapping("/images")
 	public ResponseEntity<Void> deleteProfileImage(Long memberId) {
 		memberProfileService.deleteProfileImage(memberId);
 

@@ -77,6 +77,13 @@ public class MemberAuthService {
 		member.logout();
 	}
 
+	public void deleteMember(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		memberRepository.delete(member);
+	}
+
 	public MemberPasswordFoundResponse findPassword(MemberPasswordFoundRequest memberPasswordFoundRequest) {
 		String requestEmail = memberPasswordFoundRequest.email();
 		Member member = memberRepository.findByEmail(requestEmail)

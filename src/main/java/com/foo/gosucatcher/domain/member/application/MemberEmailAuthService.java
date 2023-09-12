@@ -88,7 +88,7 @@ public class MemberEmailAuthService {
 				""".formatted(authNumber);
 			message.setText(body, "UTF-8", "html");
 		} catch (MessagingException e) {
-			throw new RuntimeException("이메일 발송 실패임");
+			throw new BusinessException(ErrorCode.NOT_CREATION_AUTH_MESSAGE);
 		}
 
 		return message;
@@ -109,7 +109,7 @@ public class MemberEmailAuthService {
 				""".formatted(temporaryPassword);
 			message.setText(body, "UTF-8", "html");
 		} catch (MessagingException e) {
-			throw new RuntimeException("이메일 발송 실패임");
+			throw new BusinessException(ErrorCode.NOT_CREATION_AUTH_MESSAGE);
 		}
 
 		return message;

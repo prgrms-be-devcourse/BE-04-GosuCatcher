@@ -17,6 +17,7 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifie
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
 import com.foo.gosucatcher.global.aop.CurrentMemberEmail;
+import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -48,6 +49,14 @@ public class MemberAuthController {
 	@DeleteMapping("/logout")
 	public ResponseEntity<Void> logout(String memberEmail) {
 		memberAuthService.logout(memberEmail);
+
+		return ResponseEntity.noContent().build();
+	}
+
+	@CurrentMemberId
+	@DeleteMapping
+	public ResponseEntity<Void> deleteMember(Long memberId) {
+		memberAuthService.deleteMember(memberId);
 
 		return ResponseEntity.noContent().build();
 	}

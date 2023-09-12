@@ -20,13 +20,13 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1/members/auth/email")
 @RestController
 public class MemberEmailAuthController {
 
 	private final MemberEmailAuthService memberEmailAuthService;
 
-	@GetMapping("/signup/auth")
+	@GetMapping
 	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestParam String email) {
 		isValidEmail(email);
 		memberEmailAuthService.checkDuplicatedEmail(email);
@@ -35,7 +35,7 @@ public class MemberEmailAuthController {
 		return ResponseEntity.ok(authenticateResponse);
 	}
 
-	@PostMapping("/signup/auth/email")
+	@PostMapping("/validation")
 	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(
 		@RequestBody @Validated MemberEmailAuthRequest memberEmailAuthRequest) {
 		MemberEmailAuthResponse memberEmailAuthResponse = memberEmailAuthService.authenticateMemberByEmail(
