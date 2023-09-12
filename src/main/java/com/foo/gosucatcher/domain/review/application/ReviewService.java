@@ -102,35 +102,32 @@ public class ReviewService {
 	}
 
 	public void delete(Long id) {
-		reviewRepository.findById(id).ifPresentOrElse(
-			review -> {
-				reviewRepository.deleteById(id);
-				if(review.replyExists()){
-					deleteReply(id, review.getReply().getId());
-				}
-				updateExpert(review.getExpert(), review.getRating(), true);
-			},
-			() -> {
-				throw new EntityNotFoundException(NOT_FOUND_REVIEW);
-			}
-		);
+		Review review = reviewRepository.findById(id)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
+
+		reviewRepository.deleteById(id);
+
+		updateExpert(review.getExpert(), review.getRating(), true);
+
+		if (review.replyExists()) {
+			long replyId = review.getReply().getId();
+			deleteReply(id, replyId);
+		}
 	}
 
 	@Transactional(readOnly = true)
 	public long countByExpertId(Long expertId) {
-		expertRepository.findById(expertId)
+		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		long count = reviewRepository.countByExpertId(expertId);
-
-		return count;
+		return reviewRepository.countByExpertId(expert.getId());
 	}
 
 	public ReplyResponse createReply(Long reviewId, ReplyRequest replyRequest) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
-		if(review.replyExists()){
+		if (review.replyExists()) {
 			throw new InvalidReplyCountException(UNSUPPORTED_MULTIPLE_REPLIES);
 		}
 
@@ -169,12 +166,13 @@ public class ReviewService {
 		reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
-		replyRepository.findById(replyId).ifPresentOrElse(
-			reply -> replyRepository.deleteById(replyId),
-			() -> {
-				throw new EntityNotFoundException(NOT_FOUND_REVIEW);
-			}
-		);
+		replyRepository.findById(replyId)
+			.ifPresentOrElse(
+				reply -> replyRepository.deleteById(replyId),
+				() -> {
+					throw new EntityNotFoundException(NOT_FOUND_REVIEW);
+				}
+			);
 	}
 
 	private void validateReplyWriter(Review review, ReplyRequest replyRequest) {
@@ -187,15 +185,16 @@ public class ReviewService {
 	}
 
 	private void updateExpert(Expert expert, double rating, boolean isDeletion) {
-		int expertReviewCount = expert.getReviewCount();
-		double expertRating = expert.getRating();
+		int currentReviewCount = expert.getReviewCount();
+		double currentRating = expert.getRating();
+
 		if (isDeletion) {
-			expertRating *= -1;
-			expertReviewCount *= -1;
+			currentRating *= -1;
+			currentReviewCount *= -1;
 		}
 
 		double updatedRating = Math.max(0,
-			((expertRating * expertReviewCount) + rating) / (expertReviewCount + 1));
+			((currentRating * currentReviewCount) + rating) / (currentReviewCount + 1));
 		String adjustedRating = String.format("%.1f", updatedRating);
 
 		Expert updatedExpert = Expert.builder()
@@ -205,7 +204,7 @@ public class ReviewService {
 			.maxTravelDistance(expert.getMaxTravelDistance())
 			.description(expert.getDescription())
 			.rating(Double.parseDouble(adjustedRating))
-			.reviewCount(Math.max(0, expertReviewCount + 1))
+			.reviewCount(Math.max(0, currentReviewCount + 1))
 			.build();
 
 		expert.update(updatedExpert);
