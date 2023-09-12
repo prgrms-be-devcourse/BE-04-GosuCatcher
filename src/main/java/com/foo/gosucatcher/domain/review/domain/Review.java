@@ -71,12 +71,12 @@ public class Review extends BaseEntity {
 		rating = updatedReview.getRating();
 	}
 
-	public void updateParent(Review parent) {
-		this.parent = parent;
+	public void updateReply(Reply reply) {
+		this.reply = reply;
 	}
 
-	boolean isReply() {
-		return parent == null;
+	public boolean replyExists(){
+		return ((reply != null) && (reply.isDeleted() == false));
 	}
 
 }

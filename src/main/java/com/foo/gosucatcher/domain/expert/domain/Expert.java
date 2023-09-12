@@ -63,29 +63,28 @@ public class Expert extends BaseEntity {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description) {
+	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description,
+		double rating, int reviewCount) {
 		this.member = member;
 		this.storeName = storeName;
 		this.location = location;
 		this.maxTravelDistance = maxTravelDistance;
 		this.description = description;
 		this.isAuto = false;
-		this.rating = 0.0;
-		this.reviewCount = 0;
+		this.rating = rating;
+		this.reviewCount = reviewCount;
 	}
 
 	public void updateIsAuto(boolean isAuto) {
 		this.isAuto = isAuto;
 	}
 
-	public void updateExpert(Expert updatedExpert) {
+	public void update(Expert updatedExpert) {
 		this.storeName = updatedExpert.getStoreName();
 		this.location = updatedExpert.getLocation();
 		this.maxTravelDistance = updatedExpert.getMaxTravelDistance();
 		this.description = updatedExpert.getDescription();
-	}
-
-	public void updateRating(double newRating) {
-		this.rating = newRating;
+		this.rating = updatedExpert.getRating();
+		this.reviewCount = updatedExpert.getReviewCount();
 	}
 }
