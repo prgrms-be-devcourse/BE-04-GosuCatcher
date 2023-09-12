@@ -4,8 +4,9 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,15 +83,22 @@ public class ExpertService {
 	}
 
 	private void duplicatedStoreNameCheck(String storeName) {
-		Optional<Expert> existingExpert = expertRepository.findByStoreName(storeName);
-		if (existingExpert.isPresent()) {
-			throw new BusinessException(ErrorCode.DUPLICATED_EXPERT_STORENAME);
-		}
+		expertRepository.findByStoreName(storeName)
+			.ifPresent(expert -> {
+				throw new BusinessException(ErrorCode.DUPLICATED_EXPERT_STORENAME);
+			});
 	}
 
 	private void checkMaxTravelDistance(int maxTravelDistance) {
 		if (maxTravelDistance < 0) {
 			throw new InvalidValueException(ErrorCode.INVALID_MAX_TRAVEL_DISTANCE);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public ExpertsResponse findExperts(String subItem, String location, Pageable pageable) {
+		Slice<Expert> expertsSlice = expertRepository.findBySubItemAndLocation(subItem, location, pageable);
+
+		return ExpertsResponse.from(expertsSlice.getContent());
 	}
 }
