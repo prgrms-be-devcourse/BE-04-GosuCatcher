@@ -1,8 +1,5 @@
 package com.foo.gosucatcher.domain.review.domain;
 
-import static java.lang.Boolean.FALSE;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -49,22 +46,21 @@ public class Review extends BaseEntity {
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-	@JoinColumn(name = "parent_id")
-	private Review parent;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "reply_id")
+	private Reply reply;
 
 	private String content;
 
 	private int rating;
 
-	private boolean isDeleted = FALSE;
+	private boolean isDeleted = false;
 
 	@Builder
-	public Review(Expert expert, Member member, SubItem subItem, Review parent, String content, int rating) {
+	public Review(Expert expert, Member member, SubItem subItem, String content, int rating) {
 		this.expert = expert;
 		this.member = member;
 		this.subItem = subItem;
-		this.parent = parent;
 		this.content = content;
 		this.rating = rating;
 		this.isDeleted = false;
@@ -83,7 +79,4 @@ public class Review extends BaseEntity {
 		return parent == null;
 	}
 
-	// public void updateReply(Reply reply) {
-	// 	this.reply = reply;
-	// }
 }

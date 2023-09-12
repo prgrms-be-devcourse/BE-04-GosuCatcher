@@ -30,6 +30,10 @@ public class Reply extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	// @OneToOne(fetch = LAZY)
+	// @JoinColumn(name = "review_id")
+	// private Review review;
+
 	private String content;
 
 	private boolean isDeleted = FALSE;

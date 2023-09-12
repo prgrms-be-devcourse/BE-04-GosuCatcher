@@ -69,7 +69,7 @@ public class ExpertService {
 		checkMaxTravelDistance(request.maxTravelDistance());
 
 		Expert updatedExpert = ExpertUpdateRequest.toExpert(request);
-		existingExpert.updateExpert(updatedExpert);
+		existingExpert.update(updatedExpert);
 
 		return existingExpert.getId();
 	}

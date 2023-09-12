@@ -2,9 +2,9 @@ package com.foo.gosucatcher.global.error.exception;
 
 import com.foo.gosucatcher.global.error.ErrorCode;
 
-public class NotSupportedBucketException extends BusinessException {
+public class UnsupportedBucketException extends BusinessException {
 
-	public NotSupportedBucketException(ErrorCode errorCode) {
+	public UnsupportedBucketException(ErrorCode errorCode) {
 		super(errorCode);
 	}
 }

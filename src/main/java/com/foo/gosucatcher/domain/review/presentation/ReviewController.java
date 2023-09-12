@@ -38,7 +38,14 @@ public class ReviewController {
 		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
 		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
 
-		return ResponseEntity.ok(reviewResponse);
+		URI uri = ServletUriComponentsBuilder
+			.fromCurrentRequest()
+			.path("/{id}")
+			.buildAndExpand(reviewResponse.id())
+			.toUri();
+
+		return ResponseEntity.created(uri)
+			.body(reviewResponse);
 	}
 
 	@GetMapping
@@ -61,7 +68,7 @@ public class ReviewController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/experts/{expertId}/counts") //평균 평점 반환 API 추가
+	@GetMapping("/experts/{expertId}/counts")
 	public ResponseEntity<Long> countByExpertId(@PathVariable Long expertId) {
 		long count = reviewService.countByExpertId(expertId);
 
@@ -94,6 +101,7 @@ public class ReviewController {
 	public ResponseEntity<Object> delete(@PathVariable Long id) {
 		reviewService.delete(id);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.noContent()
+			.build();
 	}
 }
