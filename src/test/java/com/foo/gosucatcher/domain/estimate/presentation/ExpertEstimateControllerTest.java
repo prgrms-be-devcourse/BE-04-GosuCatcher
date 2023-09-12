@@ -3,6 +3,8 @@ package com.foo.gosucatcher.domain.estimate.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,17 +22,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -45,6 +55,9 @@ class ExpertEstimateControllerTest {
 
 	@MockBean
 	ExpertEstimateService expertEstimateService;
+
+	@MockBean
+	private MatchingService matchingService;
 
 	private ExpertNormalEstimateCreateRequest expertNormalEstimateCreateRequest;
 	private ExpertResponse expertResponse;
@@ -63,7 +76,7 @@ class ExpertEstimateControllerTest {
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		memberEstimateResponse = new MemberEstimateResponse(1L, 1L,
-			1L, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+			1L, 1L, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 	}
 
 	@Test
@@ -71,30 +84,33 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateSuccessTest() throws Exception {
 
 		//given
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
+
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = new ExpertNormalEstimateResponse(1L, expertResponse, memberEstimateResponse,
 			100, "서울시 강남구", "상세설명을씁니다");
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
 			.willReturn(expertNormalEstimateResponse);
+		given(matchingService.sendFirstMessage(anyLong(), any())).willReturn(messageResponse);
 
 		//when -> then
 		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertNormalEstimateCreateRequest)))
 			.andExpect(jsonPath("$.id").value(1))
-			.andExpect(jsonPath("$.expertResponse.id").value(1))
-			.andExpect(jsonPath("$.totalCost").value(100))
-			.andExpect(jsonPath("$.description").value("상세설명을씁니다"))
-			.andExpect(jsonPath("$.activityLocation").value("서울시 강남구"))
-			.andExpect(jsonPath("$.memberEstimateResponse.id").value(1))
-			.andExpect(jsonPath("$.memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.memberEstimateResponse.subItemId").value(1))
-			.andExpect(jsonPath("$.memberEstimateResponse.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.senderId").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.memberId").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.expertId").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
 			.andDo(print());
 	}
 
 	@Test
-	@DisplayName("고수 견적서 등록 실패 - 존재하지 않는 고수")
+	@DisplayName("고수 일반 견적서 등록 실패 - 존재하지 않는 고수")
 	void createExpertEstimateFailTest_notFoundExpert() throws Exception {
 
 		//given
@@ -115,7 +131,7 @@ class ExpertEstimateControllerTest {
 	}
 
 	@Test
-	@DisplayName("고수 견적서 등록 실패 - 존재하지 않는 고객 요청 견적서")
+	@DisplayName("고수 일반 견적서 등록 실패 - 존재하지 않는 고객 요청 견적서")
 	void createExpertEstimateFailTest_notFoundMemberEstimate() throws Exception {
 
 		//given
@@ -134,7 +150,7 @@ class ExpertEstimateControllerTest {
 	}
 
 	@Test
-	@DisplayName("고수 견적서 등록 실패 - 잘못된 값 입력")
+	@DisplayName("고수 일반 견적서 등록 실패 - 잘못된 값 입력")
 	void createExpertEstimateFailTest_invalidValue() throws Exception {
 
 		//given
@@ -150,6 +166,63 @@ class ExpertEstimateControllerTest {
 			.andExpect(jsonPath("$.code").value("C001"))
 			.andExpect(jsonPath("$.errors[0].value").value("짧은 설명"))
 			.andExpect(jsonPath("$.errors[0].reason").value("견적서에 대한 설명은 6자 이상 적어주세요."))
+			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수 바로 견적서 등록 성공")
+	public void createAuto() throws Exception {
+		//given
+		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(1L, 10000, "서울시 강남구", "설명을 작성합니다");
+
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다");
+
+		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, 1L, 10000, "서울시 강남구", "설명을 작성합니다");
+
+		given(expertEstimateService.createAuto(anyLong(), any()))
+			.willReturn(expertAutoEstimateResponse);
+
+		//when -> then
+		mockMvc.perform(post(baseUrl + "/auto/{expertId}", 1L)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(expertAutoEstimateCreateRequest)))
+			.andExpect(jsonPath("$.id").value(1))
+			.andExpect(jsonPath("$.expert.id").value(1))
+			.andExpect(jsonPath("$.expert.storeName").value("업체명"))
+			.andExpect(jsonPath("$.expert.location").value("강남구"))
+			.andExpect(jsonPath("$.expert.maxTravelDistance").value(5))
+			.andExpect(jsonPath("$.expert.description").value("설명을 작성합니다"))
+			.andExpect(jsonPath("$.subItemId").value(1))
+			.andExpect(jsonPath("$.totalCost").value(10000))
+			.andExpect(jsonPath("$.activityLocation").value("서울시 강남구"))
+			.andExpect(jsonPath("$.description").value("설명을 작성합니다"))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수 바로 견적서 등록 실패")
+	public void createAutoFailed() throws Exception {
+		//given
+		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(null, 10000, "서울시 강남구", "설명을 작성합니다");
+
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다");
+
+		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, null, 10000, "서울시 강남구", "설명을 작성합니다");
+
+		given(expertEstimateService.createAuto(anyLong(), any()))
+			.willReturn(expertAutoEstimateResponse);
+
+		//when -> then
+		mockMvc.perform(post(baseUrl + "/auto/{expertId}", 1L)
+				.contentType(APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(expertAutoEstimateCreateRequest)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("C001"))
+			.andExpect(jsonPath("$.errors[0].field").value("subItemId"))
+			.andExpect(jsonPath("$.errors[0].value").value(""))
+			.andExpect(jsonPath("$.errors[0].reason").value("제공할 서비스 ID를 입력해주세요."))
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
 			.andDo(print());
 	}
@@ -211,5 +284,36 @@ class ExpertEstimateControllerTest {
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수가 응답한 견적서 입니다."))
 			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수 응답 견적서 삭제 성공 테스트")
+	void delete() throws Exception {
+		//given
+		Long expertEstimateId = 1L;
+
+		doNothing().when(expertEstimateService).delete(expertEstimateId);
+
+		//when -> then
+		mockMvc.perform(MockMvcRequestBuilders.delete(baseUrl + "/{id}", expertEstimateId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(MockMvcResultMatchers.status().isOk());
+	}
+
+	@Test
+	@DisplayName("고수 응답 견적서 삭제 실패 테스트")
+	void deleteFailed() throws Exception {
+		//given
+		Long expertEstimateId = 1L;
+
+		doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT_ESTIMATE)).when(expertEstimateService).delete(any(Long.class));
+
+		//when -> then
+		mockMvc.perform(MockMvcRequestBuilders.delete(baseUrl + "/{id}", expertEstimateId)
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.code").value("EE001"))
+			.andExpect(jsonPath("$.errors").isArray())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 고수가 응답한 견적서 입니다."));
 	}
 }

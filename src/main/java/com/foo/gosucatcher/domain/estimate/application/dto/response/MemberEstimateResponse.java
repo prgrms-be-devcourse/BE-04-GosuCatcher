@@ -21,7 +21,7 @@ public record MemberEstimateResponse(
 		}
 
 		return new MemberEstimateResponse(memberEstimate.getId(),
-			memberEstimate.getMember().getId(), null,
+			memberEstimate.getMember().getId(), memberEstimate.getExpert() == null ? null : memberEstimate.getExpert().getId(),
 			memberEstimate.getSubItem().getId(),
 			memberEstimate.getLocation(), memberEstimate.getPreferredStartDate(),
 			memberEstimate.getDetailedDescription());
