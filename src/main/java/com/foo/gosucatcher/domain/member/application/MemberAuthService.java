@@ -100,6 +100,7 @@ public class MemberAuthService {
 		return MemberPasswordFoundResponse.from(member);
 	}
 
+	//todo: 스플린트3에서 사용할 예정
 	public MemberCertifiedResponse refresh(MemberRefreshRequest memberRefreshRequest) {
 		String refreshToken = memberRefreshRequest.refreshToken();
 

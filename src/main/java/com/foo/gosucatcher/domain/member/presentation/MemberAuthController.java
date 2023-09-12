@@ -22,8 +22,8 @@ import com.foo.gosucatcher.global.aop.CurrentMemberId;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/members")
 @RestController
+@RequestMapping("/api/v1/members")
 public class MemberAuthController {
 
 	private final MemberAuthService memberAuthService;

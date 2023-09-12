@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Length;
 public record MemberEmailAuthRequest(
 	@Email(message = "올바른 이메일 형식을 입력하세요")
 	String email,
-	@Length(min = 6, max = 6)
+	@Length(min = 6, max = 6, message = "6자리 숫자를 입력하세요.")
 	String authNumber
 ) {
 }

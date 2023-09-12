@@ -6,6 +6,7 @@ public record SmsSendResponse(
 	String memberName,
 	String phoneNumber
 ) {
+
 	public static SmsSendResponse from(Member member, String toNumber) {
 		String name = member.getName();
 

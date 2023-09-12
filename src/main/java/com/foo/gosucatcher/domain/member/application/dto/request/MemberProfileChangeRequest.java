@@ -14,7 +14,7 @@ public record MemberProfileChangeRequest(
 	@NotBlank(message = "비밀번호는 비어있을 수 없습니다")
 	@Length(min = 5, max = 20, message = "비밀번호는 5자 이상 20자 이하로 입력 가능합니다")
 	String password,
-	@Pattern(regexp = "^01[0-9]-\\d{3,4}-\\d{4}$", message = "올바른 휴대폰 번호를 입력해주세요.")
+	@Pattern(regexp = "^01[016-9][1-9]\\d{6,7}$", message = "휴대폰 번호를 - 없이 11자리 입력해주세요.")
 	String phoneNumber
 ) {
 

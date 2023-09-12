@@ -29,6 +29,7 @@ public class MemberSmsAuthService {
 	private final SmsRedisTemplateUtils smsRedisTemplateUtils;
 	private final DefaultMessageService messageService;
 	private final MemberRepository memberRepository;
+
 	@Value("${auth.phone.fromNumber}")
 	private String FROM_NUMBER;
 

@@ -28,6 +28,7 @@ public class MemberEmailAuthService {
 	private final EmailRedisTemplateUtils emailRedisTemplateUtils;
 	private final JavaMailSender javaMailSender;
 	private final MemberRepository memberRepository;
+
 	@Value("${auth.email.senderEmail}")
 	private String SENDER_EMAIL;
 	@Value("${auth.time.expiration}")

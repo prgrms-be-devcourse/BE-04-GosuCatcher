@@ -18,8 +18,8 @@ import com.foo.gosucatcher.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
 @EnableWebSecurity
+@Configuration
 public class SecurityConfigure {
 
 	private final JwtTokenProvider jwtTokenProvider;

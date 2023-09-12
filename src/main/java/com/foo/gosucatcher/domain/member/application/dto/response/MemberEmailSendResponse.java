@@ -9,6 +9,7 @@ public record MemberEmailSendResponse(
 	Long expirationTime,
 	Boolean isSuccess
 ) {
+
 	public static MemberEmailSendResponse from(MimeMessage message, Long expirationTime) {
 		try {
 			String to = message.getRecipients(Message.RecipientType.TO)[0].toString();

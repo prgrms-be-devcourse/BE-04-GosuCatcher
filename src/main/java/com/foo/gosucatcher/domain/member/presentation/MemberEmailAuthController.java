@@ -20,8 +20,8 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/members/auth/email")
 @RestController
+@RequestMapping("/api/v1/members/auth/email")
 public class MemberEmailAuthController {
 
 	private final MemberEmailAuthService memberEmailAuthService;

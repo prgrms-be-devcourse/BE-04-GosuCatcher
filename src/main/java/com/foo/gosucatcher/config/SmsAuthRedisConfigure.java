@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
 @EnableRedisRepositories(redisTemplateRef = "smsRedisTemplate")
+@Configuration
 public class SmsAuthRedisConfigure {
 
 	private final ObjectMapper objectMapper;

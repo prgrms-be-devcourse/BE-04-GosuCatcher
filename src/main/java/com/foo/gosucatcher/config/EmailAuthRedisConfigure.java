@@ -15,9 +15,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@Configuration
 @EnableRedisRepositories(redisTemplateRef = "emailRedisTemplate")
+@Configuration
 public class EmailAuthRedisConfigure {
+
 	private final ObjectMapper objectMapper;
 	private final RedisProperties redisProperties;
 

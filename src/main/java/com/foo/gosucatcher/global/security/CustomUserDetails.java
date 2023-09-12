@@ -6,8 +6,8 @@ import com.foo.gosucatcher.domain.member.domain.Member;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
+@RequiredArgsConstructor
 public class CustomUserDetails {
 	private final Member member;
 	private final Expert expert;
