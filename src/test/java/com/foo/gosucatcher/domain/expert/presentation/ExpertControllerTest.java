@@ -186,7 +186,15 @@ class ExpertControllerTest {
 	@DisplayName("고수 전체 조회 성공")
 	void getAllExpertsSuccessTest() throws Exception {
 		// given
-		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
+		List<Expert> expertList = List.of(
+			Expert.builder()
+				.member(member)
+				.storeName("업체명1")
+				.location("위치1")
+				.maxTravelDistance(100)
+				.description("부가설명1")
+				.build()
+		);
 
 		ExpertsResponse expertsResponse = ExpertsResponse.from(expertList);
 		given(expertService.findAll()).willReturn(expertsResponse);
