@@ -66,7 +66,7 @@ public class Member extends BaseEntity implements UserDetails {
 	@Enumerated(EnumType.STRING)
 	private Roles role;
 
-	@Column(name = "refresh_token")
+	@Column(name = "refresh_token", length = 500)
 	private String refreshToken;
 
 	@Builder

@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 
 import io.jsonwebtoken.Claims;
@@ -45,12 +46,12 @@ public class JwtTokenProvider {
 		this.customUserDetailsService = customUserDetailsService;
 	}
 
-	public String createAccessToken(String memberEmail, Long memberId) {
-		return getToken(memberEmail, memberId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
+	public String createAccessToken(String memberEmail, Long memberId, Long expertId) {
+		return getToken(memberEmail, memberId, expertId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
 	}
 
-	public String createRefreshToken(String memberEmail, Long memberId) {
-		return getToken(memberEmail, memberId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
+	public String createRefreshToken(String memberEmail, Long memberId, Long expertId) {
+		return getToken(memberEmail, memberId, expertId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
 	}
 
 	public Authentication getAccessTokenAuthenticationByMemberEmail(String token) {
@@ -69,6 +70,19 @@ public class JwtTokenProvider {
 		Long id = ((Member)userDetails).getId();
 		String password = userDetails.getPassword();
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+
+		return new UsernamePasswordAuthenticationToken(id, password, authorities);
+	}
+
+	public Authentication getAccessTokenAuthenticationByExpertId(String token) {
+		CustomUserDetails customUserDetails = customUserDetailsService.loadExpertByMemberId(
+			getExpertId(token, accessTokenSecretKey));
+		Expert expert = customUserDetails.getExpert();
+		Member member = customUserDetails.getMember();
+
+		Long id = expert.getId();
+		String password = member.getPassword();
+		Collection<? extends GrantedAuthority> authorities = member.getAuthorities();
 
 		return new UsernamePasswordAuthenticationToken(id, password, authorities);
 	}
@@ -99,13 +113,14 @@ public class JwtTokenProvider {
 		return token.substring("Bearer ".length());
 	}
 
-	private String getToken(String memberEmail, Long memberId, long tokenExpiredTime, String secretKey) {
+	private String getToken(String memberEmail, Long memberId, Long expertId, long tokenExpiredTime, String secretKey) {
 		Date date = new Date();
 
 		Claims claims = Jwts.claims()
 			.setSubject("GosuCatcher");
 		claims.put("memberEmail", memberEmail);
 		claims.put("memberId", memberId);
+		claims.put("expertId", expertId);
 
 		return Jwts.builder()
 			.setHeaderParam(Header.TYPE, Header.JWT_TYPE)
@@ -135,6 +150,17 @@ public class JwtTokenProvider {
 			.toString();
 
 		return Long.parseLong(memberId);
+	}
+
+	private Long getExpertId(String token, String secretKey) {
+		String expertId = Jwts.parser()
+			.setSigningKey(secretKey)
+			.parseClaimsJws(token)
+			.getBody()
+			.get("expertId")
+			.toString();
+
+		return Long.parseLong(expertId);
 	}
 
 	private boolean isValidToken(String token, String secretKey) {

@@ -33,20 +33,17 @@ public class Expert extends BaseEntity {
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
-	@Column(nullable = false, length = 20)
+	@Column(length = 20)
 	private String storeName;
 
-	@Column(nullable = false)
 	private String location;
 
-	@Column(nullable = false)
 	private int maxTravelDistance;
 
-	@Column(nullable = false)
 	@Lob
 	private String description;
 
-	@Column(name = "is_baro_estimate", nullable = false)
+	@Column(name = "is_baro_estimate")
 	private boolean isBaroEstimate;
 
 	@Builder

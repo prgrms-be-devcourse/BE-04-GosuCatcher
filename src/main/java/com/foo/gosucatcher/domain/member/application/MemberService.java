@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberPasswordFoundRequest;
@@ -52,6 +54,7 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 @Service
 public class MemberService {
 
+	private final ExpertRepository expertRepository;
 	private final MemberRepository memberRepository;
 	private final MemberProfileRepository memberProfileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
@@ -65,12 +68,10 @@ public class MemberService {
 	private final String FROM_NUMBER;
 
 	public MemberService(
-		MemberRepository memberRepository,
+		ExpertRepository expertRepository, MemberRepository memberRepository,
 		MemberProfileRepository memberProfileRepository,
-		JwtTokenProvider jwtTokenProvider,
-		PasswordEncoder passwordEncoder,
-		JavaMailSender javaMailSender,
-		RedisUtils redisUtil,
+		JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder,
+		JavaMailSender javaMailSender, RedisUtils redisUtil,
 		@Value("${secret.coolsms.apiKey}")
 		String apiKey,
 		@Value("${secret.coolsms.apiSecret}")
@@ -78,6 +79,7 @@ public class MemberService {
 		@Value("${secret.coolsms.fromNumber}")
 		String fromNumber
 	) {
+		this.expertRepository = expertRepository;
 		this.memberRepository = memberRepository;
 		this.memberProfileRepository = memberProfileRepository;
 		this.jwtTokenProvider = jwtTokenProvider;
@@ -149,6 +151,11 @@ public class MemberService {
 		signupMember.updateMemberRole(Roles.ROLE_USER);
 		Member savedMember = memberRepository.save(signupMember);
 
+		Expert expert = Expert.builder()
+			.member(savedMember)
+			.build();
+		expertRepository.save(expert);
+
 		memberProfileRepository.initializeMemberProfile(savedMember);
 
 		return MemberSignupResponse.from(savedMember);
@@ -160,10 +167,14 @@ public class MemberService {
 		Member member = memberRepository.findByEmail(loginRequestEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
+		Long memberId = member.getId();
+		Expert expert = expertRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+
 		Member loginRequestMember = MemberLoginRequest.toMember(memberLoginRequest);
 		member.authenticate(loginRequestMember, passwordEncoder);
 
-		return getMemberCertifiedResponse(member);
+		return getMemberCertifiedResponse(member, expert);
 	}
 
 	public MemberCertifiedResponse refresh(MemberRefreshRequest memberRefreshRequest) {
@@ -174,13 +185,16 @@ public class MemberService {
 		}
 
 		Member member = getMemberByRefreshToken(refreshToken);
+		Long memberId = member.getId();
+		Expert expert = expertRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
 			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
 		}
 
-		return getMemberCertifiedResponse(member);
+		return getMemberCertifiedResponse(member, expert);
 	}
 
 	public void logout(String memberEmail) {
@@ -242,12 +256,13 @@ public class MemberService {
 		memberProfileRepository.deleteImage(profileImageFile);
 	}
 
-	private MemberCertifiedResponse getMemberCertifiedResponse(Member member) {
+	private MemberCertifiedResponse getMemberCertifiedResponse(Member member, Expert expert) {
 		String memberEmail = member.getEmail();
 		Long memberId = member.getId();
+		Long expertId = expert.getId();
 
-		String accessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId);
-		String refreshToken = jwtTokenProvider.createRefreshToken(memberEmail, memberId);
+		String accessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId, expertId);
+		String refreshToken = jwtTokenProvider.createRefreshToken(memberEmail, memberId, expertId);
 
 		member.refreshToken(refreshToken);
 

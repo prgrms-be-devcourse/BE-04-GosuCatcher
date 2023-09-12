@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ExpertRepository extends JpaRepository<Expert, Long> {
-  
+
 	Optional<Expert> findByStoreName(String storeName);
+
+	Optional<Expert> findByMemberId(Long memberId);
 }
