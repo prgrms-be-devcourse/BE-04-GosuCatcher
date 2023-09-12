@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class MemberService {
 	private final MemberProfileRepository memberProfileRepository;
 	private final JwtTokenProvider jwtTokenProvider;
 	private final PasswordEncoder passwordEncoder;
+	private final RedisTemplate redisTemplate;
 
 	@Transactional(readOnly = true)
 	public MemberPasswordFoundResponse findPassword(String email) {
@@ -114,6 +116,9 @@ public class MemberService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
+		String key = "search::" + member.getId();
+		redisTemplate.delete(key);
+
 		memberRepository.delete(member);
 	}
 
@@ -125,7 +130,7 @@ public class MemberService {
 	}
 
 	public MemberProfileChangeResponse changeMemberProfile(Long memberId,
-		@Validated MemberProfileChangeRequest memberProfileChangeRequest) {
+	                                                       @Validated MemberProfileChangeRequest memberProfileChangeRequest) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
