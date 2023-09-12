@@ -21,6 +21,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -67,6 +68,10 @@ public class MemberEstimate extends BaseEntity {
 	@Column(length = 500)
 	private String detailedDescription;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "expert_id")
+	private Expert expert;
+
 	private boolean isClosed = Boolean.FALSE;
 
 	@Builder
@@ -90,6 +95,10 @@ public class MemberEstimate extends BaseEntity {
 
 	public void removeChattingRoom(ChattingRoom chattingRoom) {
 		chattingRoomList.remove(chattingRoom);
+	}
+
+	public void updateExpert(Expert expert) {
+		this.expert = expert;
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
