@@ -423,4 +423,24 @@ class ExpertControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@DisplayName("고수찾기 성공")
+	void searchExpertsSuccessTest() throws Exception {
+		// given
+		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
+		ExpertsResponse expertsResponse = ExpertsResponse.from(expertList);
+		given(expertService.findExperts(any(), any(), any())).willReturn(expertsResponse);
+
+		// when -> then
+		mockMvc.perform(get("/api/v1/experts/search")
+				.param("subItem", "세부서비스")
+				.param("location", "위치1")
+				.param("pageable", "reviewCount,desc"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.expertsResponse[0].storeName").value("업체명1"))
+			.andExpect(jsonPath("$.expertsResponse[0].location").value("위치1"))
+			.andExpect(jsonPath("$.expertsResponse[0].maxTravelDistance").value(100))
+			.andExpect(jsonPath("$.expertsResponse[0].description").value("부가설명1"))
+			.andDo(print());
+	}
 }
