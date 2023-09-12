@@ -75,8 +75,8 @@ public class Review extends BaseEntity {
 		this.reply = reply;
 	}
 
-	public boolean replyExists(){
-		return ((reply != null) && (reply.isDeleted() == false));
+	public boolean replyExists() {
+		return ((reply != null) && (!reply.isDeleted()));
 	}
 
 }
