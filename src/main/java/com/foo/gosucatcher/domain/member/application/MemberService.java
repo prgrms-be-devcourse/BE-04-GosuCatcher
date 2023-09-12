@@ -3,6 +3,7 @@ package com.foo.gosucatcher.domain.member.application;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +19,8 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileCh
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.SmsAuthRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.SmsSendRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
@@ -25,6 +28,8 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberPassword
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.SmsAuthResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.SmsSendResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberProfileRepository;
@@ -38,10 +43,12 @@ import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 import com.foo.gosucatcher.global.util.RedisUtils;
 
-import lombok.RequiredArgsConstructor;
+import net.nurigo.sdk.NurigoApp;
+import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
+import net.nurigo.sdk.message.model.Message;
+import net.nurigo.sdk.message.service.DefaultMessageService;
 
 @Transactional
-@RequiredArgsConstructor
 @Service
 public class MemberService {
 
@@ -51,17 +58,43 @@ public class MemberService {
 	private final PasswordEncoder passwordEncoder;
 	private final JavaMailSender javaMailSender;
 	private final RedisUtils redisUtil;
-	private static final String senderEmail = "ysngisyosong@gmail.com";
-	private static final long expirationTime = 60 * 5L;
-	private static String AUTH_NUMBER;
+	private final DefaultMessageService defaultMessageService;
+	private static final String SENDER_EMAIL = "ysngisyosong@gmail.com";
+	private static final long EXPIRATION_TIME = 60 * 5L;
+	private String AUTH_NUMBER;
+	private final String FROM_NUMBER;
+
+	public MemberService(
+		MemberRepository memberRepository,
+		MemberProfileRepository memberProfileRepository,
+		JwtTokenProvider jwtTokenProvider,
+		PasswordEncoder passwordEncoder,
+		JavaMailSender javaMailSender,
+		RedisUtils redisUtil,
+		@Value("${secret.coolsms.apiKey}")
+		String apiKey,
+		@Value("${secret.coolsms.apiSecret}")
+		String apiSecret,
+		@Value("${secret.coolsms.fromNumber}")
+		String fromNumber
+	) {
+		this.memberRepository = memberRepository;
+		this.memberProfileRepository = memberProfileRepository;
+		this.jwtTokenProvider = jwtTokenProvider;
+		this.passwordEncoder = passwordEncoder;
+		this.javaMailSender = javaMailSender;
+		this.redisUtil = redisUtil;
+		this.FROM_NUMBER = fromNumber;
+		this.defaultMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
+	}
 
 	public MemberEmailSendResponse sendAuthEmail(String email) {
 		MimeMessage message = createAuthenticationEmail(email);
 		javaMailSender.send(message);
 
-		redisUtil.put(email, AUTH_NUMBER, expirationTime);
+		redisUtil.put(email, AUTH_NUMBER, EXPIRATION_TIME);
 
-		return MemberEmailSendResponse.from(message, expirationTime);
+		return MemberEmailSendResponse.from(message, EXPIRATION_TIME);
 	}
 
 	public MemberEmailAuthResponse authenticateMemberByEmail(MemberEmailAuthRequest memberEmailAuthRequest) {
@@ -176,7 +209,6 @@ public class MemberService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		//todo:휴대폰 인증 시스템 만들기
 		Member changedMember = MemberProfileChangeRequest.toMember(memberProfileChangeRequest);
 		member.updateProfile(changedMember, passwordEncoder);
 
@@ -239,7 +271,7 @@ public class MemberService {
 		MimeMessage message = javaMailSender.createMimeMessage();
 
 		try {
-			message.setFrom(senderEmail);
+			message.setFrom(SENDER_EMAIL);
 			message.setRecipients(MimeMessage.RecipientType.TO, email);
 			message.setSubject("이메일 인증");
 
@@ -264,7 +296,7 @@ public class MemberService {
 		MimeMessage message = javaMailSender.createMimeMessage();
 
 		try {
-			message.setFrom(senderEmail);
+			message.setFrom(SENDER_EMAIL);
 			message.setRecipients(MimeMessage.RecipientType.TO, email);
 			message.setSubject("임시 비밀번호 발급");
 
@@ -279,5 +311,54 @@ public class MemberService {
 		}
 
 		return message;
+	}
+
+	public SmsSendResponse sendSms(Long memberId, SmsSendRequest smsSendRequest) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		String toNumber = smsSendRequest.phoneNumber();
+		createAuthenticationNumber();
+
+		Message message = new Message();
+		message.setFrom(FROM_NUMBER);
+		message.setTo(toNumber);
+		message.setText("""
+			[Web 발신] 고수캐처(Gosu-Catcher)
+			인증번호: %s
+			""".formatted(AUTH_NUMBER));
+
+		try {
+			defaultMessageService.send(message);
+		} catch (NurigoMessageNotReceivedException exception) {
+			System.out.println(exception.getFailedMessageList());
+			System.out.println(exception.getMessage());
+		} catch (Exception exception) {
+			System.out.println(exception.getMessage());
+		}
+
+		redisUtil.put(toNumber, AUTH_NUMBER, 60 * 10L);
+
+		return SmsSendResponse.from(member, toNumber);
+	}
+
+	public SmsAuthResponse authenticateSms(Long memberId, SmsAuthRequest smsAuthRequest) {
+		memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+
+		String phoneNumber = smsAuthRequest.phoneNumber();
+		String authNumber = redisUtil.get(phoneNumber, String.class);
+
+		if (authNumber == null) {
+			throw new BusinessException(ErrorCode.EXPIRED_AUTH_NUMBER);
+		}
+
+		String requestAuthNumber = smsAuthRequest.authNumber();
+		if (!authNumber.equals(requestAuthNumber)) {
+			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
+		}
+		redisUtil.delete(phoneNumber);
+
+		return new SmsAuthResponse(phoneNumber, true);
 	}
 }

@@ -25,6 +25,8 @@ import com.foo.gosucatcher.domain.member.application.dto.request.MemberPasswordF
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.SmsAuthRequest;
+import com.foo.gosucatcher.domain.member.application.dto.request.SmsSendRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
@@ -33,6 +35,8 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileC
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.SmsAuthResponse;
+import com.foo.gosucatcher.domain.member.application.dto.response.SmsSendResponse;
 import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.aop.CurrentMemberEmail;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
@@ -59,7 +63,7 @@ public class MemberController {
 		return ResponseEntity.ok(authenticateResponse);
 	}
 
-	@PostMapping("/signup/auth")
+	@PostMapping("/signup/auth/email")
 	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(
 		@RequestBody @Validated MemberEmailAuthRequest memberEmailAuthRequest) {
 		MemberEmailAuthResponse memberEmailAuthResponse = memberService.authenticateMemberByEmail(
@@ -117,6 +121,24 @@ public class MemberController {
 		MemberProfileResponse response = memberService.findMemberProfile(memberId);
 
 		return ResponseEntity.ok(response);
+	}
+
+	@CurrentMemberId
+	@PostMapping("/profiles/auth/phone")
+	public ResponseEntity<SmsSendResponse> sendAuthSms(Long memberId,
+		@RequestBody @Validated SmsSendRequest smsSendRequest) {
+		SmsSendResponse smsAuthResponse = memberService.sendSms(memberId, smsSendRequest);
+
+		return ResponseEntity.ok(smsAuthResponse);
+	}
+
+	@CurrentMemberId
+	@PostMapping("/profiles/auth")
+	public ResponseEntity<SmsAuthResponse> authenticateSms(Long memberId,
+		@RequestBody @Validated SmsAuthRequest smsAuthRequest) {
+		SmsAuthResponse smsAuthResponse = memberService.authenticateSms(memberId, smsAuthRequest);
+
+		return ResponseEntity.ok(smsAuthResponse);
 	}
 
 	@CurrentMemberId
