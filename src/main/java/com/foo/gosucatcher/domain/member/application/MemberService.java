@@ -43,7 +43,8 @@ import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
-import com.foo.gosucatcher.global.util.RedisUtils;
+import com.foo.gosucatcher.global.util.EmailRedisTemplateUtils;
+import com.foo.gosucatcher.global.util.SmsRedisTemplateUtils;
 
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
@@ -60,7 +61,8 @@ public class MemberService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final PasswordEncoder passwordEncoder;
 	private final JavaMailSender javaMailSender;
-	private final RedisUtils redisUtil;
+	private final EmailRedisTemplateUtils emailRedisTemplateUtils;
+	private final SmsRedisTemplateUtils smsRedisTemplateUtils;
 	private final DefaultMessageService defaultMessageService;
 	private static final String SENDER_EMAIL = "ysngisyosong@gmail.com";
 	private static final long EXPIRATION_TIME = 60 * 5L;
@@ -71,9 +73,9 @@ public class MemberService {
 		ExpertRepository expertRepository, MemberRepository memberRepository,
 		MemberProfileRepository memberProfileRepository,
 		JwtTokenProvider jwtTokenProvider, PasswordEncoder passwordEncoder,
-		JavaMailSender javaMailSender, RedisUtils redisUtil,
-		@Value("${secret.coolsms.apiKey}")
-		String apiKey,
+		JavaMailSender javaMailSender, EmailRedisTemplateUtils redis0Util,
+		SmsRedisTemplateUtils redis1Util, @Value("${secret.coolsms.apiKey}")
+	String apiKey,
 		@Value("${secret.coolsms.apiSecret}")
 		String apiSecret,
 		@Value("${secret.coolsms.fromNumber}")
@@ -85,7 +87,8 @@ public class MemberService {
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.passwordEncoder = passwordEncoder;
 		this.javaMailSender = javaMailSender;
-		this.redisUtil = redisUtil;
+		this.emailRedisTemplateUtils = redis0Util;
+		this.smsRedisTemplateUtils = redis1Util;
 		this.FROM_NUMBER = fromNumber;
 		this.defaultMessageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, "https://api.coolsms.co.kr");
 	}
@@ -94,14 +97,14 @@ public class MemberService {
 		MimeMessage message = createAuthenticationEmail(email);
 		javaMailSender.send(message);
 
-		redisUtil.put(email, AUTH_NUMBER, EXPIRATION_TIME);
+		emailRedisTemplateUtils.put(email, AUTH_NUMBER, EXPIRATION_TIME);
 
 		return MemberEmailSendResponse.from(message, EXPIRATION_TIME);
 	}
 
 	public MemberEmailAuthResponse authenticateMemberByEmail(MemberEmailAuthRequest memberEmailAuthRequest) {
 		String email = memberEmailAuthRequest.email();
-		String authNumber = redisUtil.get(email, String.class);
+		String authNumber = emailRedisTemplateUtils.get(email, String.class);
 
 		if (authNumber == null) {
 			throw new BusinessException(ErrorCode.EXPIRED_AUTH_NUMBER);
@@ -111,7 +114,7 @@ public class MemberService {
 		if (!authNumber.equals(requestAuthNumber)) {
 			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
 		}
-		redisUtil.delete(email);
+		emailRedisTemplateUtils.delete(email);
 
 		return new MemberEmailAuthResponse(email, true);
 	}
@@ -352,7 +355,7 @@ public class MemberService {
 			System.out.println(exception.getMessage());
 		}
 
-		redisUtil.put(toNumber, AUTH_NUMBER, 60 * 10L);
+		smsRedisTemplateUtils.put(toNumber, AUTH_NUMBER, 60 * 10L);
 
 		return SmsSendResponse.from(member, toNumber);
 	}
@@ -362,7 +365,7 @@ public class MemberService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		String phoneNumber = smsAuthRequest.phoneNumber();
-		String authNumber = redisUtil.get(phoneNumber, String.class);
+		String authNumber = smsRedisTemplateUtils.get(phoneNumber, String.class);
 
 		if (authNumber == null) {
 			throw new BusinessException(ErrorCode.EXPIRED_AUTH_NUMBER);
@@ -372,7 +375,7 @@ public class MemberService {
 		if (!authNumber.equals(requestAuthNumber)) {
 			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
 		}
-		redisUtil.delete(phoneNumber);
+		smsRedisTemplateUtils.delete(phoneNumber);
 
 		return new SmsAuthResponse(phoneNumber, true);
 	}

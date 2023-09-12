@@ -4,23 +4,28 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@RequiredArgsConstructor
-public class RedisUtils {
+public class SmsRedisTemplateUtils {
 
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final RedisTemplate<String, Object> smsRedisTemplate;
 	private final ModelMapper modelMapper;
 
+	public SmsRedisTemplateUtils(@Qualifier("smsRedisTemplate") RedisTemplate<String, Object> smsRedisTemplate,
+		ModelMapper modelMapper) {
+		this.smsRedisTemplate = smsRedisTemplate;
+		this.modelMapper = modelMapper;
+	}
+
 	public void put(String key, Object value, Long expirationTime) {
-		ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+		ValueOperations<String, Object> valueOperations = smsRedisTemplate.opsForValue();
 		if (expirationTime != null) {
 			valueOperations.set(key, value, expirationTime, TimeUnit.SECONDS);
 		} else {
@@ -29,11 +34,11 @@ public class RedisUtils {
 	}
 
 	public void delete(String key) {
-		redisTemplate.delete(key);
+		smsRedisTemplate.delete(key);
 	}
 
 	public <T> T get(String key, Class<T> clazz) {
-		ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
+		ValueOperations<String, Object> valueOperations = smsRedisTemplate.opsForValue();
 
 		Object value = valueOperations.get(key);
 		if (value != null) {
@@ -48,14 +53,14 @@ public class RedisUtils {
 	}
 
 	public boolean isExists(String key) {
-		return redisTemplate.hasKey(key);
+		return smsRedisTemplate.hasKey(key);
 	}
 
 	public void setExpireTime(String key, long expirationTime) {
-		redisTemplate.expire(key, expirationTime, TimeUnit.SECONDS);
+		smsRedisTemplate.expire(key, expirationTime, TimeUnit.SECONDS);
 	}
 
 	public long getExpireTime(String key) {
-		return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+		return smsRedisTemplate.getExpire(key, TimeUnit.SECONDS);
 	}
 }

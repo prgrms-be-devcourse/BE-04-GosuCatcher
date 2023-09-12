@@ -26,8 +26,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenProvider {
 
-	private static final long ACCESS_TOKEN_EXPIRED_TIME = Duration.ofMinutes(5).toMillis();
-	private static final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofMinutes(60).toMillis();
+	private static final long ACCESS_TOKEN_EXPIRED_TIME = Duration.ofHours(24).toMillis();
+	private static final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(10).toMillis();
 
 	private final String accessTokenSecretKey;
 	private final String refreshTokenSecretKey;
