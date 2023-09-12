@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -68,6 +70,9 @@ public class MemberEstimate extends BaseEntity {
 	@Column(length = 500)
 	private String detailedDescription;
 
+	@Enumerated(EnumType.STRING)
+	private Status status = Status.PENDING;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
@@ -99,6 +104,10 @@ public class MemberEstimate extends BaseEntity {
 
 	public void updateExpert(Expert expert) {
 		this.expert = expert;
+	}
+
+	public void updateStatus() {
+		this.status = Status.PROCEEDING;
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {

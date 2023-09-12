@@ -90,6 +90,11 @@ public class MemberEstimateService {
 			.map(ExpertAutoEstimateResponse::id)
 			.forEach(expertEstimateId -> addExpertEstimateToMemberEstimate(memberEstimateId, expertEstimateId));
 
+		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_ESTIMATE));
+
+		memberEstimate.updateStatus();
+
 		return memberEstimateId;
 	}
 
