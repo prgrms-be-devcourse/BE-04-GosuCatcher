@@ -27,9 +27,17 @@ public class MemberEstimateController {
 	private final MemberEstimateService memberEstimateService;
 	private final MatchingService matchingService;
 
-	@PostMapping("/auto/{memberId}")
-	public ResponseEntity<MessagesResponse> createAutoEstimate(@PathVariable Long memberId,
+	@PostMapping("/normal/{memberId}")
+	public ResponseEntity<MemberEstimateResponse> createNormal(@PathVariable Long memberId,
 															   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+
+		return ResponseEntity.ok(memberEstimateResponse);
+	}
+
+	@PostMapping("/auto/{memberId}")
+	public ResponseEntity<MessagesResponse> createAuto(@PathVariable Long memberId,
+													   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
 		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
 		MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);

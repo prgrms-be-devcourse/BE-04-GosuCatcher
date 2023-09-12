@@ -55,6 +55,9 @@ public class ExpertEstimateService {
 		ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
 			request, memberEstimate, expert);
 
+		memberEstimate.updateStatus();
+		memberEstimate.updateExpert(expert);
+
 		expertEstimateRepository.save(expertNormalEstimate);
 
 		return ExpertNormalEstimateResponse.from(expertNormalEstimate);
