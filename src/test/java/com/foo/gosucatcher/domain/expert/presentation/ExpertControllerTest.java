@@ -423,4 +423,23 @@ class ExpertControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@DisplayName("고수찾기 실패: 잘못된 정렬기준")
+	void searchExpertsFailureNotFoundExpertSortTypeTest() throws Exception {
+		// given
+		given(expertService.findExperts(any(), any(), any()))
+			.willThrow(new InvalidValueException(ErrorCode.NOT_FOUND_EXPERT_SORT_TYPE));
+
+		// when -> then
+		mockMvc.perform(get("/api/v1/experts/search")
+				.param("subItem", "세부서비스")
+				.param("location", "위치1")
+				.param("sort", "money,desc"))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").isNotEmpty())
+			.andExpect(jsonPath("$.code").value("E004"))
+			.andExpect(jsonPath("$.errors").isEmpty())
+			.andExpect(jsonPath("$.message").value("존재하지 않는 고수 찾기 정렬 타입입니다."))
+			.andDo(print());
+	}
 }
