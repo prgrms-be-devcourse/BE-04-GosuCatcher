@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.estimate.presentation;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -10,10 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
-import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
-import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
-import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +23,15 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
@@ -237,7 +238,7 @@ class MemberEstimateControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-estimates/{memberEstimateId}", 1L)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.code").value("MRE001"))
+			.andExpect(jsonPath("$.code").value("ME001"))
 			.andExpect(jsonPath("$.errors").isArray())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 회원 요청 견적서입니다."));
 	}
@@ -268,7 +269,7 @@ class MemberEstimateControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/member-estimates/{id}", 1L)
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isNotFound())
-			.andExpect(jsonPath("$.code").value("MRE001"))
+			.andExpect(jsonPath("$.code").value("ME001"))
 			.andExpect(jsonPath("$.errors").isArray())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 회원 요청 견적서입니다."));
 	}

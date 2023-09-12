@@ -20,6 +20,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -39,52 +40,63 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEstimate extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "member_id")
+	private Member member;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sub_item_id")
-    private SubItem subItem;
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "sub_item_id")
+	private SubItem subItem;
 
-    @OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
+	@OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExpertEstimate> expertEstimateList = new ArrayList<>();
 
-    @Column(nullable = false)
-    private String location;
+	@OneToMany(mappedBy = "memberEstimate", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<ChattingRoom> chattingRoomList = new ArrayList<>();
 
-    @Column(nullable = false)
-    private LocalDateTime preferredStartDate;
+	@Column(nullable = false)
+	private String location;
 
-    @Column(length = 500)
-    private String detailedDescription;
+	@Column(nullable = false)
+	private LocalDateTime preferredStartDate;
 
-    private boolean isClosed = Boolean.FALSE;
+	@Column(length = 500)
+	private String detailedDescription;
 
-    @Builder
-    public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
-                          String detailedDescription) {
-        this.member = member;
-        this.subItem = subItem;
-        this.location = location;
-        this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
-        this.detailedDescription = detailedDescription;
-    }
+	private boolean isClosed = Boolean.FALSE;
 
-    public void addExpertEstimate(ExpertEstimate expertEstimate) {
-        expertEstimateList.add(expertEstimate);
-        expertEstimate.addMemberEstimate(this);
-    }
+	@Builder
+	public MemberEstimate(Member member, SubItem subItem, String location, LocalDateTime preferredStartDate,
+						  String detailedDescription) {
+		this.member = member;
+		this.subItem = subItem;
+		this.location = location;
+		this.preferredStartDate = validatePreferredStartDate(preferredStartDate);
+		this.detailedDescription = detailedDescription;
+	}
 
-    private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
-        if (LocalDateTime.now().isAfter(preferredStartDate)) {
-            throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
-        }
+	public void addExpertEstimate(ExpertEstimate expertEstimate) {
+		expertEstimateList.add(expertEstimate);
+		expertEstimate.addMemberEstimate(this);
+	}
 
-        return preferredStartDate;
-    }
+	public void addChattingRoom(ChattingRoom chattingRoom) {
+		chattingRoomList.add(chattingRoom);
+	}
+
+	public void removeChattingRoom(ChattingRoom chattingRoom) {
+		chattingRoomList.remove(chattingRoom);
+	}
+
+	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
+		if (LocalDateTime.now().isAfter(preferredStartDate)) {
+			throw new BusinessException(ErrorCode.INVALID_MEMBER_ESTIMATE_START_DATE);
+		}
+
+		return preferredStartDate;
+	}
 }

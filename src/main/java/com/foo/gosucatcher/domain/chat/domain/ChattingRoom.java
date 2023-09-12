@@ -1,6 +1,21 @@
 package com.foo.gosucatcher.domain.chat.domain;
 
-import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -9,8 +24,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 @Getter
 @Entity
@@ -28,10 +41,21 @@ public class ChattingRoom extends BaseEntity {
 	@JoinColumn(name = "member_estimate_id")
 	private MemberEstimate memberEstimate;
 
+	@OneToMany(mappedBy = "chattingRoom", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private List<Message> messageList = new ArrayList<>();
+
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
 	public ChattingRoom(MemberEstimate memberEstimate) {
 		this.memberEstimate = memberEstimate;
+	}
+
+	public void addMessage(Message message) {
+		messageList.add(message);
+	}
+
+	public void removeMessage(Message message) {
+		messageList.remove(message);
 	}
 }
