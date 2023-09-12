@@ -18,6 +18,7 @@ import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -93,7 +94,8 @@ public class MemberEstimateService {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_ESTIMATE));
 
-		memberEstimate.updateStatus();
+		Status nextStatus = Status.findNextStatus(memberEstimate.getStatus());
+		memberEstimate.updateStatus(nextStatus);
 
 		return memberEstimateId;
 	}

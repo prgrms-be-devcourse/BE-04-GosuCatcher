@@ -38,7 +38,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Where(clause = "is_closed = false")
-@SQLDelete(sql = "UPDATE member_estimates SET is_closed = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE member_estimates SET is_closed = true, status = 'FINISH' WHERE id = ?")
 @Table(name = "member_estimates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEstimate extends BaseEntity {
@@ -106,8 +106,8 @@ public class MemberEstimate extends BaseEntity {
 		this.expert = expert;
 	}
 
-	public void updateStatus() {
-		this.status = Status.PROCEEDING;
+	public void updateStatus(Status status) {
+		this.status = status;
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
