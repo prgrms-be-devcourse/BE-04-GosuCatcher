@@ -5,12 +5,14 @@ import static org.mockito.BDDMockito.doNothing;
 import static org.mockito.BDDMockito.doThrow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -28,8 +30,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.review.application.ReviewService;
+import com.foo.gosucatcher.domain.review.application.dto.request.ReplyRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateRequest;
+import com.foo.gosucatcher.domain.review.application.dto.response.ReplyResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -60,9 +64,10 @@ class ReviewControllerTest {
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 1L, "예시로 작성한 리뷰입니다", 5);
-			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, 1L, localDateTime,
-				localDateTime);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, false,
+				new HashMap<>(), localDateTime, localDateTime);
+
 			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
 				.willReturn(reviewResponse);
 
@@ -72,7 +77,7 @@ class ReviewControllerTest {
 					.contentType(MediaType.APPLICATION_JSON)
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value(0L))
 				.andExpect(jsonPath("$.expertId").value(expertId))
 				.andExpect(jsonPath("$.writerId").value(reviewCreateRequest.writerId()))
@@ -85,7 +90,7 @@ class ReviewControllerTest {
 		@Test
 		void createFailed_NotFoundExpert() throws Exception {
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 1L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
 
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT))
 				.when(reviewService).create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class));
@@ -106,7 +111,7 @@ class ReviewControllerTest {
 		@Test
 		void createFailed_NotFoundSubItem() throws Exception {
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, 1L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
 			long expertId = 0L;
 			long subItemId = 0L;
 
@@ -133,16 +138,16 @@ class ReviewControllerTest {
 		@Test
 		void findAllByExpertId() throws Exception {
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
 				List.of(
-					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, 1L, localDateTime,
+					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new HashMap<>(), localDateTime,
 						localDateTime),
-					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, 1L, localDateTime,
+					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new HashMap<>(), localDateTime,
 						localDateTime)),
 				true
 			);
@@ -202,16 +207,16 @@ class ReviewControllerTest {
 		@Test
 		void findAll() throws Exception {
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
 			ReviewsResponse reviewsResponse = new ReviewsResponse(
 				List.of(
-					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, 1L, localDateTime,
+					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false, new HashMap<>(), localDateTime,
 						localDateTime),
-					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, 1L, localDateTime,
+					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, false, new HashMap<>(), localDateTime,
 						localDateTime)),
 				true
 			);
@@ -251,8 +256,9 @@ class ReviewControllerTest {
 		void findById() throws Exception {
 			// given
 			LocalDateTime localDateTime = LocalDateTime.now();
-			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, 1L,
-				localDateTime, localDateTime);
+
+			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false,
+				new HashMap<>(), localDateTime, localDateTime);
 
 			long id = 1L;
 			given(reviewService.findById(any(Long.class)))
@@ -270,39 +276,6 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.content").value(reviewResponse.content()))
 				.andExpect(jsonPath("$.rating").value(reviewResponse.rating()));
 		}
-
-		@DisplayName("성공 - 상위 리뷰 아이디로 그에 대한 답글들을 조회할 수 있다")
-		@Test
-		void findByParentId() throws Exception {
-			// given
-			LocalDateTime localDateTime = LocalDateTime.now();
-			ReviewsResponse reviewsResponse = new ReviewsResponse(
-				List.of(
-					new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, 1L, localDateTime,
-						localDateTime),
-					new ReviewResponse(2L, 1L, 1L, 1L, "예시로 작성한 두번째 리뷰입니다", 3, 1L, localDateTime,
-						localDateTime)),
-				true
-			);
-
-			long id = 1L;
-			given(reviewService.findByParentId(any(Long.class), any(PageRequest.class)))
-				.willReturn(reviewsResponse);
-
-			// when
-			// then
-			mockMvc.perform(get("/api/v1/reviews/parents/{id}", id)
-					.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.reviews[0].id").value(reviewsResponse.reviews().get(0).id()))
-				.andExpect(jsonPath("$.reviews[0].expertId").value(reviewsResponse.reviews().get(0).expertId()))
-				.andExpect(jsonPath("$.reviews[0].writerId").value(reviewsResponse.reviews().get(0).writerId()))
-				.andExpect(jsonPath("$.reviews[0].subItemId").value(reviewsResponse.reviews().get(0).subItemId()))
-				.andExpect(jsonPath("$.reviews[0].content").value(reviewsResponse.reviews().get(0).content()))
-				.andExpect(jsonPath("$.reviews[0].rating").value(reviewsResponse.reviews().get(0).rating()))
-				.andExpect(jsonPath("$.reviews[0].parentId").value(reviewsResponse.reviews().get(0).parentId()));
-		}
-
 	}
 
 	@Nested
@@ -367,5 +340,98 @@ class ReviewControllerTest {
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 		}
+	}
+
+
+	@Nested
+	@DisplayName("<리뷰에 대한 답글>")
+	class ReplyTest {
+
+		@DisplayName("성공 - 리뷰에 대한 답글을 추가할 수 있다")
+		@Test
+		void create() throws Exception {
+			// given
+			long reviewId = 0L;
+
+			LocalDateTime localDateTime = LocalDateTime.now();
+			ReplyRequest replyRequest = new ReplyRequest(0L, "리뷰에 대한 답글입니다");
+			ReplyResponse replyResponse = new ReplyResponse(0L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
+
+			given(reviewService.createReply(any(Long.class), any(ReplyRequest.class)))
+				.willReturn(replyResponse);
+
+			// when
+			// then
+			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{reviewId}/replies", reviewId)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(replyRequest)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(0L))
+				.andExpect(jsonPath("$.reviewId").value(reviewId))
+				.andExpect(jsonPath("$.content").value(replyRequest.content()));
+		}
+
+		@DisplayName("성공 - 리뷰에 대한 답글을 수정할 수 있다")
+		@Test
+		void update() throws Exception {
+			// given
+			long reviewId = 0L;
+			long replyId = 0L;
+			LocalDateTime localDateTime = LocalDateTime.now();
+			ReplyRequest replyRequest = new ReplyRequest(0L, "리뷰에 대한 답글입니다");
+
+			given(reviewService.updateReply(any(Long.class), any(Long.class), any(ReplyRequest.class)))
+				.willReturn(replyId);
+
+			// when
+			// then
+			mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(replyRequest)))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").value(replyId));
+		}
+
+		@DisplayName("성공 - 리뷰에 대한 답글을 아이디로 조회할 수 있다")
+		@Test
+		void findById() throws Exception {
+			// given
+			long reviewId = 0L;
+			LocalDateTime localDateTime = LocalDateTime.now();
+			ReplyResponse replyResponse = new ReplyResponse(0L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
+
+			long replyId = 1L;
+			given(reviewService.findReplyById(any(Long.class), any(Long.class)))
+				.willReturn(replyResponse);
+
+			// when
+			// then
+			mockMvc.perform(get("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value(0L))
+				.andExpect(jsonPath("$.reviewId").value(reviewId))
+				.andExpect(jsonPath("$.content").value(replyResponse.content()));
+		}
+
+		@DisplayName("성공 - 리뷰에 대한 답글을 삭제할 수 있다")
+		@Test
+		void deleteReply() throws Exception {
+			// given
+			long reviewId = 1L;
+			long replyId = 4L;
+
+			doNothing()
+				.when(reviewService)
+				.deleteReply(reviewId, replyId);
+
+			// when
+			// then
+			mockMvc.perform(delete("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
+					.contentType(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNoContent());
+
+		}
+
 	}
 }
