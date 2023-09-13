@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.expert.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,11 +27,11 @@ public class ExpertItem extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "expert_id")
 	private Expert expert;
 
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
@@ -38,5 +39,9 @@ public class ExpertItem extends BaseEntity {
 	public ExpertItem(Expert expert, SubItem subItem) {
 		this.expert = expert;
 		this.subItem = subItem;
+	}
+
+	public void addExpert(Expert expert) {
+		this.expert = expert;
 	}
 }

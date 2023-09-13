@@ -86,7 +86,7 @@ public class ExpertEstimateService {
 	public ExpertEstimateResponse findById(Long id) {
 		ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_ESTIMATE));
-
+    
 		return ExpertEstimateResponse.from(expertEstimate);
 	}
 
