@@ -113,7 +113,7 @@ public class ExpertController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<ExpertsResponse> searchExperts(
+	public ResponseEntity<SlicedExpertsResponse> searchExperts(
 		@RequestParam(required = false) String subItem,
 		@RequestParam(required = false) String location,
 		@PageableDefault(sort = {"reviewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
