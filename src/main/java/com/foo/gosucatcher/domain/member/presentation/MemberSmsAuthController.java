@@ -36,7 +36,7 @@ public class MemberSmsAuthController {
 	@PostMapping("/validation")
 	public ResponseEntity<SmsAuthResponse> authenticateSms(Long memberId,
 		@RequestBody @Validated SmsAuthRequest smsAuthRequest) {
-		SmsAuthResponse smsAuthResponse = memberSmsService.authenticateSms(memberId, smsAuthRequest);
+		SmsAuthResponse smsAuthResponse = memberSmsService.authenticateSms(smsAuthRequest);
 
 		return ResponseEntity.ok(smsAuthResponse);
 	}

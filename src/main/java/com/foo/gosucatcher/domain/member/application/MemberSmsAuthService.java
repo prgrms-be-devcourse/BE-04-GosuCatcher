@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,82 +10,75 @@ import com.foo.gosucatcher.domain.member.application.dto.request.SmsAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.SmsSendRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.SmsAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.SmsSendResponse;
-import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.domain.member.exception.SmsAuthException;
 import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
-import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 import com.foo.gosucatcher.global.util.RandomNumberUtils;
 import com.foo.gosucatcher.global.util.SmsRedisTemplateUtils;
 
+import lombok.extern.slf4j.Slf4j;
 import net.nurigo.sdk.NurigoApp;
 import net.nurigo.sdk.message.exception.NurigoMessageNotReceivedException;
+import net.nurigo.sdk.message.model.FailedMessage;
 import net.nurigo.sdk.message.model.Message;
 import net.nurigo.sdk.message.service.DefaultMessageService;
 
+@Slf4j
 @Transactional
 @Service
 public class MemberSmsAuthService {
+	@Value("${auth.phone.fromNumber}")
+	private String FROM_NUMBER;
+	private static final String TEXT_MESSAGE = """
+		고수캐처(Gosu-Catcher)
+		인증번호: %s
+		""";
 
 	private final SmsRedisTemplateUtils smsRedisTemplateUtils;
 	private final DefaultMessageService messageService;
-	private final MemberRepository memberRepository;
-
-	@Value("${auth.phone.fromNumber}")
-	private String FROM_NUMBER;
 
 	public MemberSmsAuthService(SmsRedisTemplateUtils smsRedisTemplateUtils, MemberRepository memberRepository,
 		@Value("${secret.coolsms.apiKey}") String apiKey, @Value("${secret.coolsms.apiSecret}") String apiSecret,
 		@Value("${secret.coolsms.domain}") String domain) {
 		this.smsRedisTemplateUtils = smsRedisTemplateUtils;
-		this.memberRepository = memberRepository;
 		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, domain);
 	}
 
 	public SmsSendResponse sendSms(Long memberId, SmsSendRequest smsSendRequest) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-
 		String toNumber = smsSendRequest.phoneNumber();
 		String authNumber = RandomNumberUtils.createAuthenticationStringNumber();
 
 		Message message = new Message();
 		message.setFrom(FROM_NUMBER);
 		message.setTo(toNumber);
-		message.setText("""
-			고수캐처(Gosu-Catcher)
-			인증번호: %s
-			""".formatted(authNumber));
+		message.setText(TEXT_MESSAGE.formatted(authNumber));
 
 		try {
 			messageService.send(message);
 		} catch (NurigoMessageNotReceivedException exception) {
-			System.out.println(exception.getFailedMessageList());
-			System.out.println(exception.getMessage());
+			List<FailedMessage> failedMessageList = exception.getFailedMessageList();
+			failedMessageList.forEach(msg -> log.warn(msg.toString()));
+			log.warn(exception.getMessage());
 		} catch (Exception exception) {
-			System.out.println(exception.getMessage());
+			log.warn(exception.getMessage());
 		}
 
 		smsRedisTemplateUtils.put(toNumber, authNumber, 60 * 10L);
 
-		return SmsSendResponse.from(member, toNumber);
+		return SmsSendResponse.from(memberId, toNumber);
 	}
 
-	public SmsAuthResponse authenticateSms(Long memberId, SmsAuthRequest smsAuthRequest) {
-		memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-
+	public SmsAuthResponse authenticateSms(SmsAuthRequest smsAuthRequest) {
 		String phoneNumber = smsAuthRequest.phoneNumber();
 		String authNumber = smsRedisTemplateUtils.get(phoneNumber, String.class);
 
 		if (authNumber == null) {
-			throw new BusinessException(ErrorCode.EXPIRED_AUTH_NUMBER);
+			throw new SmsAuthException(ErrorCode.INVALID_AUTH);
 		}
 
 		String requestAuthNumber = smsAuthRequest.authNumber();
 		if (!authNumber.equals(requestAuthNumber)) {
-			throw new InvalidValueException(ErrorCode.INCORRECT_AUTH_NUMBER);
+			throw new SmsAuthException(ErrorCode.INCORRECT_AUTH_NUMBER);
 		}
 		smsRedisTemplateUtils.delete(phoneNumber);
 

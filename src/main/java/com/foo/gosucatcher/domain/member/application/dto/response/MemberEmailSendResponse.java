@@ -4,6 +4,9 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
+import com.foo.gosucatcher.domain.member.exception.EmailMessagingException;
+import com.foo.gosucatcher.global.error.ErrorCode;
+
 public record MemberEmailSendResponse(
 	String receiver,
 	Long expirationTime,
@@ -16,7 +19,7 @@ public record MemberEmailSendResponse(
 
 			return new MemberEmailSendResponse(to, expirationTime, true);
 		} catch (MessagingException e) {
-			throw new RuntimeException("임시 예외임");
+			throw new EmailMessagingException(ErrorCode.INVALID_EMAIL_FORMAT);
 		}
 	}
 }

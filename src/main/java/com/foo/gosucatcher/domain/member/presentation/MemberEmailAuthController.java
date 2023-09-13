@@ -1,6 +1,5 @@
 package com.foo.gosucatcher.domain.member.presentation;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +13,7 @@ import com.foo.gosucatcher.domain.member.application.MemberEmailAuthService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.InvalidValueException;
+import com.foo.gosucatcher.domain.member.domain.Email;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,28 +24,20 @@ public class MemberEmailAuthController {
 
 	private final MemberEmailAuthService memberEmailAuthService;
 
-	@GetMapping
-	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestParam String email) {
-		isValidEmail(email);
+	@PostMapping
+	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestBody @Validated Email email) {
 		memberEmailAuthService.checkDuplicatedEmail(email);
 		MemberEmailSendResponse authenticateResponse = memberEmailAuthService.sendAuthEmail(email);
 
 		return ResponseEntity.ok(authenticateResponse);
 	}
 
-	@PostMapping("/validation")
-	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(
+	@GetMapping("/validation")
+	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(@RequestParam String email,
 		@RequestBody @Validated MemberEmailAuthRequest memberEmailAuthRequest) {
-		MemberEmailAuthResponse memberEmailAuthResponse = memberEmailAuthService.authenticateMemberByEmail(
+		MemberEmailAuthResponse memberEmailAuthResponse = memberEmailAuthService.authenticateMemberByEmail(email,
 			memberEmailAuthRequest);
 
 		return ResponseEntity.ok(memberEmailAuthResponse);
-	}
-
-	private void isValidEmail(String email) {
-		EmailValidator emailValidator = new EmailValidator();
-		if (!emailValidator.isValid(email, null)) {
-			throw new InvalidValueException(ErrorCode.INVALID_EMAIL_FORMAT);
-		}
 	}
 }
