@@ -61,7 +61,7 @@ public enum ErrorCode {
 	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
 
 	//고수&서비스
-	NOT_FOUND_EXPERT_ITEM("EI001", "해당 고수는 요청한 서비스를 등록하지 않았습니다.");
+	NOT_FOUND_EXPERT_ITEM("EI001", "해당 고수는 요청한 서비스를 등록하지 않았습니다."),
 
 	//채팅방
 	NOT_FOUND_CHATTING_ROOM("CR001", "채팅방이 존재하지 않습니다."),
