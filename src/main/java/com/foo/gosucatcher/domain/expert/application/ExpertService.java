@@ -8,8 +8,9 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -153,5 +154,12 @@ public class ExpertService {
 		if (existingExpert.isPresent()) {
 			throw new BusinessException(DUPLICATED_EXPERT_STORENAME);
 		}
+	}
+
+	@Transactional(readOnly = true)
+	public ExpertsResponse findExperts(String subItem, String location, Pageable pageable) {
+		Slice<Expert> expertsSlice = expertRepository.findBySubItemAndLocation(subItem, location, pageable);
+
+		return ExpertsResponse.from(expertsSlice.getContent());
 	}
 }

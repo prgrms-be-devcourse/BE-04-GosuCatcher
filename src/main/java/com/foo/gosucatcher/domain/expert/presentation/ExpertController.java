@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -122,7 +125,7 @@ public class ExpertController {
       .contentType(MediaType.IMAGE_PNG)
       .body(file);
 	}
-	
+
 	@DeleteMapping("/{expertId}/images/{filename}")
 	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
 		@PathVariable String filename) {
@@ -136,5 +139,14 @@ public class ExpertController {
 		List<ImageResponse> fileInfos = imageService.loadAll(expertId);
     
 		return ResponseEntity.ok(fileInfos);
+	}
+
+	@GetMapping("/search")
+	public ResponseEntity<ExpertsResponse> searchExperts(
+		@RequestParam(required = false) String subItem,
+		@RequestParam(required = false) String location,
+		@PageableDefault(sort = {"reviewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
+
+		return ResponseEntity.ok(expertService.findExperts(subItem, location, pageable));
 	}
 }
