@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableRedisRepositories(redisTemplateRef = "emailRedisTemplate")
 @Configuration
-public class EmailAuthRedisConfigure {
+public class EmailAuthRedisConfig {
 
 	private final ObjectMapper objectMapper;
 	private final RedisProperties redisProperties;

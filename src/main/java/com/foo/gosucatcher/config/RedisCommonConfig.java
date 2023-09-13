@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Configuration
-public class RedisCommonConfigure {
+public class RedisCommonConfig {
 
 	@Bean
 	public ModelMapper modelMapper() {

@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableWebSecurity
 @Configuration
-public class SecurityConfigure {
+public class SecurityConfig {
 
 	private final JwtTokenProvider jwtTokenProvider;
 

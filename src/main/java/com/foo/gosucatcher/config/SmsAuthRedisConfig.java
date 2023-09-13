@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableRedisRepositories(redisTemplateRef = "smsRedisTemplate")
 @Configuration
-public class SmsAuthRedisConfigure {
+public class SmsAuthRedisConfig {
 
 	private final ObjectMapper objectMapper;
 	private final RedisProperties redisProperties;
