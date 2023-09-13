@@ -7,6 +7,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -21,6 +23,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
@@ -35,7 +38,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @Entity
 @Where(clause = "is_closed = false")
-@SQLDelete(sql = "UPDATE member_estimates SET is_closed = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE member_estimates SET is_closed = true, status = 'FINISHED' WHERE id = ?")
 @Table(name = "member_estimates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberEstimate extends BaseEntity {
@@ -67,6 +70,13 @@ public class MemberEstimate extends BaseEntity {
 	@Column(length = 500)
 	private String detailedDescription;
 
+	@Enumerated(EnumType.STRING)
+	private Status status = Status.PENDING;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "expert_id")
+	private Expert expert;
+
 	private boolean isClosed = Boolean.FALSE;
 
 	@Builder
@@ -90,6 +100,14 @@ public class MemberEstimate extends BaseEntity {
 
 	public void removeChattingRoom(ChattingRoom chattingRoom) {
 		chattingRoomList.remove(chattingRoom);
+	}
+
+	public void updateExpert(Expert expert) {
+		this.expert = expert;
+	}
+
+	public void updateStatus(Status status) {
+		this.status = status;
 	}
 
 	private LocalDateTime validatePreferredStartDate(LocalDateTime preferredStartDate) {
