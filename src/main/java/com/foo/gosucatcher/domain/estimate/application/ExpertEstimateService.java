@@ -23,6 +23,7 @@ import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
@@ -54,6 +55,10 @@ public class ExpertEstimateService {
 
 		ExpertEstimate expertNormalEstimate = ExpertNormalEstimateCreateRequest.toExpertEstimate(
 			request, memberEstimate, expert);
+
+		Status nextStatus = Status.findNextStatus(memberEstimate.getStatus());
+		memberEstimate.updateStatus(nextStatus);
+		memberEstimate.updateExpert(expert);
 
 		expertEstimateRepository.save(expertNormalEstimate);
 

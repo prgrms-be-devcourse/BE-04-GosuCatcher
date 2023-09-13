@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
@@ -18,6 +19,7 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEs
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,13 +29,16 @@ import lombok.RequiredArgsConstructor;
 public class ExpertEstimateController {
 
 	private final ExpertEstimateService expertEstimateService;
+	private final MatchingService matchingService;
 
 	@PostMapping("/normal/{expertId}")
-	public ResponseEntity<ExpertNormalEstimateResponse> createNormal(@PathVariable Long expertId, @RequestParam Long memberEstimateId,
-																	 @Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
+	public ResponseEntity<MessageResponse> createNormal(@PathVariable Long expertId, @RequestParam Long memberEstimateId,
+														@Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId, memberEstimateId, request);
 
-		return ResponseEntity.ok(expertNormalEstimateResponse);
+		MessageResponse messageResponse = matchingService.sendFirstMessage(memberEstimateId, expertNormalEstimateResponse);
+
+		return ResponseEntity.ok(messageResponse);
 	}
 
 	@PostMapping("/auto/{expertId}")

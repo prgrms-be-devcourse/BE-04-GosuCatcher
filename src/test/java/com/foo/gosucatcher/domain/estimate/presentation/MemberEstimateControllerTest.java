@@ -54,18 +54,76 @@ class MemberEstimateControllerTest {
 	@MockBean
 	private MatchingService matchingService;
 
-	@DisplayName("회원 바로 견적 등록 성공 테스트")
+	@DisplayName("회원 일반 견적 등록 성공 테스트")
 	@Test
-	void createAutoEstimate() throws Exception {
+	void createNormal() throws Exception {
 		//given
 		Long memberId = 1L;
 		Long subItemId = 1L;
+		Long expertId = 1L;
 
 		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+
+
+		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{memberId}", memberId)
+				.content(objectMapper.writeValueAsString(memberEstimateRequest))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"));
+	}
+
+	@DisplayName("회원 일반 견적 등록 실패 테스트")
+	@Test
+	void createNormalFailed() throws Exception {
+		//given
+		Long memberId = 1L;
+		Long expertId = 1L;
+
+		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(null,
+			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
+
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
+			expertId, null, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+
+		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{memberId}", memberId)
+				.content(objectMapper.writeValueAsString(memberEstimateRequest))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("C001"))
+			.andExpect(jsonPath("$.errors").isArray())
+			.andExpect(jsonPath("$.errors[0].field").value("subItemId"))
+			.andExpect(jsonPath("$.errors[0].value").value(""))
+			.andExpect(jsonPath("$.errors[0].reason").value("세부 서비스 id를 등록해주세요."))
+			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."));
+	}
+
+	@DisplayName("회원 바로 견적 등록 성공 테스트")
+	@Test
+	void createAuto() throws Exception {
+		//given
+		Long memberId = 1L;
+		Long subItemId = 1L;
+		Long expertId = 1L;
+
+		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId,
+			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
+
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
+			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
 		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description");
 
@@ -95,15 +153,17 @@ class MemberEstimateControllerTest {
 
 	@DisplayName("회원 바로 견적 등록 실패 테스트")
 	@Test
-	void createFailed() throws Exception {
+	void createAutoFailed() throws Exception {
 		//given
 		Long memberId = 1L;
 		Long subItemId = 1L;
+		Long expertId = 1L;
+
 		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId, " ",
 			LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			subItemId, " ", LocalDateTime.now().plusDays(3), "추가 내용");
+			expertId, subItemId, " ", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		when(memberEstimateService.create(memberId, memberEstimateRequest)).thenReturn(
 			memberEstimateResponse);
@@ -208,9 +268,10 @@ class MemberEstimateControllerTest {
 
 		Long memberId = 1L;
 		Long subItemId = 1L;
+		Long expertId = 1L;
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
+			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		when(memberEstimateService.findById(memberEstimateId)).thenReturn(memberEstimateResponse);
 

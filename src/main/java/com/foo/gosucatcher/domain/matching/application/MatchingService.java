@@ -8,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.MessageService;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 
 @RequiredArgsConstructor
@@ -30,6 +32,12 @@ public class MatchingService {
 		Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
 		return sendFirstMessage(memberEstimateId, expertAutoEstimatesResponse);
+	}
+
+	public MessageResponse sendFirstMessage(Long memberEstimateId, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
+		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
+
+		return messageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse().get(0), expertNormalEstimateResponse);
 	}
 
 	private MessagesResponse sendFirstMessage(Long memberEstimateId, ExpertAutoEstimatesResponse expertAutoEstimatesResponse) {
