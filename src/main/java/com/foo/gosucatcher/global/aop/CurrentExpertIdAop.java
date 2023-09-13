@@ -29,7 +29,7 @@ public class CurrentExpertIdAop {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Around("@annotation(currentExpertId)")
-	public Object getCurrentMemberId(ProceedingJoinPoint proceedingJoinPoint, CurrentExpertId currentExpertId) throws
+	public Object getCurrentExpertId(ProceedingJoinPoint proceedingJoinPoint, CurrentExpertId currentExpertId) throws
 		Throwable {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
@@ -40,12 +40,12 @@ public class CurrentExpertIdAop {
 		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByExpertId(token);
 		Long expertId = Long.parseLong(authentication.getPrincipal().toString());
 
-		Object[] modifiedArgs = modifyArgsWithMemberId(expertId, proceedingJoinPoint);
+		Object[] modifiedArgs = modifyArgsWithExpertId(expertId, proceedingJoinPoint);
 
 		return proceedingJoinPoint.proceed(modifiedArgs);
 	}
 
-	private Object[] modifyArgsWithMemberId(Long expertId, ProceedingJoinPoint proceedingJoinPoint) {
+	private Object[] modifyArgsWithExpertId(Long expertId, ProceedingJoinPoint proceedingJoinPoint) {
 		Object[] parameters = proceedingJoinPoint.getArgs();
 
 		MethodSignature signature = (MethodSignature)proceedingJoinPoint.getSignature();
