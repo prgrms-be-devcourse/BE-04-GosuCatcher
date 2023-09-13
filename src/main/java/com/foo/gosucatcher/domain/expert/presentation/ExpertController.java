@@ -28,6 +28,8 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRe
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsResponse;
+import com.foo.gosucatcher.domain.expert.domain.SortType;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
@@ -142,10 +144,11 @@ public class ExpertController {
 	}
 
 	@GetMapping("/search")
-	public ResponseEntity<ExpertsResponse> searchExperts(
+	public ResponseEntity<SlicedExpertsResponse> searchExperts(
 		@RequestParam(required = false) String subItem,
 		@RequestParam(required = false) String location,
 		@PageableDefault(sort = {"reviewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
+		SortType.validateSortColumns(pageable.getSort());
 
 		return ResponseEntity.ok(expertService.findExperts(subItem, location, pageable));
 	}

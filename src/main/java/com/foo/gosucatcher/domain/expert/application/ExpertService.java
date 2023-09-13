@@ -162,4 +162,11 @@ public class ExpertService {
 
 		return ExpertsResponse.from(expertsSlice.getContent());
 	}
+
+	@Transactional(readOnly = true)
+	public SlicedExpertsResponse findExperts(String subItem, String location, Pageable pageable) {
+		Slice<Expert> expertsSlice = expertRepository.findBySubItemAndLocation(subItem, location, pageable);
+
+		return SlicedExpertsResponse.from(expertsSlice);
+	}
 }

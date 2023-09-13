@@ -26,6 +26,7 @@ public enum ErrorCode {
 	DUPLICATED_EXPERT_STORENAME("E002", "상점명이 중복될 수 없습니다."),
 	INVALID_MAX_TRAVEL_DISTANCE("E003", "최대 이동거리는 0 이상이어야 합니다."),
 	ALREADY_REGISTERED_BY_SUB_ITEM("E004", "해당 서비스로는 이미 등록되어있습니다."),
+	NOT_FOUND_EXPERT_SORT_TYPE("E005", "존재하지 않는 고수 찾기 정렬 타입입니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
