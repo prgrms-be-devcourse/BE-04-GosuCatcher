@@ -2,15 +2,14 @@ package com.foo.gosucatcher.domain.member.application;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foo.gosucatcher.config.SmsAuthProperties;
 import com.foo.gosucatcher.domain.member.application.dto.request.SmsAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.SmsSendRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.SmsAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.SmsSendResponse;
-import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.member.exception.SmsAuthException;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.util.RandomNumberUtils;
@@ -27,8 +26,7 @@ import net.nurigo.sdk.message.service.DefaultMessageService;
 @Transactional
 @Service
 public class MemberSmsAuthService {
-	@Value("${auth.phone.fromNumber}")
-	private String FROM_NUMBER;
+
 	private static final String TEXT_MESSAGE = """
 		고수캐처(Gosu-Catcher)
 		인증번호: %s
@@ -37,11 +35,15 @@ public class MemberSmsAuthService {
 	private final SmsRedisTemplateUtils smsRedisTemplateUtils;
 	private final DefaultMessageService messageService;
 
-	public MemberSmsAuthService(SmsRedisTemplateUtils smsRedisTemplateUtils, MemberRepository memberRepository,
-		@Value("${secret.coolsms.apiKey}") String apiKey, @Value("${secret.coolsms.apiSecret}") String apiSecret,
-		@Value("${secret.coolsms.domain}") String domain) {
+	private final String FROM_NUMBER;
+	private final Long EXPIRATION_TIME;
+
+	public MemberSmsAuthService(SmsRedisTemplateUtils smsRedisTemplateUtils, SmsAuthProperties smsAuthProperties) {
 		this.smsRedisTemplateUtils = smsRedisTemplateUtils;
-		this.messageService = NurigoApp.INSTANCE.initialize(apiKey, apiSecret, domain);
+		this.messageService = NurigoApp.INSTANCE.initialize(smsAuthProperties.getApiKey(),
+			smsAuthProperties.getApiKey(), smsAuthProperties.getDomain());
+		this.FROM_NUMBER = smsAuthProperties.getFromNumber();
+		this.EXPIRATION_TIME = smsAuthProperties.getExpirationTime();
 	}
 
 	public SmsSendResponse sendSms(Long memberId, SmsSendRequest smsSendRequest) {
@@ -63,7 +65,7 @@ public class MemberSmsAuthService {
 			log.warn(exception.getMessage());
 		}
 
-		smsRedisTemplateUtils.put(toNumber, authNumber, 60 * 10L);
+		smsRedisTemplateUtils.put(toNumber, authNumber, EXPIRATION_TIME);
 
 		return SmsSendResponse.from(memberId, toNumber);
 	}

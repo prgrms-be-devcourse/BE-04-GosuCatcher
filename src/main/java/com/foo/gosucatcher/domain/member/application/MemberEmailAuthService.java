@@ -3,11 +3,11 @@ package com.foo.gosucatcher.domain.member.application;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foo.gosucatcher.config.EmailAuthProperties;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
@@ -18,16 +18,9 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.util.EmailRedisTemplateUtils;
 import com.foo.gosucatcher.global.util.RandomNumberUtils;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
 @Transactional
 @Service
 public class MemberEmailAuthService {
-
-	private final EmailRedisTemplateUtils emailRedisTemplateUtils;
-	private final JavaMailSender javaMailSender;
-	private final MemberRepository memberRepository;
 
 	private static final String AUTH_EMAIL_SUBJECT = "고수캐쳐(GoSu-Catcher) 이메일 인증";
 	private static final String AUTH_EMAIL_BODY = """
@@ -41,10 +34,22 @@ public class MemberEmailAuthService {
 		<h1>%s</h1>
 		<h3>로그인 후 꼭 비밀번호를 변경해주세요! 감사합니다.</h3>
 		""";
-	@Value("${auth.email.senderEmail}")
-	private String SENDER_EMAIL;
-	@Value("${auth.time.expiration}")
-	private Long EXPIRATION_TIME;
+
+	private final EmailRedisTemplateUtils emailRedisTemplateUtils;
+	private final JavaMailSender javaMailSender;
+	private final MemberRepository memberRepository;
+
+	private final String SENDER_EMAIL;
+	private final Long EXPIRATION_TIME;
+
+	public MemberEmailAuthService(EmailRedisTemplateUtils emailRedisTemplateUtils, JavaMailSender javaMailSender,
+		MemberRepository memberRepository, EmailAuthProperties emailAuthProperties) {
+		this.emailRedisTemplateUtils = emailRedisTemplateUtils;
+		this.javaMailSender = javaMailSender;
+		this.memberRepository = memberRepository;
+		this.SENDER_EMAIL = emailAuthProperties.getSenderEmail();
+		this.EXPIRATION_TIME = emailAuthProperties.getExpirationTime();
+	}
 
 	@Transactional(readOnly = true)
 	public void checkDuplicatedEmail(Email email) {
