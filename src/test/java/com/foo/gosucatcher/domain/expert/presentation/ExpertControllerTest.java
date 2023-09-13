@@ -31,6 +31,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,6 +42,7 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateReq
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
@@ -89,7 +91,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 등록 성공")
 	void createExpertSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1");
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0);
 		given(expertService.create(any(ExpertCreateRequest.class), eq(1L))).willReturn(expertResponse);
 
 		// when -> then
@@ -152,7 +154,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 ID로 조회 성공")
 	void getExpertByIdSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1");
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0);
 		given(expertService.findById(1L)).willReturn(expertResponse);
 
 		// when -> then
@@ -206,7 +208,7 @@ class ExpertControllerTest {
 	void updateExpertSuccessTest() throws Exception {
 		// given
 		ExpertUpdateRequest updateRequest = new ExpertUpdateRequest("새로운 업체명", "새로운 위치", 150, "새로운 부가설명");
-		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명");
+		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명", 0.0, 0);
 
 		given(expertService.update(1L, updateRequest)).willReturn(1L);
 
@@ -420,6 +422,28 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.code").value("E001"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수찾기 성공")
+	void searchExpertsSuccessTest() throws Exception {
+		// given
+		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
+		SlicedExpertsResponse slicedExpertsResponse = SlicedExpertsResponse.from(new SliceImpl<>(expertList));
+		given(expertService.findExperts(any(), any(), any())).willReturn(slicedExpertsResponse);
+
+		// when -> then
+		mockMvc.perform(get("/api/v1/experts/search")
+				.param("subItem", "세부서비스")
+				.param("location", "위치1")
+				.param("sort", "reviewCount,desc"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.expertsResponse[0].storeName").value("업체명1"))
+			.andExpect(jsonPath("$.expertsResponse[0].location").value("위치1"))
+			.andExpect(jsonPath("$.expertsResponse[0].maxTravelDistance").value(100))
+			.andExpect(jsonPath("$.expertsResponse[0].description").value("부가설명1"))
+			.andExpect(jsonPath("$.hasNext").isBoolean())
 			.andDo(print());
 	}
 
