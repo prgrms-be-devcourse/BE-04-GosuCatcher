@@ -1,11 +1,16 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,10 +23,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -40,6 +50,9 @@ class MemberEstimateServiceTest {
 
 	@Mock
 	private SubItemRepository subItemRepository;
+
+	@Mock
+	private ExpertEstimateRepository expertEstimateRepository;
 
 	@InjectMocks
 	private MemberEstimateService memberEstimateService;
@@ -153,5 +166,61 @@ class MemberEstimateServiceTest {
 		assertThat(memberEstimateResponse.location()).isEqualTo(memberEstimate.getLocation());
 		assertThat(memberEstimateResponse.preferredStartDate()).isEqualTo(memberEstimate.getPreferredStartDate());
 		assertThat(memberEstimateResponse.detailedDescription()).isEqualTo(memberEstimate.getDetailedDescription());
+	}
+
+	@DisplayName("회원 요청 견적서 삭제 테스트")
+	@Test
+	void delete() {
+		//given
+		when(memberEstimateRepository.findById(null)).thenReturn(Optional.of(memberEstimate));
+
+		//when
+		assertDoesNotThrow(() -> memberEstimateService.delete(memberEstimate.getId()));
+
+		//then
+		verify(memberEstimateRepository, times(1)).delete(memberEstimate);
+	}
+
+	@DisplayName("회원이 요청한 바로 견적서에 매칭된 고수 응답 견적서를 요청 바로 견적서 정보에 업데이트하는 테스트")
+	@Test
+	void updateExpertEstimates() {
+		//given
+		Long memberEstimateId = 1L;
+
+		Expert expert = Expert.builder()
+			.member(member)
+			.storeName("업체명")
+			.location("강남구")
+			.maxTravelDistance(5)
+			.description("설명")
+			.build();
+
+		ExpertResponse expertResponse = ExpertResponse.from(expert);
+
+		List<ExpertAutoEstimateResponse> expertAutoEstimateResponses = new ArrayList<>();
+
+		ExpertAutoEstimateResponse response1 = new ExpertAutoEstimateResponse(1L, expertResponse, 1L, 10000, "강남구", "설명1");
+		ExpertAutoEstimateResponse response2 = new ExpertAutoEstimateResponse(2L, expertResponse, 1L, 20000, "강남구", "설명2");
+		expertAutoEstimateResponses.add(response1);
+		expertAutoEstimateResponses.add(response2);
+
+		when(memberEstimateRepository.findById(memberEstimateId)).thenReturn(Optional.of(memberEstimate));
+
+		ExpertEstimate expertEstimate = ExpertEstimate.builder()
+			.expert(expert)
+			.memberEstimate(memberEstimate)
+			.subItem(subItem)
+			.totalCost(10000)
+			.activityLocation("강남구")
+			.description("견적서입니다.")
+			.build();
+
+		when(expertEstimateRepository.findById(anyLong())).thenReturn(Optional.of(expertEstimate));
+
+		//when
+		Long updatedMemberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateId, expertAutoEstimateResponses);
+
+		//then
+		assertThat(memberEstimateId).isEqualTo(updatedMemberEstimateId);
 	}
 }

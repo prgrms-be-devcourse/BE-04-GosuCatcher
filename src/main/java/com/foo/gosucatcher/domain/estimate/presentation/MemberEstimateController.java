@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
 import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
+import com.foo.gosucatcher.domain.matching.application.MatchingService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,13 +25,24 @@ import lombok.RequiredArgsConstructor;
 public class MemberEstimateController {
 
 	private final MemberEstimateService memberEstimateService;
+	private final MatchingService matchingService;
 
-	@PostMapping("/{memberId}")
-	public ResponseEntity<MemberEstimateResponse> create(@PathVariable Long memberId,
-		@Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+	@PostMapping("/normal/{memberId}")
+	public ResponseEntity<MemberEstimateResponse> createNormal(@PathVariable Long memberId,
+															   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
 		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
 
 		return ResponseEntity.ok(memberEstimateResponse);
+	}
+
+	@PostMapping("/auto/{memberId}")
+	public ResponseEntity<MessagesResponse> createAuto(@PathVariable Long memberId,
+													   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+
+		MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);
+
+		return ResponseEntity.ok(messagesResponse);
 	}
 
 	@GetMapping

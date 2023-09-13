@@ -38,16 +38,20 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
+import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
 import com.foo.gosucatcher.domain.image.infrastructure.FileSystemExpertImageService;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
@@ -263,7 +267,7 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
 			.andDo(print());
 	}
-
+      
 	@Test
 	@DisplayName("이미지 업로드 성공")
 	void uploadImageSuccessTest() throws Exception {
@@ -422,6 +426,45 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
 			.andDo(print());
 	}
+  
+  @Test
+	@DisplayName("고수 서브 아이템 추가 성공")
+	void addSubItemSuccessTest() throws Exception {
+		//given
+		ExpertSubItemRequest request = new ExpertSubItemRequest("세부 서비스 이름");
+		Long expertId = 1L;
+
+		given(expertService.addSubItem(eq(expertId), any(ExpertSubItemRequest.class)))
+			.willReturn(expertId);
+
+		//when -> then
+		mockMvc.perform(post("/api/v1/experts/{id}/sub-items", expertId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").value(expertId))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수 서브 아이템 추가 실패 - 존재하지 않는 고수 or 서비스")
+	void addSubItemFailTest() throws Exception {
+		//given
+		ExpertSubItemRequest request = new ExpertSubItemRequest("잘못된 세부 서비스 이름");
+		Long expertId = 1L;
+
+		given(expertService.addSubItem(eq(expertId), any(ExpertSubItemRequest.class)))
+			.willThrow(new BusinessException(ErrorCode.ALREADY_REGISTERED_BY_SUB_ITEM));
+
+		//when -> then
+		mockMvc.perform(post("/api/v1/experts/{id}/sub-items", expertId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("E004"))
+			.andExpect(jsonPath("$.message").value("해당 서비스로는 이미 등록되어있습니다."))
+			.andDo(print());
+	}
 
 	@Test
 	@DisplayName("고수찾기 성공")
@@ -441,6 +484,62 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.expertsResponse[0].location").value("위치1"))
 			.andExpect(jsonPath("$.expertsResponse[0].maxTravelDistance").value(100))
 			.andExpect(jsonPath("$.expertsResponse[0].description").value("부가설명1"))
+      .andDo(print());
+
+  @Test
+	@DisplayName("고수 서브 아이템 삭제 성공")
+	void removeSubItemSuccessTest() throws Exception {
+		//given
+		ExpertSubItemRequest request = new ExpertSubItemRequest("세부 서비스 이름");
+		Long expertId = 1L;
+
+		doNothing().when(expertService).removeSubItem(eq(expertId), any(ExpertSubItemRequest.class));
+
+		//when
+		mockMvc.perform(delete("/api/v1/experts/{id}/sub-items", expertId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isNoContent())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("고수 서브 아이템 삭제 실패 - 등록하지 않은 서비스")
+	void removeSubItemFailTest() throws Exception {
+		//given
+		ExpertSubItemRequest request = new ExpertSubItemRequest("등록하지 않은 세부 서비스 이름");
+		Long expertId = 1L;
+
+		doThrow(new BusinessException(ErrorCode.NOT_FOUND_EXPERT_ITEM))
+			.when(expertService).removeSubItem(anyLong(), any(ExpertSubItemRequest.class));
+
+		//when
+		mockMvc.perform(delete("/api/v1/experts/{id}/sub-items", expertId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value("EI001"))
+			.andExpect(jsonPath("$.message").value("해당 고수는 요청한 서비스를 등록하지 않았습니다."))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("해당 고수가 가진 세부 서비스 조회")
+	void getSubItemsByExpertIdSuccessTest() throws Exception {
+
+		//given
+		Long id = 1L;
+		SubItemsResponse subItemsResponse = new SubItemsResponse(
+			List.of(new SubItemResponse(1L, "알바", "청소 알바", "청소 알바 설명")));
+
+		given(expertService.getSubItemsByExpertId(id))
+			.willReturn(subItemsResponse);
+
+		//when -> then
+		mockMvc.perform(get("/api/v1/experts/{id}/sub-items", id))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.subItemsResponse.[0].id").value(1))
+			.andExpect(jsonPath("$.subItemsResponse.[0].name").value("청소 알바"))
 			.andDo(print());
 	}
 }

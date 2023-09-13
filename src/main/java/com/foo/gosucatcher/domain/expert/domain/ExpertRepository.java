@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface ExpertRepository extends JpaRepository<Expert, Long> {
 
@@ -22,4 +23,7 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
 		" WHERE (si.name = :subItem OR :subItem IS NULL)" +
 		" AND (e.location = :location OR :location IS NULL)")
 	Slice<Expert> findBySubItemAndLocation(String subItem, String location, Pageable pageable);
+  
+  @Query("SELECT e FROM Expert e JOIN FETCH e.expertItemList ei JOIN FETCH ei.subItem WHERE e.id = :id")
+	Optional<Expert> findExpertWithSubItemsById(@Param("id") Long id);
 }

@@ -24,9 +24,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
+import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
@@ -43,8 +45,7 @@ public class ExpertController {
 	private final ImageService imageService;
 
 	@PostMapping
-	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request,
-		@RequestParam Long memberId) {
+	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request, @RequestParam Long memberId) {
 		ExpertResponse expertResponse = expertService.create(request, memberId);
 
 		return ResponseEntity.ok(expertResponse);
@@ -79,6 +80,28 @@ public class ExpertController {
 		return ResponseEntity.ok(null);
 	}
 
+  @PostMapping("/{id}/sub-items")
+	public ResponseEntity<Long> addSubItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
+		Long expertId = expertService.addSubItem(id, request);
+
+		return ResponseEntity.ok(expertId);
+	}
+
+	@DeleteMapping("/{id}/sub-items")
+	public ResponseEntity<Object> removeItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
+		expertService.removeSubItem(id, request);
+
+		return ResponseEntity.noContent()
+			.build();
+	}
+
+	@GetMapping("/{id}/sub-items")
+	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(@PathVariable Long id) {
+		SubItemsResponse response = expertService.getSubItemsByExpertId(id);
+
+		return ResponseEntity.ok(response);
+	}
+  
 	@PostMapping("/{expertId}/images")
 	public ResponseEntity<ImageUploadResponse> uploadImage(@PathVariable Long expertId, MultipartFile file) throws
 		IllegalStateException,
@@ -87,6 +110,7 @@ public class ExpertController {
 		String uploadedFilename = imageService.store(request);
 
 		ImageUploadResponse response = new ImageUploadResponse(expertId, uploadedFilename);
+      
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(response);
 	}
@@ -96,19 +120,24 @@ public class ExpertController {
 		@PathVariable String filename) {
 
 		Resource file = imageService.loadAsResource(expertId, filename);
-		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(file);
+    
+		return ResponseEntity.ok()
+      .contentType(MediaType.IMAGE_PNG)
+      .body(file);
 	}
 
 	@DeleteMapping("/{expertId}/images/{filename}")
 	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
 		@PathVariable String filename) {
 		imageService.delete(expertId, filename);
+    
 		return ResponseEntity.ok(null);
 	}
 
 	@GetMapping("{expertId}/images")
 	public ResponseEntity<List<ImageResponse>> getAllImages(@PathVariable Long expertId) {
 		List<ImageResponse> fileInfos = imageService.loadAll(expertId);
+    
 		return ResponseEntity.ok(fileInfos);
 	}
 
