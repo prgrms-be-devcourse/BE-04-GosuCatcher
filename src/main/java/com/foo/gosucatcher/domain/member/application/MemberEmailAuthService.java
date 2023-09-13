@@ -36,10 +36,9 @@ public class MemberEmailAuthService {
 
 	@Transactional(readOnly = true)
 	public void checkDuplicatedEmail(String email) {
-		memberRepository.findByEmail(email)
-			.ifPresent((member) -> {
-				throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER);
-			});
+		if (memberRepository.existsByEmail(email)) {
+			throw new InvalidValueException(ErrorCode.DUPLICATED_MEMBER);
+		}
 	}
 
 	public MemberEmailSendResponse sendAuthEmail(String email) {
