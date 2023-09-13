@@ -106,10 +106,6 @@ public class Expert extends BaseEntity {
 		this.rating = adjustRating(updated);
 	}
 
-	public boolean isSamePerson(long memberId) {
-		return this.member.getId() == memberId;
-	}
-
 	private double adjustRating(double rating) {
 		return Math.round(rating * 10) / 10.0;
 	}
