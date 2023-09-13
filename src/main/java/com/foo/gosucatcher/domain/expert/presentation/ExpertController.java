@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +27,12 @@ import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateReq
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
+import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.SortType;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -98,7 +100,7 @@ public class ExpertController {
 		Resource file = imageService.loadAsResource(expertId, filename);
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(file);
 	}
-	
+
 	@DeleteMapping("/{expertId}/images/{filename}")
 	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
 		@PathVariable String filename) {
@@ -118,12 +120,9 @@ public class ExpertController {
 		@RequestParam(required = false) String location,
 		@PageableDefault(sort = {"reviewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
 
-		for (Sort.Order order : pageable.getSort()) {
-			if (!SortType.isValidColumnName(order.getProperty())) {
-				throw new InvalidValueException(ErrorCode.NOT_FOUND_EXPERT_SORT_TYPE);
-			}
-		}
+		SortType.validateSortColumns(pageable.getSort());
 
 		return ResponseEntity.ok(expertService.findExperts(subItem, location, pageable));
+
 	}
 }
