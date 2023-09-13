@@ -3,7 +3,6 @@ package com.foo.gosucatcher.domain.review.application;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_REVIEW;
 import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_MULTIPLE_REPLIES;
-import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_REPLIER;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +29,6 @@ import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 import com.foo.gosucatcher.global.error.exception.InvalidReplyCountException;
-import com.foo.gosucatcher.global.error.exception.UnsupportedReplierException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,16 +43,18 @@ public class ReviewService {
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
 
-	public ReviewResponse create(Long expertId, Long subItemId, ReviewCreateRequest reviewCreateRequest) {
+	public ReviewResponse create(Long expertId, Long subItemId, Long writerId,
+		ReviewCreateRequest reviewCreateRequest) {
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
-		Member writer = memberRepository.findById(reviewCreateRequest.writerId())
+		Member writer = memberRepository.findById(writerId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(subItemId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
+		expert.addRating(reviewCreateRequest.rating());
+
 		Review review = ReviewCreateRequest.toReview(reviewCreateRequest, expert, writer, subItem);
-		updateExpert(expert, reviewCreateRequest.rating(), false);
 		reviewRepository.save(review);
 
 		return ReviewResponse.from(review);
@@ -68,17 +68,11 @@ public class ReviewService {
 	}
 
 	@Transactional(readOnly = true)
-	public ReviewsResponse findAllByExpertIdAndSubItem(Pageable pageable, Long expertId, Long subItemId) {
+	public ReviewsResponse findAllByExpertIdAndSubItem(Long expertId, Long subItemId, Pageable pageable) {
 		Slice<Review> reviews;
-
-		if (subItemId == null) {
-			reviews = reviewRepository.findAllByExpertIdOrderByCreatedAt(expertId, pageable);
-		} else {
-			reviews = reviewRepository.findAllByExpertIdAndSubItemIdOrderByCreatedAt(expertId, subItemId, pageable);
-		}
+		reviews = reviewRepository.findAllByExpertIdAndSubItemIdOrderByCreatedAt(expertId, subItemId, pageable);
 
 		return ReviewsResponse.from(reviews);
-
 	}
 
 	@Transactional(readOnly = true)
@@ -89,30 +83,22 @@ public class ReviewService {
 		return ReviewResponse.from(review);
 	}
 
-	public Long update(Long id, ReviewUpdateRequest reviewUpdateRequest) {
+	public Long update(Long id, Long updaterId, ReviewUpdateRequest reviewUpdateRequest) {
 		Review review = reviewRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
 		Review updatedReview = ReviewUpdateRequest.toReview(reviewUpdateRequest);
-
-		review.update(updatedReview);
-		updateExpert(review.getExpert(), reviewUpdateRequest.rating(), false);
+		review.update(updatedReview, updaterId);
 
 		return id;
 	}
 
-	public void delete(Long id) {
+	public void delete(Long id, Long updaterId) {
 		Review review = reviewRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
+		review.delete(updaterId);
 		reviewRepository.deleteById(id);
-
-		updateExpert(review.getExpert(), review.getRating(), true);
-
-		if (review.replyExists()) {
-			long replyId = review.getReply().getId();
-			deleteReply(id, replyId);
-		}
 	}
 
 	@Transactional(readOnly = true)
@@ -123,91 +109,39 @@ public class ReviewService {
 		return reviewRepository.countByExpertId(expert.getId());
 	}
 
-	public ReplyResponse createReply(Long reviewId, ReplyRequest replyRequest) {
+	public ReplyResponse createReply(long reviewId, long writerId, ReplyRequest replyRequest) {
 		Review review = reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
+
+		Reply reply = ReplyRequest.toReply(replyRequest, review);
+		reply.validateWriter(writerId, review);
 
 		if (review.replyExists()) {
 			throw new InvalidReplyCountException(UNSUPPORTED_MULTIPLE_REPLIES);
 		}
 
-		validateReplyWriter(review, replyRequest);
-
-		Reply reply = ReplyRequest.toReply(replyRequest);
 		replyRepository.save(reply);
-		review.updateReply(reply);
 
 		return ReplyResponse.of(review.getId(), reply);
 	}
 
-	public long updateReply(Long reviewId, long replyId, ReplyRequest replyRequest) {
-		Review review = reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
-
-		validateReplyWriter(review, replyRequest);
-
+	public long updateReply(long replyId, ReplyRequest replyRequest, Long updaterId) {
 		Reply reply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
 		Reply updatedReply = ReplyRequest.toReply(replyRequest);
-		reply.update(updatedReply);
+
+		reply.update(updatedReply, updaterId);
 
 		return replyId;
 	}
 
-	public ReplyResponse findReplyById(Long reviewId, Long replyId) {
-		Reply reply = replyRepository.findById(replyId)
+	public void deleteReply(Long id, Long updaterId) {
+		Reply reply = replyRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
-		return ReplyResponse.of(reviewId, reply);
+		reply.validateWriter(updaterId);
+
+		replyRepository.deleteById(id);
 	}
-
-	public void deleteReply(Long reviewId, Long replyId) {
-		reviewRepository.findById(reviewId)
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
-
-		replyRepository.findById(replyId)
-			.ifPresentOrElse(
-				reply -> replyRepository.deleteById(replyId),
-				() -> {
-					throw new EntityNotFoundException(NOT_FOUND_REVIEW);
-				}
-			);
-	}
-
-	private void validateReplyWriter(Review review, ReplyRequest replyRequest) {
-		long expertId = review.getExpert().getId();
-		long writerId = replyRequest.writerId();
-
-		if (expertId != writerId) {
-			throw new UnsupportedReplierException(UNSUPPORTED_REPLIER);
-		}
-	}
-
-	private void updateExpert(Expert expert, double rating, boolean isDeletion) {
-		int currentReviewCount = expert.getReviewCount();
-		double currentRating = expert.getRating();
-
-		if (isDeletion) {
-			currentRating *= -1;
-			currentReviewCount *= -1;
-		}
-
-		double updatedRating = Math.max(0,
-			((currentRating * currentReviewCount) + rating) / (currentReviewCount + 1));
-		String adjustedRating = String.format("%.1f", updatedRating);
-
-		Expert updatedExpert = Expert.builder()
-			.member(expert.getMember())
-			.storeName(expert.getStoreName())
-			.location(expert.getLocation())
-			.maxTravelDistance(expert.getMaxTravelDistance())
-			.description(expert.getDescription())
-			.rating(Double.parseDouble(adjustedRating))
-			.reviewCount(Math.max(0, currentReviewCount + 1))
-			.build();
-
-		expert.update(updatedExpert);
-	}
-
 }

@@ -30,7 +30,7 @@ public record ReviewResponse(
 			reply.put("UpdatedAt", review.getReply().getUpdatedAt().toString());
 		}
 
-		return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getMember().getId(),
+		return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getWriter().getId(),
 			review.getSubItem().getId(), review.getContent(), review.getRating(), replyExisted,
 			reply, review.getCreatedAt(), review.getUpdatedAt());
 	}

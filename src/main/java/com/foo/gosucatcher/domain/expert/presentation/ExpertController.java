@@ -80,8 +80,8 @@ public class ExpertController {
 	public ResponseEntity<ImageUploadResponse> uploadImage(@PathVariable Long expertId, MultipartFile file) throws
 		IllegalStateException,
 		IOException {
-		ImageUploadRequest request = new ImageUploadRequest(expertId, file);
-		String uploadedFilename = imageService.store(request);
+		ImageUploadRequest request = new ImageUploadRequest(file);
+		String uploadedFilename = imageService.store(expertId, request);
 
 		ImageUploadResponse response = new ImageUploadResponse(expertId, uploadedFilename);
 		return ResponseEntity.status(HttpStatus.CREATED)
@@ -95,7 +95,7 @@ public class ExpertController {
 		Resource file = imageService.loadAsResource(expertId, filename);
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(file);
 	}
-	
+
 	@DeleteMapping("/{expertId}/images/{filename}")
 	public ResponseEntity<String> deleteImage(@PathVariable Long expertId,
 		@PathVariable String filename) {

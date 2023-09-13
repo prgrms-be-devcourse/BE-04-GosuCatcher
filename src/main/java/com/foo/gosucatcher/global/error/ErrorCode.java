@@ -31,6 +31,7 @@ public enum ErrorCode {
 	UNSUPPORTED_REPLIER("R002", "리뷰에 대한 답장은 서비스를 제공한 고수만 가능합니다."),
 	UNSUPPORTED_REPLY("R003", "존재하지 않는 리뷰에 대한 답장입니다."),
 	UNSUPPORTED_MULTIPLE_REPLIES("R004", "리뷰에 대한 답장은 1개 이하만 작성할 수 있습니다"),
+	INVALID_UPDATER("R005", "본인이 작성한 리뷰만 수정할 수 있습니다"),
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),

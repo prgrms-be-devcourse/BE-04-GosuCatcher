@@ -22,14 +22,14 @@ public record ReviewUpdateRequest(
 	int rating
 ) {
 
-	public static Review toReview(ReviewUpdateRequest reviewUpdateRequest, Expert expert, Member writer,
+	public static Review toReview(ReviewCreateRequest reviewCreateRequest, Expert expert, Member writer,
 		SubItem subItem) {
 		return Review.builder()
 			.expert(expert)
-			.member(writer)
+			.writer(writer)
 			.subItem(subItem)
-			.content(reviewUpdateRequest.content())
-			.rating(reviewUpdateRequest.rating())
+			.content(reviewCreateRequest.content())
+			.rating(reviewCreateRequest.rating())
 			.build();
 	}
 

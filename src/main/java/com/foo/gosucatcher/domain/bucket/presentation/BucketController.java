@@ -55,7 +55,7 @@ public class BucketController {
 		BucketResponse bucketResponse = bucketService.create(bucketRequest);
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
-			.path("/{id}")
+			.path("/{memberId}")
 			.buildAndExpand(bucketResponse.id())
 			.toUri();
 

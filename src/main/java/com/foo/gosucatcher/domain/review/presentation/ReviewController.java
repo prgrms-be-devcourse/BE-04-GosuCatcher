@@ -25,6 +25,7 @@ import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateReq
 import com.foo.gosucatcher.domain.review.application.dto.response.ReplyResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
+import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,49 +34,54 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/reviews")
 public class ReviewController {
 
+	private static final int DEFAULT_PAGING_SIZE = 3;
 	private final ReviewService reviewService;
-	private final int DEFAULT_PAGING_SIZE = 3;
 
 	@PostMapping("/{expertId}")
+	@CurrentMemberId
 	public ResponseEntity<ReviewResponse> create(
 		@PathVariable Long expertId,
 		@RequestParam Long subItemId,
-		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest) {
-		ReviewResponse reviewResponse = reviewService.create(expertId, subItemId, reviewCreateRequest);
+		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest,
+		Long memberId
+	) {
+		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
-			.path("/{id}")
-			.buildAndExpand(reviewResponse.id())
+			.path("/{expertId}")
+			.buildAndExpand(response.id())
 			.toUri();
 
 		return ResponseEntity.created(uri)
-			.body(reviewResponse);
+			.body(response);
 	}
 
 	@GetMapping
 	public ResponseEntity<ReviewsResponse> findAll(
 		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-		Pageable pageable) {
+		Pageable pageable
+	) {
 		ReviewsResponse response = reviewService.findAll(pageable);
 
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/experts/{expertId}")
-	public ResponseEntity<ReviewsResponse> findAllByExpertId(@PathVariable Long expertId,
+	@GetMapping("/experts")
+	public ResponseEntity<ReviewsResponse> findAllByExpertId(
+		@RequestParam Long id,
 		@RequestParam(required = false) Long subItemId,
 		@PageableDefault(sort = "updatedAt", size = DEFAULT_PAGING_SIZE, direction = Sort.Direction.DESC)
-		Pageable pageable) {
-
-		ReviewsResponse response = reviewService.findAllByExpertIdAndSubItem(pageable, expertId, subItemId);
+		Pageable pageable
+	) {
+		ReviewsResponse response = reviewService.findAllByExpertIdAndSubItem(id, subItemId, pageable);
 
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/experts/{expertId}/counts")
-	public ResponseEntity<Long> countByExpertId(@PathVariable Long expertId) {
-		long count = reviewService.countByExpertId(expertId);
+	@GetMapping("/counts/experts")
+	public ResponseEntity<Long> countByExpertId(@RequestParam Long id) {
+		long count = reviewService.countByExpertId(id);
 
 		return ResponseEntity.ok(count);
 	}
@@ -88,51 +94,64 @@ public class ReviewController {
 	}
 
 	@PatchMapping("/{id}")
-	//TODO : security 적용하여 수정자 == 원글 작성자 비교
-	public ResponseEntity<Long> update(@PathVariable Long id, @RequestBody ReviewUpdateRequest reviewUpdateRequest) {
-		Long updatedId = reviewService.update(id, reviewUpdateRequest);
+	@CurrentMemberId
+	public ResponseEntity<Long> update(
+		@PathVariable Long id,
+		@RequestBody ReviewUpdateRequest reviewUpdateRequest,
+		Long memberId
+	) {
+		long updatedId = reviewService.update(id, memberId, reviewUpdateRequest);
 
 		return ResponseEntity.ok(updatedId);
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<Object> delete(@PathVariable Long id) {
-		reviewService.delete(id);
+	@CurrentMemberId
+	public ResponseEntity<Object> delete(@PathVariable Long id, Long memberId) {
+		reviewService.delete(id, memberId);
 
 		return ResponseEntity.noContent()
 			.build();
 	}
 
 	@PostMapping("/{reviewId}/replies")
+	@CurrentMemberId
 	public ResponseEntity<ReplyResponse> createReply(
 		@PathVariable Long reviewId,
-		@Validated @RequestBody ReplyRequest replyRequest) {
-		ReplyResponse replyResponse = reviewService.createReply(reviewId, replyRequest);
+		@Validated @RequestBody ReplyRequest replyRequest,
+		Long memberId
+	) {
+		ReplyResponse response = reviewService.createReply(reviewId, memberId, replyRequest);
 
-		return ResponseEntity.ok(replyResponse);
+		URI uri = ServletUriComponentsBuilder
+			.fromCurrentRequest()
+			.path("/{reviewId}/replies")
+			.buildAndExpand(response.id())
+			.toUri();
+
+		return ResponseEntity.created(uri)
+			.body(response);
 	}
 
-	@PatchMapping("/{reviewId}/replies/{replyId}")
+	@PatchMapping("/replies")
+	@CurrentMemberId
 	public ResponseEntity<Long> updateReply(
-		@PathVariable Long reviewId,
-		@PathVariable Long replyId,
-		@Validated @RequestBody ReplyRequest replyRequest) {
-
-		long updatedId = reviewService.updateReply(reviewId, replyId, replyRequest);
+		@RequestParam Long id,
+		@Validated @RequestBody ReplyRequest replyRequest,
+		Long memberId
+	) {
+		long updatedId = reviewService.updateReply(id, replyRequest, memberId);
 
 		return ResponseEntity.ok(updatedId);
 	}
 
-	@GetMapping("/{reviewId}/replies/{replyId}")
-	public ResponseEntity<ReplyResponse> findReplyByID(@PathVariable Long reviewId, @PathVariable Long replyId) {
-		ReplyResponse replyResponse = reviewService.findReplyById(reviewId, replyId);
-
-		return ResponseEntity.ok(replyResponse);
-	}
-
-	@DeleteMapping("/{reviewId}/replies/{replyId}")
-	public ResponseEntity<Object> deleteReply(@PathVariable Long reviewId, @PathVariable Long replyId) {
-		reviewService.deleteReply(reviewId, replyId);
+	@DeleteMapping("/replies")
+	@CurrentMemberId
+	public ResponseEntity<Object> deleteReply(
+		@RequestParam Long id,
+		Long memberId
+	) {
+		reviewService.deleteReply(id, memberId);
 
 		return ResponseEntity.noContent()
 			.build();

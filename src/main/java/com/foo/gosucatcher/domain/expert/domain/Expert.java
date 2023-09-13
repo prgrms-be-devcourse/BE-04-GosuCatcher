@@ -87,4 +87,30 @@ public class Expert extends BaseEntity {
 		this.rating = updatedExpert.getRating();
 		this.reviewCount = updatedExpert.getReviewCount();
 	}
+
+	public void addRating(double rating) {
+		double updated = (this.rating * reviewCount + rating) / (reviewCount + 1);
+		reviewCount++;
+		this.rating = adjustRating(updated);
+	}
+
+	public void updateRating(double rating) {
+		double updated = (this.rating * reviewCount - this.rating + rating) / reviewCount;
+
+		this.rating = adjustRating(updated);
+	}
+
+	public void deleteReview(double rating) {
+		double updated = Math.max(this.rating * reviewCount - this.rating - rating, 0) / (reviewCount - 1);
+		reviewCount--;
+		this.rating = adjustRating(updated);
+	}
+
+	public boolean isSamePerson(long memberId) {
+		return this.member.getId() == memberId;
+	}
+
+	private double adjustRating(double rating) {
+		return Math.round(rating * 10) / 10.0;
+	}
 }

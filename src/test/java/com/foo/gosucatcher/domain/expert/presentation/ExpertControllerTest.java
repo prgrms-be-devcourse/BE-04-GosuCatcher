@@ -279,7 +279,7 @@ class ExpertControllerTest {
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		given(imageService.store(any())).willReturn("test.jpg");
+		given(imageService.store(any(Long.class), any())).willReturn("test.jpg");
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -296,7 +296,7 @@ class ExpertControllerTest {
 		// given
 		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
 
-		given(imageService.store(any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
+		given(imageService.store(any(Long.class), any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -316,7 +316,8 @@ class ExpertControllerTest {
 		MockMultipartFile validFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		given(imageService.store(any())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+		given(imageService.store(any(Long.class), any())).willThrow(
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
