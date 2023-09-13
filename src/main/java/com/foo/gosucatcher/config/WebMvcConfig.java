@@ -7,7 +7,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @Configuration
-public class WebMvcConfigure {
+public class WebMvcConfig {
 
 	private static final long MAX_AGE_SECONDS = 3600;
 

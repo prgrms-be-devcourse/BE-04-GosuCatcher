@@ -51,13 +51,10 @@ public class Expert extends BaseEntity {
 	@Column(nullable = false, length = 20)
 	private String storeName;
 
-	@Column(nullable = false)
 	private String location;
 
-	@Column(nullable = false)
 	private int maxTravelDistance;
 
-	@Column(nullable = false)
 	@Lob
 	private String description;
 

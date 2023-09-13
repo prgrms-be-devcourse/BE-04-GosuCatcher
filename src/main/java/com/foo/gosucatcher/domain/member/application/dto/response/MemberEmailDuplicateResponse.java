@@ -4,6 +4,7 @@ public record MemberEmailDuplicateResponse(
 	String email,
 	Boolean isUsable
 ) {
+	
 	public static MemberEmailDuplicateResponse from(String email) {
 		return new MemberEmailDuplicateResponse(email, true);
 	}

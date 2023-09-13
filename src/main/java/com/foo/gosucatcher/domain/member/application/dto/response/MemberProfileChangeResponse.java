@@ -6,6 +6,7 @@ public record MemberProfileChangeResponse(
 	Long id,
 	String email
 ) {
+
 	public static MemberProfileChangeResponse from(Member member) {
 		Long memberId = member.getId();
 		String memberEmail = member.getEmail();

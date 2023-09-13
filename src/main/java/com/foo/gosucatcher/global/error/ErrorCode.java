@@ -41,6 +41,9 @@ public enum ErrorCode {
 	ALREADY_CERTIFIED("M005", "이미 인증된 회원입니다."),
 	INVALID_EMAIL_FORMAT("M006", "올바르지 않은 이메일 형식입니다."),
 	UNAUTHENTICATED_MEMBER("M006", "인증되지 않은 회원입니다."),
+	INCORRECT_AUTH_NUMBER("M007", "잘못된 인증번호입니다."),
+	INVALID_AUTH("M008", "유효하지 않은 인증입니다."),
+	NOT_CREATION_AUTH_MESSAGE("M009", "인증 메시지를 생성할 수 없습니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
