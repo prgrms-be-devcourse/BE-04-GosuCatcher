@@ -22,10 +22,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateCreateRequest;
-import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertEstimateUpdateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
@@ -91,7 +91,7 @@ class ExpertEstimateServiceUnitTest {
 			.description("축구 레슨 해드립니다.")
 			.build();
 
-		memberEstimate = MemberEstimate.builder()
+		memberEstimate = memberEstimate.builder()
 			.member(member)
 			.subItem(subItem)
 			.preferredStartDate(LocalDateTime.now().plusDays(1))
@@ -107,13 +107,13 @@ class ExpertEstimateServiceUnitTest {
 	}
 
 	@Test
-	@DisplayName("고수 응답 견적서 생성 성공")
+	@DisplayName("일반 고수 견적서 생성 성공")
 	void createExpertEstimateSuccessTest() throws Exception {
 
 		//given
 		Long expertId = 1L;
-		ExpertEstimateCreateRequest request =
-			new ExpertEstimateCreateRequest(memberEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
+		ExpertNormalEstimateCreateRequest request =
+			new ExpertNormalEstimateCreateRequest(100, "서울시 강남구", "메시를 만들어 드립니다.");
 
 		when(expertEstimateRepository.save(any(ExpertEstimate.class)))
 			.thenReturn(expertEstimate);
@@ -121,16 +121,14 @@ class ExpertEstimateServiceUnitTest {
 			.thenReturn(Optional.of(expert));
 		when(memberEstimateRepository.findById(memberEstimate.getId()))
 			.thenReturn(Optional.of(memberEstimate));
-		when(subItemRepository.findById(subItem.getId()))
-			.thenReturn(Optional.of(subItem));
 
 		//when
-		ExpertEstimateResponse expertEstimateResponse = expertEstimateService.create(expertId,
-			request);
+		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId,
+			memberEstimate.getId(), request);
 
 		//then
-		assertThat(expertEstimateResponse.totalCost()).isEqualTo(request.totalCost());
-		assertThat(expertEstimateResponse.memberEstimateId()).isEqualTo(memberEstimate.getId());
+		assertThat(expertNormalEstimateResponse.totalCost()).isEqualTo(request.totalCost());
+		assertThat(expertNormalEstimateResponse.memberEstimateResponse().id()).isEqualTo(memberEstimate.getId());
 	}
 
 	@Test
@@ -138,15 +136,15 @@ class ExpertEstimateServiceUnitTest {
 	void createExpertEstimateFailTest_notFoundExpert() throws Exception {
 
 		//given
-		ExpertEstimateCreateRequest request =
-			new ExpertEstimateCreateRequest(memberEstimate.getId(), subItem.getId(), 100, "메시를 만들어 드립니다.", true);
+		ExpertNormalEstimateCreateRequest request =
+			new ExpertNormalEstimateCreateRequest(100, "서울시 강남구", "메시를 만들어 드립니다.");
 
 		when(expertRepository.findById(anyLong()))
 			.thenReturn(Optional.empty());
 
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
-			() -> expertEstimateService.create(1L, request));
+			() -> expertEstimateService.createNormal(1L, memberEstimate.getId(), request));
 	}
 
 	@Test
@@ -154,17 +152,17 @@ class ExpertEstimateServiceUnitTest {
 	void createExpertEstimateFailTest_notFoundMemberEstimate() throws Exception {
 
 		//given
-		ExpertEstimateCreateRequest request =
-			new ExpertEstimateCreateRequest(999L, subItem.getId(), 100, "메시를 만들어 드립니다.", true);
+		ExpertNormalEstimateCreateRequest request =
+			new ExpertNormalEstimateCreateRequest(100, "서울시 강남구", "메시를 만들어 드립니다.");
 
 		when(expertRepository.findById(anyLong()))
 			.thenReturn(Optional.of(expert));
-		when(memberEstimateRepository.findById(request.memberEstimateId()))
+		when(memberEstimateRepository.findById(null))
 			.thenReturn(Optional.empty());
 
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
-			() -> expertEstimateService.create(1L, request));
+			() -> expertEstimateService.createNormal(1L, memberEstimate.getId(), request));
 	}
 
 	@Test
@@ -174,16 +172,16 @@ class ExpertEstimateServiceUnitTest {
 		//given
 		List<ExpertEstimate> estimates = Arrays.asList(expertEstimate);
 
-		when(expertEstimateRepository.findAll())
+		// Mock 객체 설정: findAllWithFetchJoin() 메서드 호출 시 estimates 리스트 반환하도록 설정
+		when(expertEstimateRepository.findAllWithFetchJoin())
 			.thenReturn(estimates);
 
 		//when
 		ExpertEstimatesResponse estimatesResponse = expertEstimateService.findAll();
 
 		//then
-		assertThat(estimatesResponse.expertResponseEstimatesResponse()).hasSize(1);
-		assertThat(estimatesResponse.expertResponseEstimatesResponse().get(0).expertId()).isEqualTo(expert.getId());
-		assertThat(estimatesResponse.expertResponseEstimatesResponse().get(0).totalCost()).isEqualTo(
+		assertThat(estimatesResponse.expertEstimateResponseList()).hasSize(1);
+		assertThat(estimatesResponse.expertEstimateResponseList().get(0).totalCost()).isEqualTo(
 			expertEstimate.getTotalCost());
 	}
 
@@ -202,9 +200,6 @@ class ExpertEstimateServiceUnitTest {
 		//then
 		assertThat(estimateResponse.id()).isEqualTo(expertEstimate.getId());
 		assertThat(estimateResponse.totalCost()).isEqualTo(expertEstimate.getTotalCost());
-		assertThat(estimateResponse.expertId()).isEqualTo(expertEstimate.getExpert().getId());
-		assertThat(estimateResponse.memberEstimateId()).isEqualTo(
-			expertEstimate.getMemberEstimate().getId());
 	}
 
 	@Test
@@ -219,45 +214,6 @@ class ExpertEstimateServiceUnitTest {
 		//when -> then
 		assertThrows(EntityNotFoundException.class,
 			() -> expertEstimateService.findById(expertEstimateId));
-	}
-
-	@Test
-	@DisplayName("고수 견적서 수정 성공")
-	void updateExpertEstimateSuccessTest() throws Exception {
-
-		//given
-		int newTotalCost = 333;
-		String newDescription = "호날두를 만들어 드립니다.";
-		ExpertEstimateUpdateRequest updateRequest = new ExpertEstimateUpdateRequest(
-			newTotalCost, newDescription, true);
-
-		when(expertEstimateRepository.findById(null))
-			.thenReturn(Optional.of(expertEstimate));
-
-		//when
-		expertEstimateService.update(expertEstimate.getId(), updateRequest);
-
-		//then
-		assertThat(expertEstimate.getTotalCost()).isEqualTo(newTotalCost);
-		assertThat(expertEstimate.getDescription()).isEqualTo(newDescription);
-	}
-
-	@Test
-	@DisplayName("고수 견적서 수정 실패 - 존재하지 않는 고수 견적서")
-	void updateExpertEstimateFailTest_notFoundExpertEstimate() throws Exception {
-
-		//given
-		int newTotalCost = 333;
-		String newDescription = "호날두를 만들어 드립니다.";
-		ExpertEstimateUpdateRequest updateRequest = new ExpertEstimateUpdateRequest(
-			newTotalCost, newDescription, true);
-
-		when(expertEstimateRepository.findById(null))
-			.thenReturn(Optional.empty());
-
-		//when -> then
-		assertThrows(EntityNotFoundException.class,
-			() -> expertEstimateService.update(expertEstimate.getId(), updateRequest));
 	}
 
 	@Test
