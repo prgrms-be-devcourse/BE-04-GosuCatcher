@@ -103,6 +103,10 @@ public class Expert extends BaseEntity {
 	public void removeExpertItem(ExpertItem expertItem) {
 		this.getExpertItemList().remove(expertItem);
 	}
+  
+	public void updateRating(double newRating) {
+		this.rating = newRating;
+	}
 
 	private int checkMaxTravelDistance(int maxTravelDistance) {
 		if (maxTravelDistance < 0) {
@@ -110,5 +114,4 @@ public class Expert extends BaseEntity {
 		}
 
 		return maxTravelDistance;
-	}
 }

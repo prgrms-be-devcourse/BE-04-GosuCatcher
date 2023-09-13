@@ -4,8 +4,8 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_BUCKET;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,25 +32,27 @@ public class BucketService {
 	private final ExpertRepository expertRepository;
 
 	@Transactional(readOnly = true)
-	public BucketsResponse findAll() {
-		List<Bucket> likes = bucketRepository.findAll();
+	public BucketsResponse findAll(Pageable pageable) {
+		Slice<Bucket> likes = bucketRepository.findAll(pageable);
 
 		return BucketsResponse.from(likes);
 	}
 
 	public void deleteById(Long id) {
-		if (bucketRepository.findById(id).isEmpty()) {
-			throw new EntityNotFoundException(NOT_FOUND_BUCKET);
-		}
-
-		bucketRepository.deleteById(id);
+		bucketRepository.findById(id)
+			.ifPresentOrElse(
+				bucket -> bucketRepository.deleteById(id),
+				() -> {
+					throw new EntityNotFoundException(NOT_FOUND_BUCKET);
+				}
+			);
 	}
 
 	public BucketResponse create(BucketRequest bucketRequest) {
 		Member member = memberRepository.findById(bucketRequest.memberId())
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 		Expert expert = expertRepository.findById(bucketRequest.expertId())
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		Bucket bucket = BucketRequest.toLikes(member, expert);
 
@@ -62,11 +64,23 @@ public class BucketService {
 	@Transactional(readOnly = true)
 	public Boolean checkStatus(Long expertId, Long memberId) {
 		Member member = memberRepository.findById(memberId)
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 		Expert expert = expertRepository.findById(expertId)
-				.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		return bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
-				.isPresent();
+		boolean status = bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
+			.isPresent();
+
+		return status;
+	}
+
+	@Transactional(readOnly = true)
+	public BucketsResponse findAllByMemberId(Long memberId, Pageable pageable) {
+		memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+
+		Slice<Bucket> bucket = bucketRepository.findAllByMemberId(memberId, pageable);
+
+		return BucketsResponse.from(bucket);
 	}
 }
