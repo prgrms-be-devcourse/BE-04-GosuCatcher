@@ -103,7 +103,7 @@ public class Expert extends BaseEntity {
 	public void removeExpertItem(ExpertItem expertItem) {
 		this.getExpertItemList().remove(expertItem);
 	}
-  
+
 	public void updateRating(double newRating) {
 		this.rating = newRating;
 	}
@@ -114,4 +114,5 @@ public class Expert extends BaseEntity {
 		}
 
 		return maxTravelDistance;
+	}
 }
