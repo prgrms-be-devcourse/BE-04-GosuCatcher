@@ -40,7 +40,7 @@ public class SecurityConfigure {
 			.and()
 			.authorizeRequests()
 			.antMatchers("/api/v1/**").permitAll()
-			.antMatchers("/ws/**").permitAll()
+			.antMatchers("/ws/**").permitAll() //채팅
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);

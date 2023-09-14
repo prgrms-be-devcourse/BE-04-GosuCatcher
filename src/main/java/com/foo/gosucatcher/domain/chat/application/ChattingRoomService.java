@@ -37,7 +37,7 @@ public class ChattingRoomService {
 	private final MemberEstimateRepository memberEstimateRepository;
 	private final ChattingRoomRepository chattingRoomRepository;
 	private final ObjectMapper objectMapper;
-	private static Set<WebSocketSession> sessions = new HashSet<>(); //후에 STOMP 적용하면서 삭제될 예정
+	private static Set<WebSocketSession> sessions = new HashSet<>(); //STOMP 적용하면서 삭제될 예정
 
 	public ChattingRoomsResponse create(Long memberEstimateId) {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
