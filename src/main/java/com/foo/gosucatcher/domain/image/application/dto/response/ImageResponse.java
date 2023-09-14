@@ -1,8 +1,8 @@
 package com.foo.gosucatcher.domain.image.application.dto.response;
 
+import java.util.List;
+
 public record ImageResponse(
-	String filename,
-	String url,
-	Long size
+	List<String> filenames
 ) {
 }
