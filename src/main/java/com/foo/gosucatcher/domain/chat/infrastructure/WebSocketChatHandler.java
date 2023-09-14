@@ -1,7 +1,6 @@
 package com.foo.gosucatcher.domain.chat.infrastructure;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.TextMessage;
@@ -13,7 +12,6 @@ import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.MessageService;
 import com.foo.gosucatcher.domain.chat.application.dto.request.MessageRequest;
 
-@Slf4j
 @RequiredArgsConstructor
 @Component
 public class WebSocketChatHandler extends TextWebSocketHandler {
