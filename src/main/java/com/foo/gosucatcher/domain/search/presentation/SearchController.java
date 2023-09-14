@@ -31,8 +31,8 @@ public class SearchController {
 
 	@GetMapping
 	@CurrentMemberId
-	public ResponseEntity<SearchListResponse> getSearchList(Long memberId) {
-		SearchListResponse searchList = searchService.getSearchList(memberId);
+	public ResponseEntity<SearchListResponse> getRecentSearchList(Long memberId) {
+		SearchListResponse searchList = searchService.getResentSearchList(memberId);
 
 		return ResponseEntity.ok(searchList);
 	}

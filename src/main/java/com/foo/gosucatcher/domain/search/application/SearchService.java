@@ -51,7 +51,7 @@ public class SearchService {
 	}
 
 	@Transactional(readOnly = true)
-	public SearchListResponse getSearchList(Long memberId) {
+	public SearchListResponse getResentSearchList(Long memberId) {
 
 		String key = "search::" + memberId;
 
