@@ -37,8 +37,6 @@ public class ChattingRoom extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	private String roomUuid;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_estimate_id")
 	private MemberEstimate memberEstimate;
@@ -49,9 +47,8 @@ public class ChattingRoom extends BaseEntity {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public ChattingRoom(MemberEstimate memberEstimate, String roomUuid) {
+	public ChattingRoom(MemberEstimate memberEstimate) {
 		this.memberEstimate = memberEstimate;
-		this.roomUuid = roomUuid;
 	}
 
 	public void addMessage(Message message) {

@@ -8,7 +8,7 @@ import com.foo.gosucatcher.domain.member.domain.Member;
 public record MessageRequest(
 	MessageType type,
 	Long senderId,
-	String chattingRoomId,
+	Long chattingRoomId,
 	String content
 ) {
 

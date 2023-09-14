@@ -9,10 +9,8 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.foo.gosucatcher.domain.chat.application.ChattingService;
-import com.foo.gosucatcher.domain.chat.application.dto.request.ChattingRoomCreateRequest;
+import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.dto.request.MessageRequest;
-import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -20,22 +18,19 @@ import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 public class WebSocketChatHandler extends TextWebSocketHandler {
 
 	private final ObjectMapper objectMapper;
-	private final ChattingService chattingService;
+	private final ChattingRoomService chattingRoomService;
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		String payload = message.getPayload();
-		log.info("payload {}", payload);
+		log.info("message payload = {}", payload);
 
-		MessageRequest chatMessage = objectMapper.readValue(payload, MessageRequest.class);
-		log.info("chattingRoomId={}", chatMessage.chattingRoomId());
-		log.info("senderId={}", chatMessage.senderId());
-		log.info("type={}", chatMessage.type());
-		log.info("content={}", chatMessage.content());
+		MessageRequest messageRequest = objectMapper.readValue(payload, MessageRequest.class);
+		log.info("chattingRoomId = {}", messageRequest.chattingRoomId());
+		log.info("senderId = {}", messageRequest.senderId());
+		log.info("type = {}", messageRequest.type());
+		log.info("content = {}", messageRequest.content());
 
-		ChattingRoom room = chattingService.findRoomById(chatMessage.chattingRoomId().toString());
-		ChattingRoomCreateRequest chattingRoomCreateRequest = new ChattingRoomCreateRequest(1L, room.getRoomUuid());
-
-		chattingRoomCreateRequest.handleActions(session, chatMessage, chattingService);
+		chattingRoomService.handleActions(session, messageRequest);
 	}
 }
