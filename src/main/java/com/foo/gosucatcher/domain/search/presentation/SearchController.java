@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.search.application.SearchService;
 import com.foo.gosucatcher.domain.search.application.dto.response.SearchListResponse;
-import com.foo.gosucatcher.domain.search.application.dto.response.SearchResponse;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +23,10 @@ public class SearchController {
 
 	@PostMapping
 	@CurrentMemberId
-	public ResponseEntity<SearchResponse> search(@RequestParam String keyword, Long memberId) {
-		SearchResponse searchResponse = searchService.searchKeyword(memberId, keyword);
+	public ResponseEntity<SubItemsResponse> search(@RequestParam String keyword, Long memberId) {
+		SubItemsResponse subItemsResponse = searchService.searchKeyword(memberId, keyword);
 
-		return ResponseEntity.ok(searchResponse);
+		return ResponseEntity.ok(subItemsResponse);
 	}
 
 	@GetMapping

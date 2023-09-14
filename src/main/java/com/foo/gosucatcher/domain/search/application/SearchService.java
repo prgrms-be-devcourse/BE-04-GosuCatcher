@@ -7,12 +7,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.member.domain.Member;
-import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
+import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.search.application.dto.response.SearchListResponse;
-import com.foo.gosucatcher.domain.search.application.dto.response.SearchResponse;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,45 +20,49 @@ import lombok.RequiredArgsConstructor;
 public class SearchService {
 
 	private final RedisTemplate<String, String> redisTemplate;
-	private final MemberRepository memberRepository;
+	private final SubItemRepository subItemRepository;
 
-	public SearchResponse searchKeyword(Long memberId, String keyword) {
-		if (keyword == null || keyword.isBlank() || keyword.isEmpty()) return null;
+	public SubItemsResponse searchKeyword(Long memberId, String keyword) {
+		if (isInvalidKeyword(keyword)) return null;
 
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-		String key = "search::" + member.getId();
+		String key = "search::" + memberId;
 
-		ListOperations<String, String> listOperations = redisTemplate.opsForList();
-		for (String pastKeyword : listOperations.range(key, 0, listOperations.size(key))) {
-			if (String.valueOf(pastKeyword).equals(keyword)) return null;
+		List<SubItem> subItems = subItemRepository.findByNameContains(keyword);
+
+		if (!subItems.isEmpty()) {
+			ListOperations<String, String> listOperations = redisTemplate.opsForList();
+			boolean isKeywordInRedis = false;
+
+			for (String pastKeyword : listOperations.range(key, 0, listOperations.size(key))) {
+				if (pastKeyword.equals(keyword)) {
+					isKeywordInRedis = true;
+					break;
+				}
+			}
+			if (!isKeywordInRedis) {
+				if (listOperations.size(key) == 5) {
+					listOperations.leftPop(key);
+				}
+				listOperations.rightPush(key, keyword);
+			}
 		}
 
-		if (listOperations.size(key) < 5) {
-			listOperations.rightPush(key, keyword);
-		} else if (listOperations.size(key) == 5) {
-			listOperations.leftPop(key);
-			listOperations.rightPush(key, keyword);
-		}
-
-		return SearchResponse.from(keyword);
+		return SubItemsResponse.from(subItems);
 	}
 
 	@Transactional(readOnly = true)
 	public SearchListResponse getSearchList(Long memberId) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-		String key = "search::" + member.getId();
+
+		String key = "search::" + memberId;
 
 		ListOperations<String, String> listOperations = redisTemplate.opsForList();
 
-
 		List<String> range = listOperations.range(key, 0, listOperations.size(key));
 
-		List<SearchResponse> searchResponses = range.stream()
-			.map(SearchResponse::from)
-			.toList();
+		return SearchListResponse.from(range);
+	}
 
-		return SearchListResponse.from(searchResponses);
+	private boolean isInvalidKeyword(String keyword) {
+		return keyword == null || keyword.isBlank() || keyword.isEmpty();
 	}
 }
