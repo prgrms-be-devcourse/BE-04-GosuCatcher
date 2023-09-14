@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableRedisRepositories
+@EnableRedisRepositories(redisTemplateRef = "searchRedisTemplate")
 public class RedisConfig {
 
 	@Value("${spring.redis.host}")
@@ -26,12 +26,12 @@ public class RedisConfig {
 	}
 
 	@Bean
-	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-		RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-		redisTemplate.setConnectionFactory(redisConnectionFactory);
-		redisTemplate.setKeySerializer(new StringRedisSerializer());
-		redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+	public RedisTemplate<String, String> searchRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+		RedisTemplate<String, String> searchRedisTemplate = new RedisTemplate<>();
+		searchRedisTemplate.setConnectionFactory(redisConnectionFactory);
+		searchRedisTemplate.setKeySerializer(new StringRedisSerializer());
+		searchRedisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
 
-		return redisTemplate;
+		return searchRedisTemplate;
 	}
 }
