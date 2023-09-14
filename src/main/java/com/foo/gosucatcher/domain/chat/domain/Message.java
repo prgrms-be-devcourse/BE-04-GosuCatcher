@@ -34,12 +34,16 @@ public class Message extends BaseEntity {
 
 	private String content;
 
+	@Enumerated(EnumType.STRING)
+	private MessageType messageType;
+
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public Message(Member sender, ChattingRoom chattingRoom, String content) {
+	public Message(Member sender, ChattingRoom chattingRoom, String content, MessageType messageType) {
 		this.sender = sender;
 		this.chattingRoom = chattingRoom;
 		this.content = content;
+		this.messageType = messageType;
 	}
 }

@@ -20,6 +20,7 @@ import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.chat.domain.Message;
 import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
+import com.foo.gosucatcher.domain.chat.domain.MessageType;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -45,7 +46,7 @@ public class MessageService {
         ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
-        Message message = MessageRequest.toMessage(sender, chattingRoom, content);
+        Message message = MessageRequest.toMessage(MessageType.ENTER, sender, chattingRoom, content);
         Message savedMessage = messageRepository.save(message);
 
         chattingRoom.addMessage(message);

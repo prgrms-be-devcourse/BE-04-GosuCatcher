@@ -40,6 +40,7 @@ public class SecurityConfigure {
 			.and()
 			.authorizeRequests()
 			.antMatchers("/api/v1/**").permitAll()
+			.antMatchers("/ws/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
