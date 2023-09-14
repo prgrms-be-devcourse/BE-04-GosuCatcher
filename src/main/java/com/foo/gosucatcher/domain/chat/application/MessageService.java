@@ -20,7 +20,7 @@ import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.chat.domain.Message;
 import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
-import com.foo.gosucatcher.domain.chat.domain.MessageType;
+import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -39,14 +39,14 @@ public class MessageService {
     private final ChattingRoomRepository chattingRoomRepository;
     private final MemberRepository memberRepository;
 
-    public MessageResponse create(Long senderId, Long chattingRoomId, String content) {
+    public MessageResponse create(Long senderId, Long chattingRoomId, String content, ChattingStatus chattingStatus) {
         Member sender = memberRepository.findById(senderId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
         ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
                 .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
-        Message message = MessageRequest.toMessage(MessageType.ENTER, sender, chattingRoom, content);
+        Message message = MessageRequest.toMessage(chattingStatus, sender, chattingRoom, content);
         Message savedMessage = messageRepository.save(message);
 
         chattingRoom.addMessage(message);
@@ -81,7 +81,7 @@ public class MessageService {
         }
 
         List<MessageResponse> messageResponses = IntStream.range(0, chattingRoomResponses.size())
-                .mapToObj(count -> create(expertAutoEstimateResponses.get(count).expert().id(), chattingRoomResponses.get(count).id(), expertAutoEstimateResponses.get(count).description()))
+                .mapToObj(count -> create(expertAutoEstimateResponses.get(count).expert().id(), chattingRoomResponses.get(count).id(), expertAutoEstimateResponses.get(count).description(), ChattingStatus.PENDING))
                 .collect(Collectors.toList());
 
         return MessagesResponse.valueOf(messageResponses);
@@ -89,6 +89,6 @@ public class MessageService {
 
     public MessageResponse sendExpertEstimateMessage(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
 
-        return create(expertNormalEstimateResponse.id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description());
+        return create(expertNormalEstimateResponse.id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description(), ChattingStatus.PENDING);
     }
 }

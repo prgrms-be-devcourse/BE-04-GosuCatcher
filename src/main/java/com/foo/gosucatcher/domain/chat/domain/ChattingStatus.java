@@ -1,5 +1,5 @@
 package com.foo.gosucatcher.domain.chat.domain;
 
-public enum MessageType {
-	ENTER, TALK
+public enum ChattingStatus {
+	PENDING, ENTER, TALK
 }

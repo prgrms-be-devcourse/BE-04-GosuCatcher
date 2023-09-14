@@ -1,16 +1,18 @@
 package com.foo.gosucatcher.domain.chat.application.dto.response;
 
+import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
 import com.foo.gosucatcher.domain.chat.domain.Message;
 
 public record MessageResponse(
         Long id,
         Long senderId,
         ChattingRoomResponse chattingRoomResponse,
-        String message
+        String message,
+        ChattingStatus chattingStatus
 ) {
 
     public static MessageResponse from(Message message) {
 
-        return new MessageResponse(message.getId(), message.getSender().getId(), ChattingRoomResponse.from(message.getChattingRoom()), message.getContent());
+        return new MessageResponse(message.getId(), message.getSender().getId(), ChattingRoomResponse.from(message.getChattingRoom()), message.getContent(), message.getChattingStatus());
     }
 }

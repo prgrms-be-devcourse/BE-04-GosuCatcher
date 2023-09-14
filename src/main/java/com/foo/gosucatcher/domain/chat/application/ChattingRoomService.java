@@ -20,7 +20,7 @@ import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResp
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
-import com.foo.gosucatcher.domain.chat.domain.MessageType;
+import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -100,7 +100,7 @@ public class ChattingRoomService {
 	}
 
 	public void handleActions(WebSocketSession session, MessageRequest messageRequest) {
-		if (messageRequest.type().equals(MessageType.ENTER)) {
+		if (messageRequest.chattingStatus().equals(ChattingStatus.ENTER)) {
 			sessions.add(session);
 		}
 

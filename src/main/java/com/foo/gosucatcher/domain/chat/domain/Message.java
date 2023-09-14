@@ -35,15 +35,15 @@ public class Message extends BaseEntity {
 	private String content;
 
 	@Enumerated(EnumType.STRING)
-	private MessageType messageType;
+	private ChattingStatus chattingStatus;
 
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public Message(Member sender, ChattingRoom chattingRoom, String content, MessageType messageType) {
+	public Message(Member sender, ChattingRoom chattingRoom, String content, ChattingStatus chattingStatus) {
 		this.sender = sender;
 		this.chattingRoom = chattingRoom;
 		this.content = content;
-		this.messageType = messageType;
+		this.chattingStatus = chattingStatus;
 	}
 }
