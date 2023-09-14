@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class SearchService {
 
+	private static final int MAXIMUM_SAVED_VALUE = 5;
 	private final RedisTemplate<String, String> redisTemplate;
 	private final SubItemRepository subItemRepository;
 
@@ -40,7 +41,7 @@ public class SearchService {
 				}
 			}
 			if (!isKeywordInRedis) {
-				if (listOperations.size(key) == 5) {
+				if (listOperations.size(key) == MAXIMUM_SAVED_VALUE) {
 					listOperations.leftPop(key);
 				}
 				listOperations.rightPush(key, keyword);
