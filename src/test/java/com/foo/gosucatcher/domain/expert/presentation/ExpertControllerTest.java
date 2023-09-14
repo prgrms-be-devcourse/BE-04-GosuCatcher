@@ -45,11 +45,11 @@ import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertsResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
 import com.foo.gosucatcher.domain.image.infrastructure.FileSystemExpertImageService;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -192,7 +192,15 @@ class ExpertControllerTest {
 	@DisplayName("고수 전체 조회 성공")
 	void getAllExpertsSuccessTest() throws Exception {
 		// given
-		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1"));
+		List<Expert> expertList = List.of(
+			Expert.builder()
+				.member(member)
+				.storeName("업체명1")
+				.location("위치1")
+				.maxTravelDistance(100)
+				.description("부가설명1")
+				.build()
+		);
 
 		ExpertsResponse expertsResponse = ExpertsResponse.from(expertList);
 		given(expertService.findAll()).willReturn(expertsResponse);
@@ -269,7 +277,7 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
 			.andDo(print());
 	}
-      
+
 	@Test
 	@DisplayName("이미지 업로드 성공")
 	void uploadImageSuccessTest() throws Exception {
@@ -277,7 +285,7 @@ class ExpertControllerTest {
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		given(imageService.store(any())).willReturn("test.jpg");
+		given(imageService.store(any(Long.class), any())).willReturn("test.jpg");
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -294,7 +302,7 @@ class ExpertControllerTest {
 		// given
 		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
 
-		given(imageService.store(any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
+		given(imageService.store(any(Long.class), any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -314,7 +322,8 @@ class ExpertControllerTest {
 		MockMultipartFile validFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		given(imageService.store(any())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+		given(imageService.store(any(Long.class), any())).willThrow(
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -428,7 +437,7 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수입니다."))
 			.andDo(print());
 	}
-  
+
   @Test
 	@DisplayName("고수 서브 아이템 추가 성공")
 	void addSubItemSuccessTest() throws Exception {
@@ -546,7 +555,7 @@ class ExpertControllerTest {
 			.andExpect(jsonPath("$.subItemsResponse.[0].name").value("청소 알바"))
 			.andDo(print());
 	}
-  
+
   @Test
 	@DisplayName("고수찾기 실패: 잘못된 정렬기준")
 	void searchExpertsFailureNotFoundExpertSortTypeTest() throws Exception {

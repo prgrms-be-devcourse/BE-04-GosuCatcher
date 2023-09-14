@@ -81,7 +81,7 @@ public class ExpertService {
 		duplicatedStoreNameCheck(request.storeName());
 
 		Expert updatedExpert = ExpertUpdateRequest.toExpert(request);
-		existingExpert.updateExpert(updatedExpert);
+		existingExpert.update(updatedExpert);
 
 		return existingExpert.getId();
 	}

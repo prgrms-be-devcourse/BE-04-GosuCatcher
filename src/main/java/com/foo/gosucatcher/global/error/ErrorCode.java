@@ -32,6 +32,8 @@ public enum ErrorCode {
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
 	UNSUPPORTED_REPLIER("R002", "리뷰에 대한 답장은 서비스를 제공한 고수만 가능합니다."),
 	NOT_FOUND_REPLY("R003", "존재하지 않는 리뷰에 대한 답장입니다."),
+	UNSUPPORTED_MULTIPLE_REPLIES("R004", "리뷰에 대한 답장은 1개 이하만 작성할 수 있습니다"),
+	INVALID_UPDATER("R005", "본인이 작성한 리뷰만 수정할 수 있습니다"),
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
@@ -42,8 +44,9 @@ public enum ErrorCode {
 	INVALID_EMAIL_FORMAT("M006", "올바르지 않은 이메일 형식입니다."),
 	UNAUTHENTICATED_MEMBER("M006", "인증되지 않은 회원입니다."),
 	INCORRECT_AUTH_NUMBER("M007", "잘못된 인증번호입니다."),
-	INVALID_AUTH("M008", "유효하지 않은 인증입니다."),
+	EXPIRED_AUTH_NUMBER("M008", "인증시간이 만료되었습니다."),
 	NOT_CREATION_AUTH_MESSAGE("M009", "인증 메시지를 생성할 수 없습니다."),
+	INVALID_AUTH("M010", "유효하지 않은 인증입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
@@ -62,7 +65,7 @@ public enum ErrorCode {
 
 	//찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
-	NOT_SUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
+	UNSUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
 
 	//고수&서비스
 	NOT_FOUND_EXPERT_ITEM("EI001", "해당 고수는 요청한 서비스를 등록하지 않았습니다."),

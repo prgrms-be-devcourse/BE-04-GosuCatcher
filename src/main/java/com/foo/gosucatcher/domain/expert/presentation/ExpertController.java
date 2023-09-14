@@ -108,8 +108,8 @@ public class ExpertController {
 	public ResponseEntity<ImageUploadResponse> uploadImage(@PathVariable Long expertId, MultipartFile file) throws
 		IllegalStateException,
 		IOException {
-		ImageUploadRequest request = new ImageUploadRequest(expertId, file);
-		String uploadedFilename = imageService.store(request);
+		ImageUploadRequest request = new ImageUploadRequest(file);
+		String uploadedFilename = imageService.store(expertId, request);
 
 		ImageUploadResponse response = new ImageUploadResponse(expertId, uploadedFilename);
       

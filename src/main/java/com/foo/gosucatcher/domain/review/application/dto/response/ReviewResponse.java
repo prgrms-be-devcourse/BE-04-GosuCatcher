@@ -12,7 +12,7 @@ public record ReviewResponse(
 	Long writerId,
 	Long subItemId,
 	String content,
-	int rating,
+	double rating,
 	boolean replyExisted,
 	Map<String, String> reply,
 	LocalDateTime createdAt,
@@ -30,7 +30,7 @@ public record ReviewResponse(
 			reply.put("UpdatedAt", review.getReply().getUpdatedAt().toString());
 		}
 
-		return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getMember().getId(),
+		return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getWriter().getId(),
 			review.getSubItem().getId(), review.getContent(), review.getRating(), replyExisted,
 			reply, review.getCreatedAt(), review.getUpdatedAt());
 	}

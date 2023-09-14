@@ -6,16 +6,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-	Page<Review> findAll(Pageable pageable);
-
-	Slice<Review> findAllByExpertId(Long expertId, Pageable pageable);
+	Page<Review> findAllByOrderByCreatedAt(Pageable pageable);
 
 	Optional<Review> findById(Long id);
 
-	Slice<Review> findAllByExpertIdAndSubItemId(Long expertId, Long subItemId, Pageable pageable);
+	@Query("select r from Review r where r.expert.id = ?1 and (?2 IS NULL or r.subItem.id = ?2) order by r.createdAt")
+	Slice<Review> findAllByExpertIdAndSubItemIdOrderByCreatedAt(Long expertId, Long subItemId, Pageable pageable);
 
 	Long countByExpertId(Long expertId);
 }
