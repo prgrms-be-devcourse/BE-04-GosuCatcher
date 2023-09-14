@@ -178,12 +178,6 @@ public class JwtTokenProvider {
 		}
 	}
 
-	public boolean isRefreshTokenExistInDb(String refreshToken) {
-		Long memberId = getMemberId(refreshToken, REFRESH_TOKEN_SECRET_KEY);
-		log.warn("isRefreshTokenExistInDb : {}", memberId);
-		return customUserDetailsService.isSameRefreshTokenExist(memberId, refreshToken);
-	}
-
 	public CustomUserDetails getMemberAndExpertByRefreshToken(String refreshToken) {
 		Long memberId = getMemberId(refreshToken, REFRESH_TOKEN_SECRET_KEY);
 

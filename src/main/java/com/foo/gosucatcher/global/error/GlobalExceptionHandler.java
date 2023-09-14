@@ -6,8 +6,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import com.foo.gosucatcher.global.error.exception.HttpHeaderException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 @RestControllerAdvice
@@ -37,6 +39,20 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
 		ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult());
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(MemberCertifiedFailException.class)
+	public ResponseEntity<ErrorResponse> handleCertifiedFailException(MemberCertifiedFailException e) {
+		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
+
+		return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(HttpHeaderException.class)
+	public ResponseEntity<ErrorResponse> handleHttpHeaderException(HttpHeaderException e) {
+		ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode());
 
 		return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 	}
