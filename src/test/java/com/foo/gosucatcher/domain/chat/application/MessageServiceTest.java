@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.chat.application;
 
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
+import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
 import com.foo.gosucatcher.domain.chat.domain.Message;
 import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
@@ -94,7 +95,7 @@ class MessageServiceTest {
         when(messageRepository.findById(null)).thenReturn(Optional.ofNullable(message));
 
         //when
-        MessageResponse messageResponse = messageService.create(senderId, chattingRoomId, content);
+        MessageResponse messageResponse = messageService.create(senderId, chattingRoomId, content, ChattingStatus.ENTER);
         Message result = messageRepository.findById(messageResponse.id()).get();
 
         //then
@@ -126,7 +127,7 @@ class MessageServiceTest {
 
         //then
         assertThat(messagesResponse).isNotNull();
-        assertThat(messagesResponse.messagesResponse().get(0).message()).isEqualTo("요청서에 대한 견적서입니다.");
+        assertThat(messagesResponse.messagesResponse().get(0).content()).isEqualTo("요청서에 대한 견적서입니다.");
     }
 
     @DisplayName("채팅 메시지를 삭제하는 테스트")
