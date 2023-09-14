@@ -91,15 +91,17 @@ public class ChattingRoomService {
 		memberEstimate.removeChattingRoom(chattingRoom);
 	}
 
-	public <T> void sendMessagesToSessions(WebSocketSession session, T message) {
+	public <T> void sendMessage(WebSocketSession session, T message) {
 		try{
-			session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+			synchronized (session) {
+				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
+			}
 		} catch (IOException e) {
 			log.error(e.getMessage(), e);
 		}
 	}
 
-	public void handleActions(WebSocketSession session, MessageRequest messageRequest) {
+	public void handleWebSocketSession(WebSocketSession session, MessageRequest messageRequest) {
 		if (messageRequest.chattingStatus().equals(ChattingStatus.ENTER)) {
 			sessions.add(session);
 		}
@@ -109,6 +111,6 @@ public class ChattingRoomService {
 
 	private <T> void sendMessagesToSessions(T message) {
 		sessions.parallelStream()
-			.forEach(session -> sendMessagesToSessions(session, message));
+			.forEach(session -> sendMessage(session, message));
 	}
 }
