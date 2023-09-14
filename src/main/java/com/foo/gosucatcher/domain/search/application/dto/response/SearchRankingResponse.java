@@ -5,4 +5,7 @@ public record SearchRankingResponse(
 	String keyword
 ) {
 
+	public static SearchRankingResponse of(int rating, String keyword) {
+		return new SearchRankingResponse(rating, keyword);
+	}
 }

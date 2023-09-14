@@ -8,13 +8,14 @@ public record SearchRankingListResponse(
 ) {
 
 	public static SearchRankingListResponse from(List<String> searchRankingList) {
-		List<SearchRankingResponse> responses = new ArrayList<>();
+		List<SearchRankingResponse> rankingListResponse = new ArrayList<>();
 
 		int rating = 1;
 		for (String keyword : searchRankingList) {
-			responses.add(new SearchRankingResponse(rating, keyword));
+			SearchRankingResponse searchRankingResponse = SearchRankingResponse.of(rating, keyword);
+			rankingListResponse.add(searchRankingResponse);
 			rating++;
 		}
-		return new SearchRankingListResponse(responses);
+		return new SearchRankingListResponse(rankingListResponse);
 	}
 }
