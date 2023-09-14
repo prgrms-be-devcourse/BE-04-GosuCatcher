@@ -7,6 +7,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
@@ -29,6 +30,7 @@ public class SubItemService {
 
 	private final SubItemRepository subItemRepository;
 	private final MainItemRepository mainItemRepository;
+	private final ExpertRepository expertRepository;
 
 	public SubItemResponse create(SubItemCreateRequest request) {
 		MainItem mainItem = mainItemRepository.findById(request.mainItemId())
@@ -37,7 +39,10 @@ public class SubItemService {
 		duplicatedNameCheck(request.name());
 
 		SubItem subItem = SubItemCreateRequest.toSubItem(mainItem, request);
+
 		subItemRepository.save(subItem);
+
+		mainItem.addSubItem(subItem);
 
 		return SubItemResponse.from(subItem);
 	}
@@ -81,7 +86,11 @@ public class SubItemService {
 		SubItem subItem = subItemRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
 
+		MainItem mainItem = subItem.getMainItem();
+
 		subItemRepository.delete(subItem);
+
+		mainItem.removeSubItem(subItem);
 	}
 
 	private void duplicatedNameCheck(String name) {

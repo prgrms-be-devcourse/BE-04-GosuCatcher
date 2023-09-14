@@ -1,16 +1,19 @@
 package com.foo.gosucatcher.domain.item.application;
 
-import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
-import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
-import com.foo.gosucatcher.domain.item.domain.MainItem;
-import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
-import com.foo.gosucatcher.domain.item.domain.SubItem;
-import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
-import com.foo.gosucatcher.global.error.exception.BusinessException;
-import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,234 +25,262 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertItem;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemCreateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.request.sub.SubItemUpdateRequest;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsSliceResponse;
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.MainItemRepository;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
+import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
+import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.global.error.exception.BusinessException;
+import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class SubItemServiceUnitTest {
 
-    @InjectMocks
-    private SubItemService subItemService;
+	@InjectMocks
+	private SubItemService subItemService;
 
-    @Mock
-    private MainItemRepository mainItemRepository;
+	@Mock
+	private MainItemRepository mainItemRepository;
 
-    @Mock
-    private SubItemRepository subItemRepository;
+	@Mock
+	private SubItemRepository subItemRepository;
 
-    private MainItem mainItem;
-    private SubItem subItem;
-    private SubItemCreateRequest subItemCreateRequest;
+	@Mock
+	private ExpertRepository expertRepository;
 
-    @BeforeEach
-    void setUp() {
-        mainItem = MainItem.builder()
-            .name("청소")
-            .description("청소를 구해보세요.")
-            .build();
+	private Member member;
+	private MainItem mainItem;
+	private SubItem subItem;
+	private SubItemCreateRequest subItemCreateRequest;
+	private Expert expert;
+	private ExpertItem expertItem;
 
-        subItem = SubItem.builder()
-            .mainItem(mainItem)
-            .name("방 청소")
-            .description("방 청소 설명")
-            .build();
+	@BeforeEach
+	void setUp() {
+		mainItem = MainItem.builder()
+			.name("청소")
+			.description("청소를 구해보세요.")
+			.build();
 
-        subItemCreateRequest = new SubItemCreateRequest(1L, "방 청소", "방 청소 설명");
-    }
+		subItem = SubItem.builder()
+			.mainItem(mainItem)
+			.name("방 청소")
+			.description("방 청소 설명")
+			.build();
 
-    @Test
-    @DisplayName("하위 서비스 생성,저장 성공")
-    void createSubItemSuccessTest() throws Exception {
+		member = Member.builder()
+			.name("이홍섭")
+			.password("q1w2e3")
+			.email("sjun@naver.com")
+			.phoneNumber("010")
+			.build();
 
-        //given
-        when(subItemRepository.save(any(SubItem.class)))
-            .thenReturn(subItem);
+		expert = Expert.builder()
+			.member(member)
+			.storeName("축구 레슨")
+			.location("서울시 강남구")
+			.maxTravelDistance(10)
+			.description("축구 레슨 해드립니다.")
+			.build();
 
-        when(subItemRepository.findById(null))
-            .thenReturn(Optional.of(subItem));
+		expertItem = ExpertItem.builder()
+			.expert(expert)
+			.subItem(subItem)
+			.build();
 
-        when(mainItemRepository.findById(anyLong()))
-            .thenReturn(Optional.of(mainItem));
+		subItemCreateRequest = new SubItemCreateRequest(1L, "방 청소", "방 청소 설명");
+	}
 
-        //when
-        SubItemResponse subItemResponse = subItemService.create(subItemCreateRequest);
-        SubItem foundSubItem = subItemRepository.findById(subItemResponse.id()).get();
+	@Test
+	@DisplayName("하위 서비스 생성,저장 성공")
+	void createSubItemSuccessTest() throws Exception {
 
-        //then
-        assertThat(foundSubItem.getName()).isEqualTo(subItemCreateRequest.name());
-        assertThat(foundSubItem.getDescription()).isEqualTo(subItemCreateRequest.description());
-        assertThat(foundSubItem.getMainItem().getName()).isEqualTo(mainItem.getName());
-    }
+		//given
+		when(subItemRepository.save(any(SubItem.class)))
+			.thenReturn(subItem);
 
-    @Test
-    @DisplayName("하위 서비스 생성 실패 - 존재하지 않는 메인 서비스")
-    void createSubItemFailTest_notFoundMainItem() throws Exception {
+		when(subItemRepository.findById(null))
+			.thenReturn(Optional.of(subItem));
 
-        //given
-        when(mainItemRepository.findById(anyLong()))
-            .thenReturn(Optional.empty());
+		when(mainItemRepository.findById(anyLong()))
+			.thenReturn(Optional.of(mainItem));
 
-        //when -> then
-        assertThrows(EntityNotFoundException.class,
-            () -> subItemService.create(subItemCreateRequest));
-    }
+		//when
+		SubItemResponse subItemResponse = subItemService.create(subItemCreateRequest);
+		SubItem foundSubItem = subItemRepository.findById(subItemResponse.id()).get();
 
-    @Test
-    @DisplayName("하위 서비스 생성 실패 - 중복된 이름")
-    void createSubItemFailTest_DuplicatedName() throws Exception {
+		//then
+		assertThat(foundSubItem.getName()).isEqualTo(subItemCreateRequest.name());
+		assertThat(foundSubItem.getDescription()).isEqualTo(subItemCreateRequest.description());
+		assertThat(foundSubItem.getMainItem().getName()).isEqualTo(mainItem.getName());
+	}
 
-        //given
-        String duplicateName = "방 청소";
+	@Test
+	@DisplayName("하위 서비스 생성 실패 - 존재하지 않는 메인 서비스")
+	void createSubItemFailTest_notFoundMainItem() throws Exception {
 
-        when(mainItemRepository.findById(anyLong()))
-            .thenReturn(Optional.of(mainItem));
+		//given
+		when(mainItemRepository.findById(anyLong()))
+			.thenReturn(Optional.empty());
 
-        when(subItemRepository.findByName(duplicateName))
-            .thenReturn(Optional.of(subItem));
+		//when -> then
+		assertThrows(EntityNotFoundException.class,
+			() -> subItemService.create(subItemCreateRequest));
+	}
 
-        //when -> then
-        assertThrows(BusinessException.class,
-            () -> subItemService.create(subItemCreateRequest));
-    }
+	@Test
+	@DisplayName("하위 서비스 생성 실패 - 중복된 이름")
+	void createSubItemFailTest_DuplicatedName() throws Exception {
 
-    @Test
-    @DisplayName("하위 서비스 전체 조회")
-    void findAllSuccessTest() throws Exception {
+		//given
+		String duplicateName = "방 청소";
 
-        //given
-        List<SubItem> subItemList = Collections.singletonList(subItem);
+		when(mainItemRepository.findById(anyLong()))
+			.thenReturn(Optional.of(mainItem));
 
-        when(subItemRepository.findAll())
-            .thenReturn(subItemList);
+		when(subItemRepository.findByName(duplicateName))
+			.thenReturn(Optional.of(subItem));
 
-        //when
-        SubItemsResponse subItemsResponse = subItemService.findAll();
+		//when -> then
+		assertThrows(BusinessException.class,
+			() -> subItemService.create(subItemCreateRequest));
+	}
 
-        //then
-        assertThat(subItemsResponse).isNotNull();
-        assertThat(subItemsResponse.subItemsResponse()).hasSize(1);
-        assertThat(subItemsResponse.subItemsResponse().get(0).name()).isEqualTo(subItem.getName());
-        assertThat(subItemsResponse.subItemsResponse().get(0).description()).isEqualTo(subItem.getDescription());
-        assertThat(subItemsResponse.subItemsResponse().get(0).mainItemName()).isEqualTo(mainItem.getName());
-    }
+	@Test
+	@DisplayName("하위 서비스 전체 조회")
+	void findAllSuccessTest() throws Exception {
 
-    @Test
-    @DisplayName("하위 서비스 ID로 조회 성공")
-    void findSubItemByIdSuccessTest() throws Exception {
+		//given
+		List<SubItem> subItemList = Collections.singletonList(subItem);
 
-        //given
-        Long subItemId = subItem.getId();
+		when(subItemRepository.findAll())
+			.thenReturn(subItemList);
 
-        when(subItemRepository.findById(subItemId))
-            .thenReturn(Optional.of(subItem));
+		//when
+		SubItemsResponse subItemsResponse = subItemService.findAll();
 
-        //when
-        SubItemResponse subItemResponse = subItemService.findById(subItemId);
+		//then
+		assertThat(subItemsResponse).isNotNull();
+		assertThat(subItemsResponse.subItemsResponse()).hasSize(1);
+		assertThat(subItemsResponse.subItemsResponse().get(0).name()).isEqualTo(subItem.getName());
+		assertThat(subItemsResponse.subItemsResponse().get(0).description()).isEqualTo(subItem.getDescription());
+		assertThat(subItemsResponse.subItemsResponse().get(0).mainItemName()).isEqualTo(mainItem.getName());
+	}
 
-        //then
-        assertThat(subItemResponse.name()).isEqualTo(subItem.getName());
-        assertThat(subItemResponse.mainItemName()).isEqualTo(mainItem.getName());
-    }
+	@Test
+	@DisplayName("하위 서비스 ID로 조회 성공")
+	void findSubItemByIdSuccessTest() throws Exception {
 
-    @Test
-    @DisplayName("하위 서비스 ID로 조회 실패 - 존재하지 않는 하위 서비스")
-    void findSubItemByIdFailTest_notFoundSubItem() throws Exception {
+		//given
+		Long subItemId = subItem.getId();
 
-        //given
-        Long subItemId = subItem.getId();
-        when(subItemRepository.findById(subItemId))
-            .thenReturn(Optional.empty());
+		when(subItemRepository.findById(subItemId))
+			.thenReturn(Optional.of(subItem));
 
-        //when -> then
-        assertThrows(EntityNotFoundException.class, () -> subItemService.findById(subItemId));
-    }
+		//when
+		SubItemResponse subItemResponse = subItemService.findById(subItemId);
 
-    @Test
-    @DisplayName("메인 아이템 이름으로 하위 서비스 검색")
-    void findAllByMainItemNameTest() {
-        // given
-        String mainItemName = "청소";
-        int page = 0;
-        int size = 10;
+		//then
+		assertThat(subItemResponse.name()).isEqualTo(subItem.getName());
+		assertThat(subItemResponse.mainItemName()).isEqualTo(mainItem.getName());
+	}
 
-        List<SubItem> subItems = new ArrayList<>();
-        subItems.add(subItem);
-        PageRequest pageRequest = PageRequest.of(page, size);
+	@Test
+	@DisplayName("하위 서비스 ID로 조회 실패 - 존재하지 않는 하위 서비스")
+	void findSubItemByIdFailTest_notFoundSubItem() throws Exception {
 
-        Slice<SubItem> subItemSlice = new SliceImpl<>(subItems, pageRequest, true);
+		//given
+		Long subItemId = subItem.getId();
+		when(subItemRepository.findById(subItemId))
+			.thenReturn(Optional.empty());
 
-        when(subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(page, size)))
-            .thenReturn(subItemSlice);
+		//when -> then
+		assertThrows(EntityNotFoundException.class, () -> subItemService.findById(subItemId));
+	}
 
-        //when
-        SubItemsSliceResponse response = subItemService.findAllByMainItemName(mainItemName, pageRequest);
+	@Test
+	@DisplayName("메인 아이템 이름으로 하위 서비스 검색")
+	void findAllByMainItemNameTest() {
+		// given
+		String mainItemName = "청소";
+		int page = 0;
+		int size = 10;
 
-        //then
-        assertThat(response.subItemSlicesResponse()).hasSize(subItems.size());
-        assertThat(response.hasNext()).isEqualTo(subItemSlice.hasNext());
-    }
+		List<SubItem> subItems = new ArrayList<>();
+		subItems.add(subItem);
+		PageRequest pageRequest = PageRequest.of(page, size);
 
-    @Test
-    @DisplayName("하위 서비스 업데이트 성공")
-    void updateSubItemSuccessTest() throws Exception {
+		Slice<SubItem> subItemSlice = new SliceImpl<>(subItems, pageRequest, true);
 
-        //given
-        String newName = "새로운 이름";
-        SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
+		when(subItemRepository.findAllByMainItemName(mainItemName, PageRequest.of(page, size)))
+			.thenReturn(subItemSlice);
 
-        when(subItemRepository.findById(null))
-            .thenReturn(Optional.of(subItem));
+		//when
+		SubItemsSliceResponse response = subItemService.findAllByMainItemName(mainItemName, pageRequest);
 
-        when(subItemRepository.findByName(newName))
-            .thenReturn(Optional.empty());
+		//then
+		assertThat(response.subItemSlicesResponse()).hasSize(subItems.size());
+		assertThat(response.hasNext()).isEqualTo(subItemSlice.hasNext());
+	}
 
-        //when
-        subItemService.update(mainItem.getId(), subItemUpdateRequest);
+	@Test
+	@DisplayName("하위 서비스 업데이트 성공")
+	void updateSubItemSuccessTest() throws Exception {
 
-        //then
-        assertThat(subItem.getName()).isEqualTo(newName);
-        assertThat(subItem.getDescription()).isEqualTo(subItemUpdateRequest.description());
-    }
+		//given
+		String newName = "새로운 이름";
+		SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
 
-    @Test
-    @DisplayName("하위 서비스 업데이트 실패 - 존재하지 않는 하위 서비스")
-    void updateSubItemFailTest_subItemNotFound() throws Exception {
+		when(subItemRepository.findById(null))
+			.thenReturn(Optional.of(subItem));
 
-        //given
-        String newName = "새로운 이름";
-        SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
+		when(subItemRepository.findByName(newName))
+			.thenReturn(Optional.empty());
 
-        when(subItemRepository.findById(null))
-            .thenReturn(Optional.empty());
+		//when
+		subItemService.update(mainItem.getId(), subItemUpdateRequest);
 
-        //when -> then
-        assertThrows(EntityNotFoundException.class,
-            () -> subItemService.update(mainItem.getId(), subItemUpdateRequest));
-    }
+		//then
+		assertThat(subItem.getName()).isEqualTo(newName);
+		assertThat(subItem.getDescription()).isEqualTo(subItemUpdateRequest.description());
+	}
 
-    @Test
-    @DisplayName("하위 서비스 삭제 성공")
-    void deleteSubItemSuccessTest() throws Exception {
+	@Test
+	@DisplayName("하위 서비스 업데이트 실패 - 존재하지 않는 하위 서비스")
+	void updateSubItemFailTest_subItemNotFound() throws Exception {
 
-        //given
-        when(subItemRepository.findById(null))
-            .thenReturn(Optional.of(subItem));
+		//given
+		String newName = "새로운 이름";
+		SubItemUpdateRequest subItemUpdateRequest = new SubItemUpdateRequest(newName, "축구 설명");
 
-        //when
-        assertDoesNotThrow(() -> subItemService.delete(subItem.getId()));
+		when(subItemRepository.findById(null))
+			.thenReturn(Optional.empty());
 
-        //then
-        verify(subItemRepository, times(1)).delete(subItem);
-    }
+		//when -> then
+		assertThrows(EntityNotFoundException.class,
+			() -> subItemService.update(mainItem.getId(), subItemUpdateRequest));
+	}
+
+	@Test
+	@DisplayName("하위 서비스 삭제 성공")
+	void deleteSubItemSuccessTest() throws Exception {
+
+		//given
+		when(subItemRepository.findById(null))
+			.thenReturn(Optional.of(subItem));
+
+		//when
+		assertDoesNotThrow(() -> subItemService.delete(subItem.getId()));
+
+		//then
+		verify(subItemRepository, times(1)).delete(subItem);
+	}
 }

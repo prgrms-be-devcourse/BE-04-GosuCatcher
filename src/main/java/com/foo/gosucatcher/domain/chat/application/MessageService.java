@@ -21,6 +21,7 @@ import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.chat.domain.Message;
 import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -83,5 +84,10 @@ public class MessageService {
                 .collect(Collectors.toList());
 
         return MessagesResponse.valueOf(messageResponses);
+    }
+
+    public MessageResponse sendExpertEstimateMessage(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
+
+        return create(expertNormalEstimateResponse.id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description());
     }
 }

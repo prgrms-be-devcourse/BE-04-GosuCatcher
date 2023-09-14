@@ -1,5 +1,9 @@
 package com.foo.gosucatcher.domain.expert.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -8,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -16,6 +21,8 @@ import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -37,6 +44,9 @@ public class Expert extends BaseEntity {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
+
+	@OneToMany(mappedBy = "expert", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ExpertItem> expertItemList = new ArrayList<>();
 
 	@Column(nullable = false, length = 20)
 	private String storeName;
@@ -67,7 +77,7 @@ public class Expert extends BaseEntity {
 		this.member = member;
 		this.storeName = storeName;
 		this.location = location;
-		this.maxTravelDistance = maxTravelDistance;
+		this.maxTravelDistance = checkMaxTravelDistance(maxTravelDistance);
 		this.description = description;
 		this.isAuto = false;
 		this.rating = 0.0;
@@ -81,11 +91,27 @@ public class Expert extends BaseEntity {
 	public void updateExpert(Expert updatedExpert) {
 		this.storeName = updatedExpert.getStoreName();
 		this.location = updatedExpert.getLocation();
-		this.maxTravelDistance = updatedExpert.getMaxTravelDistance();
+		this.maxTravelDistance = checkMaxTravelDistance(updatedExpert.getMaxTravelDistance());
 		this.description = updatedExpert.getDescription();
 	}
 
+	public void addExpertItem(ExpertItem expertItem) {
+		expertItem.addExpert(this);
+		this.getExpertItemList().add(expertItem);
+	}
+
+	public void removeExpertItem(ExpertItem expertItem) {
+		this.getExpertItemList().remove(expertItem);
+	}
+  
 	public void updateRating(double newRating) {
 		this.rating = newRating;
 	}
+
+	private int checkMaxTravelDistance(int maxTravelDistance) {
+		if (maxTravelDistance < 0) {
+			throw new InvalidValueException(ErrorCode.INVALID_MAX_TRAVEL_DISTANCE);
+		}
+
+		return maxTravelDistance;
 }
