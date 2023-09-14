@@ -21,7 +21,9 @@ import io.jsonwebtoken.Header;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 public class JwtTokenProvider {
 
@@ -34,7 +36,7 @@ public class JwtTokenProvider {
 
 	public JwtTokenProvider(CustomUserDetailsService customUserDetailsService, JwtProperties jwtProperties) {
 		this.customUserDetailsService = customUserDetailsService;
-		this.ACCESS_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getAccessTokenExpiredTime()).toMillis();
+		this.ACCESS_TOKEN_EXPIRED_TIME = Duration.ofSeconds(jwtProperties.getAccessTokenExpiredTime()).toMillis();
 		this.REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getRefreshTokenExpiredTime()).toMillis();
 		this.ACCESS_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getAccessTokenSecretKey());
 		this.REFRESH_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getRefreshTokenSecretKey());
@@ -69,7 +71,7 @@ public class JwtTokenProvider {
 	}
 
 	public Authentication getAccessTokenAuthenticationByExpertId(String token) {
-		CustomUserDetails customUserDetails = customUserDetailsService.loadExpertByMemberId(
+		CustomUserDetails customUserDetails = customUserDetailsService.loadMemberAndExpertByMemberId(
 			getExpertId(token, ACCESS_TOKEN_SECRET_KEY));
 		Expert expert = customUserDetails.getExpert();
 		Member member = customUserDetails.getMember();
@@ -174,6 +176,18 @@ public class JwtTokenProvider {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public boolean isRefreshTokenExistInDb(String refreshToken) {
+		Long memberId = getMemberId(refreshToken, REFRESH_TOKEN_SECRET_KEY);
+		log.warn("isRefreshTokenExistInDb : {}", memberId);
+		return customUserDetailsService.isSameRefreshTokenExist(memberId, refreshToken);
+	}
+
+	public CustomUserDetails getMemberAndExpertByRefreshToken(String refreshToken) {
+		Long memberId = getMemberId(refreshToken, REFRESH_TOKEN_SECRET_KEY);
+
+		return customUserDetailsService.loadMemberAndExpertByMemberId(memberId);
 	}
 
 	private String getTokenSecretKey(String accessTokenSecretKey) {

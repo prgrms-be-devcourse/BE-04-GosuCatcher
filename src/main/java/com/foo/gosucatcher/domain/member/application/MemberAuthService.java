@@ -80,7 +80,10 @@ public class MemberAuthService {
 	public void deleteMember(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		Expert expert = expertRepository.findByMemberIdWithFetchJoin(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
+		expertRepository.delete(expert);
 		memberRepository.delete(member);
 	}
 
