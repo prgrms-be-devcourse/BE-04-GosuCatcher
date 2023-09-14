@@ -16,24 +16,23 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.ErrorResponse;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
 
-public class JwtAccessTokenFilter extends OncePerRequestFilter {
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
-
-	public JwtAccessTokenFilter(JwtTokenProvider jwtTokenProvider) {
-		this.jwtTokenProvider = jwtTokenProvider;
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
-		String token = jwtTokenProvider.resolveAccessToken(request);
+		String accessToken = jwtTokenProvider.resolveAccessToken(request);
+		String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
 		try {
-			if (token != null && jwtTokenProvider.isValidAccessToken(token)) {
-				token = jwtTokenProvider.removeBearer(token);
-				Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
+			if (accessToken != null && jwtTokenProvider.isValidAccessToken(accessToken)) {
+				accessToken = jwtTokenProvider.removeBearer(accessToken);
+				Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(accessToken);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 

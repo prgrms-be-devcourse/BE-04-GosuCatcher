@@ -1,6 +1,6 @@
 package com.foo.gosucatcher.domain.bucket.domain;
 
-import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.*;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -53,7 +53,7 @@ public class Bucket extends BaseEntity {
 		long memberId = member.getId();
 
 		if (memberId == expertMemberId) {
-			throw new NotSupportedBucketException(ErrorCode.UNSUPPORTED_SELF_BUCKET);
+			throw new NotSupportedBucketException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;

@@ -7,7 +7,6 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,37 +25,32 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Component
 public class JwtTokenProvider {
 
-	private static final long ACCESS_TOKEN_EXPIRED_TIME = Duration.ofHours(24).toMillis();
-	private static final long REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(10).toMillis();
-
-	private final String accessTokenSecretKey;
-	private final String refreshTokenSecretKey;
-
 	private final CustomUserDetailsService customUserDetailsService;
 
-	public JwtTokenProvider(
-		@Value("${spring.jwt.accessTokenSecretKey}")
-		String accessTokenSecretKey,
-		@Value("${spring.jwt.refreshTokenSecretKey}")
-		String refreshTokenSecretKey,
-		CustomUserDetailsService customUserDetailsService
-	) {
-		this.accessTokenSecretKey = getTokenSecretKey(accessTokenSecretKey);
-		this.refreshTokenSecretKey = getTokenSecretKey(refreshTokenSecretKey);
+	private final long ACCESS_TOKEN_EXPIRED_TIME;
+	private final long REFRESH_TOKEN_EXPIRED_TIME;
+	private final String ACCESS_TOKEN_SECRET_KEY;
+	private final String REFRESH_TOKEN_SECRET_KEY;
+
+	public JwtTokenProvider(CustomUserDetailsService customUserDetailsService, JwtProperties jwtProperties) {
 		this.customUserDetailsService = customUserDetailsService;
+		this.ACCESS_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getAccessTokenExpiredTime()).toMillis();
+		this.REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getRefreshTokenExpiredTime()).toMillis();
+		this.ACCESS_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getAccessTokenSecretKey());
+		this.REFRESH_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getRefreshTokenSecretKey());
 	}
 
 	public String createAccessToken(String memberEmail, Long memberId, Long expertId) {
-		return getToken(memberEmail, memberId, expertId, ACCESS_TOKEN_EXPIRED_TIME, accessTokenSecretKey);
+		return getToken(memberEmail, memberId, expertId, ACCESS_TOKEN_EXPIRED_TIME, ACCESS_TOKEN_SECRET_KEY);
 	}
 
 	public String createRefreshToken(String memberEmail, Long memberId, Long expertId) {
-		return getToken(memberEmail, memberId, expertId, REFRESH_TOKEN_EXPIRED_TIME, refreshTokenSecretKey);
+		return getToken(memberEmail, memberId, expertId, REFRESH_TOKEN_EXPIRED_TIME, REFRESH_TOKEN_SECRET_KEY);
 	}
 
 	public Authentication getAccessTokenAuthenticationByMemberEmail(String token) {
 		UserDetails userDetails = customUserDetailsService.loadUserByUsername(
-			getMemberEmail(token, accessTokenSecretKey));
+			getMemberEmail(token, ACCESS_TOKEN_SECRET_KEY));
 		String email = userDetails.getUsername();
 		String password = userDetails.getPassword();
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
@@ -66,7 +60,7 @@ public class JwtTokenProvider {
 
 	public Authentication getAccessTokenAuthenticationByMemberId(String token) {
 		UserDetails userDetails = customUserDetailsService.loadUserByUsername(
-			getMemberId(token, accessTokenSecretKey));
+			getMemberId(token, ACCESS_TOKEN_SECRET_KEY));
 		Long id = ((Member)userDetails).getId();
 		String password = userDetails.getPassword();
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
@@ -76,7 +70,7 @@ public class JwtTokenProvider {
 
 	public Authentication getAccessTokenAuthenticationByExpertId(String token) {
 		CustomUserDetails customUserDetails = customUserDetailsService.loadExpertByMemberId(
-			getExpertId(token, accessTokenSecretKey));
+			getExpertId(token, ACCESS_TOKEN_SECRET_KEY));
 		Expert expert = customUserDetails.getExpert();
 		Member member = customUserDetails.getMember();
 
@@ -89,7 +83,7 @@ public class JwtTokenProvider {
 
 	public Authentication getRefreshTokenAuthentication(String token) {
 		UserDetails userDetails = customUserDetailsService.loadUserByUsername(
-			getMemberEmail(token, refreshTokenSecretKey));
+			getMemberEmail(token, REFRESH_TOKEN_SECRET_KEY));
 		String email = userDetails.getUsername();
 		String password = userDetails.getPassword();
 		Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
@@ -98,15 +92,19 @@ public class JwtTokenProvider {
 	}
 
 	public String resolveAccessToken(HttpServletRequest request) {
-		return request.getHeader("AccessToken");
+		return request.getHeader("Authorization");
+	}
+
+	public String resolveRefreshToken(HttpServletRequest request) {
+		return request.getHeader("RefreshToken");
 	}
 
 	public boolean isValidAccessToken(String token) {
-		return isValidToken(token, accessTokenSecretKey);
+		return isValidToken(token, ACCESS_TOKEN_SECRET_KEY);
 	}
 
 	public boolean isValidRefreshToken(String token) {
-		return isValidToken(token, refreshTokenSecretKey);
+		return isValidToken(token, REFRESH_TOKEN_SECRET_KEY);
 	}
 
 	public String removeBearer(String token) {
