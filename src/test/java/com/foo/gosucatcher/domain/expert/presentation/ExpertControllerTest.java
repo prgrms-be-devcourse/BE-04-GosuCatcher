@@ -272,7 +272,8 @@ class ExpertControllerTest {
 		// given
 		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
 
-		given(expertService.uploadImage(any(Long.class), any())).willThrow(new InvalidValueException(ErrorCode.INVALID_IMAGE));
+		given(expertService.uploadImage(any(Long.class), any())).willThrow(
+			new InvalidValueException(ErrorCode.INVALID_IMAGE));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/1/images")
@@ -292,7 +293,8 @@ class ExpertControllerTest {
 		MockMultipartFile validFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		given(expertService.uploadImage(any(Long.class), any())).willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+		given(expertService.uploadImage(any(Long.class), any())).willThrow(
+			new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/3/images")
@@ -430,7 +432,7 @@ class ExpertControllerTest {
 			.andDo(print());
 	}
 
-  @Test
+	@Test
 	@DisplayName("고수 서브 아이템 삭제 성공")
 	void removeSubItemSuccessTest() throws Exception {
 		//given
@@ -487,7 +489,7 @@ class ExpertControllerTest {
 			.andDo(print());
 	}
 
-  @Test
+	@Test
 	@DisplayName("고수찾기 실패: 잘못된 정렬기준")
 	void searchExpertsFailureNotFoundExpertSortTypeTest() throws Exception {
 		// given

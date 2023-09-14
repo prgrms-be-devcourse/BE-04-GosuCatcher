@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class FileSystemExpertImageService implements ImageService {
 
-	public ImageUploadResponse store(ImageUploadRequest request){
+	public ImageUploadResponse store(ImageUploadRequest request) {
 		return null;
 	}
 
-	public void delete(ImageDeleteRequest request){
+	public void delete(ImageDeleteRequest request) {
 
 	}
 }

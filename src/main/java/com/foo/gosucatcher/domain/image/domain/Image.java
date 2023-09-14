@@ -1,4 +1,3 @@
-
 package com.foo.gosucatcher.domain.image.domain;
 
 import javax.persistence.MappedSuperclass;
