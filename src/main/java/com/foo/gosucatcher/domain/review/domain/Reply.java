@@ -15,8 +15,8 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.review.exception.UnsupportedReplierException;
 import com.foo.gosucatcher.global.BaseEntity;
-import com.foo.gosucatcher.global.error.exception.UnsupportedReplierException;
 
 import lombok.AccessLevel;
 import lombok.Builder;

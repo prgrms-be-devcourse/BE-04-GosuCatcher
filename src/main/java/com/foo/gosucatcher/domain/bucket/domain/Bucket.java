@@ -15,10 +15,10 @@ import javax.persistence.Table;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.foo.gosucatcher.domain.bucket.exception.UnsupportedBucketException;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
-import com.foo.gosucatcher.global.error.exception.UnsupportedBucketException;
 
 import lombok.AccessLevel;
 import lombok.Builder;

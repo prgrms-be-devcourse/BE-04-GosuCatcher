@@ -26,9 +26,9 @@ import com.foo.gosucatcher.domain.review.domain.Reply;
 import com.foo.gosucatcher.domain.review.domain.ReplyRepository;
 import com.foo.gosucatcher.domain.review.domain.Review;
 import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
+import com.foo.gosucatcher.domain.review.exception.InvalidReplyCountException;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
-import com.foo.gosucatcher.global.error.exception.InvalidReplyCountException;
 
 import lombok.RequiredArgsConstructor;
 

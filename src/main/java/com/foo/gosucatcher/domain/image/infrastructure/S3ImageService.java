@@ -28,8 +28,8 @@ import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
-import com.foo.gosucatcher.global.error.exception.ImageIOException;
-import com.foo.gosucatcher.global.error.exception.InvalidTypeException;
+import com.foo.gosucatcher.domain.image.exception.ImageIOException;
+import com.foo.gosucatcher.domain.image.exception.InvalidFileTypeException;
 import com.foo.gosucatcher.global.error.exception.InvalidValueException;
 
 import lombok.RequiredArgsConstructor;
@@ -39,17 +39,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class S3ImageService implements ImageService {
 
+	private static final String supportedImageExtension[] = {"jpg", "jpeg", "png"};
 	private final AmazonS3 amazonS3;
-
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
-
-	private static final String supportedImageExtension[] = {"jpg", "jpeg", "png"};
 
 	@Override
 	public ImagesResponse store(ImageUploadRequest request) {
 		List<String> paths = new ArrayList<>();
-		// try {
 		for (MultipartFile multipartFile : request.files()) {
 			validateFile(multipartFile);
 			File file = convertToFile(multipartFile);
@@ -141,7 +138,7 @@ public class S3ImageService implements ImageService {
 			.anyMatch(extension -> extension.equalsIgnoreCase(inputExtension));
 
 		if (!isExtensionValid) {
-			throw new InvalidTypeException(INVALID_IMAGE_FORMAT);
+			throw new InvalidFileTypeException(INVALID_IMAGE_FORMAT);
 		}
 	}
 }

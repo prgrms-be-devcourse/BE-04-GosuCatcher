@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.global.error.exception;
+package com.foo.gosucatcher.domain.image.exception;
 
 import com.foo.gosucatcher.global.error.ErrorCode;
 
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ImageIOException extends RuntimeException{
+public class ImageIOException extends RuntimeException {
 
 	private final ErrorCode errorCode;
 }
