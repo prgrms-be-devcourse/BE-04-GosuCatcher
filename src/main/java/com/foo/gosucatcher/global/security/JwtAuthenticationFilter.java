@@ -16,24 +16,31 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.ErrorResponse;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-public class JwtAccessTokenFilter extends OncePerRequestFilter {
+@Slf4j
+@RequiredArgsConstructor
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
-
-	public JwtAccessTokenFilter(JwtTokenProvider jwtTokenProvider) {
-		this.jwtTokenProvider = jwtTokenProvider;
-	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
 		FilterChain filterChain) throws ServletException, IOException {
-		String token = jwtTokenProvider.resolveAccessToken(request);
+		String accessToken = jwtTokenProvider.resolveAccessToken(request);
+		String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
 		try {
-			if (token != null && jwtTokenProvider.isValidAccessToken(token)) {
-				token = jwtTokenProvider.removeBearer(token);
-				Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
+			if (accessToken != null && jwtTokenProvider.isValidAccessToken(accessToken)) {
+				accessToken = jwtTokenProvider.removeBearer(accessToken);
+				Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(accessToken);
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+
+			if (refreshToken != null && jwtTokenProvider.isValidRefreshToken(refreshToken)) {
+				refreshToken = jwtTokenProvider.removeBearer(refreshToken);
+				Authentication authentication = jwtTokenProvider.getRefreshTokenAuthentication(refreshToken);
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 
@@ -43,7 +50,12 @@ public class JwtAccessTokenFilter extends OncePerRequestFilter {
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 
-			ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR);
+			ErrorResponse errorResponse;
+			if (jwtTokenProvider.isValidAccessToken(accessToken)) {
+				errorResponse = ErrorResponse.of(ErrorCode.EXPIRED_AUTHENTICATION);
+			} else {
+				errorResponse = ErrorResponse.of(ErrorCode.NOT_VALID_REFRESH_TOKEN);
+			}
 			new ObjectMapper().writeValue(response.getWriter(), errorResponse);
 		}
 	}

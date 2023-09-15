@@ -1,4 +1,4 @@
-package com.foo.gosucatcher.domain.member.exception;
+package com.foo.gosucatcher.global.error.exception;
 
 import com.foo.gosucatcher.global.error.ErrorCode;
 
@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class MemberCertifiedFailException extends RuntimeException {
+public class AopException extends RuntimeException {
 
 	private final ErrorCode errorCode;
 }

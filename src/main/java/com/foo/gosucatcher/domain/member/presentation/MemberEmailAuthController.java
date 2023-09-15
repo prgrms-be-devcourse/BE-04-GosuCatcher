@@ -2,7 +2,6 @@ package com.foo.gosucatcher.domain.member.presentation;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,7 +31,7 @@ public class MemberEmailAuthController {
 		return ResponseEntity.ok(authenticateResponse);
 	}
 
-	@GetMapping("/validation")
+	@PostMapping("/validation")
 	public ResponseEntity<MemberEmailAuthResponse> authenticateMemberByEmail(@RequestParam String email,
 		@RequestBody @Validated MemberEmailAuthRequest memberEmailAuthRequest) {
 		MemberEmailAuthResponse memberEmailAuthResponse = memberEmailAuthService.authenticateMemberByEmail(email,

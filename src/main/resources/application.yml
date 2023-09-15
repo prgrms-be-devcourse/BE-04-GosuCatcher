@@ -11,6 +11,8 @@ spring:
   jwt:
     accessTokenSecretKey: DUMMY_ACCESS_TOKEN_SECRET
     refreshTokenSecretKey: DUMMY_REFRESH_TOKEN_SECRET
+    accessTokenExpiredTime: 1
+    refreshTokenExpiredTime: 30
 
   mail:
     host: smtp.gmail.com

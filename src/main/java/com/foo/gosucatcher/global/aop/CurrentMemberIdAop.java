@@ -15,8 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.AopException;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -29,20 +33,26 @@ public class CurrentMemberIdAop {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Around("@annotation(currentMemberId)")
-	public Object getCurrentMemberId(ProceedingJoinPoint proceedingJoinPoint, CurrentMemberId currentMemberId) throws
-		Throwable {
+	public Object getCurrentMemberId(ProceedingJoinPoint proceedingJoinPoint, CurrentMemberId currentMemberId) {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
 
 		String token = jwtTokenProvider.resolveAccessToken(request);
 		token = jwtTokenProvider.removeBearer(token);
 
-		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberId(token);
-		Long memberId = Long.parseLong(authentication.getPrincipal().toString());
+		try {
+			Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberId(token);
+			Long memberId = Long.parseLong(authentication.getPrincipal().toString());
+			Object[] modifiedArgs = modifyArgsWithMemberId(memberId, proceedingJoinPoint);
 
-		Object[] modifiedArgs = modifyArgsWithMemberId(memberId, proceedingJoinPoint);
-
-		return proceedingJoinPoint.proceed(modifiedArgs);
+			return proceedingJoinPoint.proceed(modifiedArgs);
+		} catch (ExpiredJwtException e) {
+			throw new MemberCertifiedFailException(ErrorCode.EXPIRED_AUTHENTICATION);
+		} catch (RuntimeException e) {
+			throw new MemberCertifiedFailException(ErrorCode.INVALID_TOKEN);
+		} catch (Throwable e) {
+			throw new AopException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	private Object[] modifyArgsWithMemberId(Long memberId, ProceedingJoinPoint proceedingJoinPoint) {

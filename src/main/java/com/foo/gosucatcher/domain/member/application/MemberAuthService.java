@@ -1,6 +1,5 @@
 package com.foo.gosucatcher.domain.member.application;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,8 +8,8 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberLoginRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberPasswordFoundRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.MemberRefreshRequest;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberSignupRequest;
+import com.foo.gosucatcher.domain.member.application.dto.response.JwtReissueResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifiedResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
@@ -20,6 +19,7 @@ import com.foo.gosucatcher.domain.member.domain.Roles;
 import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
+import com.foo.gosucatcher.global.security.CustomUserDetails;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 import com.foo.gosucatcher.global.util.RandomNumberUtils;
 
@@ -80,7 +80,10 @@ public class MemberAuthService {
 	public void deleteMember(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		Expert expert = expertRepository.findByMemberIdWithFetchJoin(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
+		expertRepository.delete(expert);
 		memberRepository.delete(member);
 	}
 
@@ -100,25 +103,22 @@ public class MemberAuthService {
 		return MemberPasswordFoundResponse.from(member);
 	}
 
-	//todo: 스플린트3에서 사용할 예정
-	public MemberCertifiedResponse refresh(MemberRefreshRequest memberRefreshRequest) {
-		String refreshToken = memberRefreshRequest.refreshToken();
-
-		if (jwtTokenProvider.isValidRefreshToken(refreshToken)) {
-			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
+	public JwtReissueResponse reissue(String refreshToken) {
+		if (!jwtTokenProvider.isValidRefreshToken(refreshToken)) {
+			throw new MemberCertifiedFailException(ErrorCode.NOT_VALID_REFRESH_TOKEN);
 		}
 
-		Member member = getMemberByRefreshToken(refreshToken);
-		Long memberId = member.getId();
-		Expert expert = expertRepository.findByMemberId(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
+		refreshToken = jwtTokenProvider.removeBearer(refreshToken);
+		CustomUserDetails userDetails = getCustomUserDetailsByRefreshToken(refreshToken);
+		Member member = userDetails.getMember();
+		Expert expert = userDetails.getExpert();
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
-			throw new MemberCertifiedFailException(ErrorCode.CERTIFICATION_FAIL);
+			throw new MemberCertifiedFailException(ErrorCode.NOT_VALID_REFRESH_TOKEN);
 		}
 
-		return getMemberCertifiedResponse(member, expert);
+		return createJwtReissueResponse(member, expert);
 	}
 
 	private MemberCertifiedResponse getMemberCertifiedResponse(Member member, Expert expert) {
@@ -134,11 +134,17 @@ public class MemberAuthService {
 		return MemberCertifiedResponse.from(accessToken, refreshToken);
 	}
 
-	private Member getMemberByRefreshToken(String refreshToken) {
-		Authentication authentication = jwtTokenProvider.getRefreshTokenAuthentication(refreshToken);
-		String memberEmail = authentication.getName();
+	private CustomUserDetails getCustomUserDetailsByRefreshToken(String refreshToken) {
+		return jwtTokenProvider.getMemberAndExpertByRefreshToken(refreshToken);
+	}
 
-		return memberRepository.findByEmail(memberEmail)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+	private JwtReissueResponse createJwtReissueResponse(Member member, Expert expert) {
+		Long memberId = member.getId();
+		String memberEmail = member.getEmail();
+		Long expertId = expert.getId();
+
+		String reissuedAccessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId, expertId);
+
+		return new JwtReissueResponse(reissuedAccessToken);
 	}
 }

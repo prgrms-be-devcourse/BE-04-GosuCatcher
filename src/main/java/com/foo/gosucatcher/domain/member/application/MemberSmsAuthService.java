@@ -41,7 +41,7 @@ public class MemberSmsAuthService {
 	public MemberSmsAuthService(SmsRedisTemplateUtils smsRedisTemplateUtils, SmsAuthProperties smsAuthProperties) {
 		this.smsRedisTemplateUtils = smsRedisTemplateUtils;
 		this.messageService = NurigoApp.INSTANCE.initialize(smsAuthProperties.getApiKey(),
-			smsAuthProperties.getApiKey(), smsAuthProperties.getDomain());
+			smsAuthProperties.getApiSecret(), smsAuthProperties.getDomain());
 		this.FROM_NUMBER = smsAuthProperties.getFromNumber();
 		this.EXPIRATION_TIME = smsAuthProperties.getExpirationTime();
 	}

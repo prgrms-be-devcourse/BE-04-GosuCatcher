@@ -32,12 +32,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 	}
 
-	public CustomUserDetails loadExpertByMemberId(Long memberId) {
+	public CustomUserDetails loadMemberAndExpertByMemberId(Long memberId) {
 		Expert expert = expertRepository.findByMemberId(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		return new CustomUserDetails(member, expert);
+	}
+
+	public boolean isSameRefreshTokenExist(Long memberId, String refreshToken) {
+		return memberRepository.existsByMemberIdAndRefreshToken(memberId, refreshToken);
 	}
 }
