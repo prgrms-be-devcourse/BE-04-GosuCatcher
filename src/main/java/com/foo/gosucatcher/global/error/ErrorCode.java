@@ -54,7 +54,9 @@ public enum ErrorCode {
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
 	EMPTY_IMAGE("F002", "이미지를 업로드 바랍니다."),
 	INVALID_IMAGE_FORMAT("F003", "지원하지 않는 이미지 파일 형식입니다."),
-	EXCESSIVE_IMAGE_SIZE("F004", "지원하는 이미지 파일의 용량을 초과하였습니다."),
+	EXCESSIVE_IMAGE_COUNT("F004", "업로드 가능한 이미지 최대 개수를 초과하였습니다."),
+
+
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
 	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
