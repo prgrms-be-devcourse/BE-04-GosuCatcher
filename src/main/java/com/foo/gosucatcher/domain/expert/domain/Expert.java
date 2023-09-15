@@ -61,7 +61,7 @@ public class Expert extends BaseEntity {
 	@Column(name = "is_auto", nullable = false)
 	private boolean isAuto;
 
-	@Column(nullable = false, columnDefinition = "double default 0.0")
+	@Column(name = "rating", nullable = false, columnDefinition = "double default 0.0")
 	private double rating;
 
 	@Column(name = "review_count", nullable = false, columnDefinition = "int default 0")
@@ -71,26 +71,51 @@ public class Expert extends BaseEntity {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder
-	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description) {
+	public Expert(Member member, String storeName, String location, int maxTravelDistance, String description,
+		double rating, int reviewCount) {
 		this.member = member;
 		this.storeName = storeName;
 		this.location = location;
 		this.maxTravelDistance = checkMaxTravelDistance(maxTravelDistance);
 		this.description = description;
 		this.isAuto = false;
-		this.rating = 0.0;
-		this.reviewCount = 0;
+		this.rating = rating;
+		this.reviewCount = reviewCount;
 	}
 
 	public void updateIsAuto(boolean isAuto) {
 		this.isAuto = isAuto;
 	}
 
-	public void updateExpert(Expert updatedExpert) {
+	public void update(Expert updatedExpert) {
 		this.storeName = updatedExpert.getStoreName();
 		this.location = updatedExpert.getLocation();
 		this.maxTravelDistance = checkMaxTravelDistance(updatedExpert.getMaxTravelDistance());
 		this.description = updatedExpert.getDescription();
+		this.rating = updatedExpert.getRating();
+		this.reviewCount = updatedExpert.getReviewCount();
+	}
+
+	public void addRating(double rating) {
+		double updated = (this.rating * reviewCount + rating) / (reviewCount + 1);
+		reviewCount++;
+		this.rating = adjustRating(updated);
+	}
+
+	public void updateRating(double rating) {
+		double updated = (this.rating * reviewCount - this.rating + rating) / reviewCount;
+
+		this.rating = adjustRating(updated);
+	}
+
+	public void deleteReview(double rating) {
+		double updated = Math.max(this.rating * reviewCount - this.rating - rating, 0) / (reviewCount - 1);
+		reviewCount--;
+		this.rating = adjustRating(updated);
+	}
+
+	private double adjustRating(double rating) {
+		return Math.round(rating * 10) / 10.0;
 	}
 
 	public void addExpertItem(ExpertItem expertItem) {
@@ -100,10 +125,6 @@ public class Expert extends BaseEntity {
 
 	public void removeExpertItem(ExpertItem expertItem) {
 		this.getExpertItemList().remove(expertItem);
-	}
-
-	public void updateRating(double newRating) {
-		this.rating = newRating;
 	}
 
 	private int checkMaxTravelDistance(int maxTravelDistance) {

@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.bucket.domain;
 
-import static java.lang.Boolean.*;
+import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_SELF_BUCKET;
+import static java.lang.Boolean.FALSE;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,8 +18,7 @@ import org.hibernate.annotations.Where;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.NotSupportedBucketException;
+import com.foo.gosucatcher.global.error.exception.UnsupportedBucketException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -53,7 +53,7 @@ public class Bucket extends BaseEntity {
 		long memberId = member.getId();
 
 		if (memberId == expertMemberId) {
-			throw new NotSupportedBucketException(ErrorCode.NOT_SUPPORTED_SELF_BUCKET);
+			throw new UnsupportedBucketException(UNSUPPORTED_SELF_BUCKET);
 		}
 
 		this.expert = expert;

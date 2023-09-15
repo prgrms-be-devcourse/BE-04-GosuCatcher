@@ -127,7 +127,7 @@ class ChattingRoomServiceTest {
         when(chattingRoomRepository.findAllByMemberEstimate(memberEstimate)).thenReturn(expectedChattingRooms);
 
         //when
-        ChattingRoomsResponse chattingRoomResponse = chattingRoomService.findAllByMemberEstimate(memberEstimateId);
+        ChattingRoomsResponse chattingRoomResponse = chattingRoomService.findAllByMemberEstimateId(memberEstimateId);
         List<ChattingRoomResponse> chattingRoomResponses = chattingRoomResponse.chattingRoomsResponse();
 
         //then

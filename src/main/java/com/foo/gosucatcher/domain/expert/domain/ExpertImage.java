@@ -31,8 +31,8 @@ public class ExpertImage extends Image {
 	private Expert expert;
 
 	@Builder
-	public ExpertImage(String filename, String url, Long size, Expert expert) {
-		super(filename, url, size);
+	public ExpertImage(String filename, Expert expert) {
+		super(filename);
 		this.expert = expert;
 	}
 }

@@ -1,8 +1,7 @@
 package com.foo.gosucatcher.domain.review.domain;
 
-import static java.lang.Boolean.FALSE;
+import static com.foo.gosucatcher.global.error.ErrorCode.INVALID_UPDATER;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -19,6 +18,7 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.global.BaseEntity;
+import com.foo.gosucatcher.global.error.exception.UnsupportedUpdateException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,38 +43,59 @@ public class Review extends BaseEntity {
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
-	private Member member;
+	private Member writer;
 
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "sub_item_id")
 	private SubItem subItem;
 
-	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "reply_id")
 	private Reply reply;
 
 	private String content;
 
-	private int rating;
+	private double rating;
 
-	private boolean isDeleted = FALSE;
+	private boolean isDeleted = false;
 
 	@Builder
-	public Review(Expert expert, Member member, SubItem subItem, String content, int rating) {
+	public Review(Expert expert, Member writer, SubItem subItem, String content, int rating) {
 		this.expert = expert;
-		this.member = member;
+		this.writer = writer;
 		this.subItem = subItem;
 		this.content = content;
 		this.rating = rating;
-		this.isDeleted = false;
 	}
 
-	public void update(Review updatedReview) {
-		content = updatedReview.getContent();
-		rating = updatedReview.getRating();
+	public void update(Review updated, long updaterId) {
+		content = updated.getContent();
+		rating = updated.getRating();
+
+		validateWriter(updaterId);
+
+		expert.updateRating(rating);
 	}
 
-	public void updateReply(Reply reply) {
+	public void delete(long updaterId) {
+		validateWriter(updaterId);
+
+		expert.deleteReview(rating);
+	}
+
+	public boolean replyExists() {
+		return ((reply != null) && (!reply.isDeleted()));
+	}
+
+	private void validateWriter(long updaterId) {
+		long writerId = writer.getId();
+
+		if (writerId != updaterId) {
+			throw new UnsupportedUpdateException(INVALID_UPDATER);
+		}
+	}
+
+	public void addReply(Reply reply) {
 		this.reply = reply;
 	}
 }

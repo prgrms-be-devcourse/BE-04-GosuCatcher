@@ -8,5 +8,5 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 
 public interface ExpertItemRepository extends JpaRepository<ExpertItem, Long> {
 
-    Optional<ExpertItem> findByExpertAndSubItem(Expert expert, SubItem subItem);
+	Optional<ExpertItem> findByExpertAndSubItem(Expert expert, SubItem subItem);
 }

@@ -1,10 +1,10 @@
 package com.foo.gosucatcher.domain.item.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MainItemRepository extends JpaRepository<MainItem, Long> {
 
-    Optional<MainItem> findByName(String name);
+	Optional<MainItem> findByName(String name);
 }
