@@ -122,6 +122,13 @@ public class ExpertEstimateService {
 		return ExpertEstimatesResponse.from(expertEstimates);
 	}
 
+	@Transactional(readOnly = true)
+	public ExpertAutoEstimatesResponse findAllUnmatchedAutoByExpertId(Long expertId) {
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllExpertAndMemberEstimateIsNull(expertId);
+
+		return ExpertAutoEstimatesResponse.from(expertEstimates);
+	}
+
 	private void checkAlreadyResponded(MemberEstimate memberEstimate) {
 		List<ExpertEstimate> expertEstimateList = memberEstimate.getExpertEstimateList();
 		expertEstimateList.stream()

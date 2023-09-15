@@ -21,4 +21,7 @@ public interface ExpertEstimateRepository extends JpaRepository<ExpertEstimate, 
 
 	@Query("SELECT ee FROM ExpertEstimate ee JOIN FETCH ee.expert JOIN FETCH ee.memberEstimate")
 	List<ExpertEstimate> findAllByMemberEstimate(MemberEstimate memberEstimate);
+
+	@Query("SELECT ee FROM ExpertEstimate ee WHERE ee.expert.id = :expertId AND ee.memberEstimate IS NULL")
+	List<ExpertEstimate> findAllExpertAndMemberEstimateIsNull(@Param("expertId") Long expertId);
 }

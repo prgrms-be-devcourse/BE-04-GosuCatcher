@@ -16,10 +16,12 @@ import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
+import com.foo.gosucatcher.global.aop.CurrentExpertId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -75,5 +77,13 @@ public class ExpertEstimateController {
 		ExpertEstimatesResponse expertEstimatesResponse = expertEstimateService.findAllByMemberEstimateId(memberEstimateId);
 
 		return ResponseEntity.ok(expertEstimatesResponse);
+	}
+
+	@GetMapping("/auto")
+	@CurrentExpertId
+	public ResponseEntity<ExpertAutoEstimatesResponse> findAutosByExpertId(Long expertId) {
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllUnmatchedAutoByExpertId(expertId);
+
+		return ResponseEntity.ok(expertAutoEstimatesResponse);
 	}
 }
