@@ -56,13 +56,14 @@ public class ReviewController {
 		@RequestPart(required = false) List<MultipartFile> imageFiles,
 		Long memberId
 	) {
-		if(imageFiles.size() > IMAGE_MAX_COUNT){
+		if (imageFiles.size() > IMAGE_MAX_COUNT) {
 			throw new InvalidImageFileCountException(EXCESSIVE_IMAGE_COUNT);
 		}
 
 		ImageUploadRequest imageUploadRequest = new ImageUploadRequest(imageFiles);
 
-		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest, imageUploadRequest);
+		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest,
+			imageUploadRequest);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()
