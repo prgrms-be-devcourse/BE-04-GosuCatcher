@@ -69,4 +69,11 @@ public class ExpertEstimateController {
 
 		return ResponseEntity.ok(null);
 	}
+
+	@GetMapping("/member-estimates/{memberEstimateId}")
+	public ResponseEntity<ExpertEstimatesResponse> findAllByMemberEstimateId(@PathVariable Long memberEstimateId) {
+		ExpertEstimatesResponse expertEstimatesResponse = expertEstimateService.findAllByMemberEstimateId(memberEstimateId);
+
+		return ResponseEntity.ok(expertEstimatesResponse);
+	}
 }

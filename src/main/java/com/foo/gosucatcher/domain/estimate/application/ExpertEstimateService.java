@@ -91,7 +91,7 @@ public class ExpertEstimateService {
 	public ExpertEstimateResponse findById(Long id) {
 		ExpertEstimate expertEstimate = expertEstimateRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT_ESTIMATE));
-    
+
 		return ExpertEstimateResponse.from(expertEstimate);
 	}
 
@@ -110,6 +110,16 @@ public class ExpertEstimateService {
 		List<ExpertEstimate> randomExpertEstimates = RandomElementSelector.selectRandomElements(expertEstimates, 10);
 
 		return ExpertAutoEstimatesResponse.from(randomExpertEstimates);
+	}
+
+	@Transactional(readOnly = true)
+	public ExpertEstimatesResponse findAllByMemberEstimateId(Long memberEstimateId) {
+		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_ESTIMATE));
+
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByMemberEstimate(memberEstimate);
+
+		return ExpertEstimatesResponse.from(expertEstimates);
 	}
 
 	private void checkAlreadyResponded(MemberEstimate memberEstimate) {
