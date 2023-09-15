@@ -4,6 +4,8 @@ import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_REVIEW;
 import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_MULTIPLE_REPLIES;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -12,6 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
+import com.foo.gosucatcher.domain.image.ImageService;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -25,6 +30,8 @@ import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsRespons
 import com.foo.gosucatcher.domain.review.domain.Reply;
 import com.foo.gosucatcher.domain.review.domain.ReplyRepository;
 import com.foo.gosucatcher.domain.review.domain.Review;
+import com.foo.gosucatcher.domain.review.domain.ReviewImage;
+import com.foo.gosucatcher.domain.review.domain.ReviewImageRepository;
 import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
 import com.foo.gosucatcher.domain.review.exception.InvalidReplyCountException;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -42,9 +49,11 @@ public class ReviewService {
 	private final ExpertRepository expertRepository;
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
+	private final ReviewImageRepository reviewImageRepository;
+	private final ImageService imageService;
 
 	public ReviewResponse create(Long expertId, Long subItemId, Long writerId,
-		ReviewCreateRequest reviewCreateRequest) {
+		ReviewCreateRequest reviewCreateRequest, ImageUploadRequest imageUploadRequest) {
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 		Member writer = memberRepository.findById(writerId)
@@ -57,7 +66,27 @@ public class ReviewService {
 		Review review = ReviewCreateRequest.toReview(reviewCreateRequest, expert, writer, subItem);
 		reviewRepository.save(review);
 
+		ImagesResponse imagesResponse = saveImages(review, imageUploadRequest);
+		List<ReviewImage> reviewImages = ImagesResponse.toReviewImages(review, imagesResponse);
+
+		review.addReviewImages(reviewImages);
+
 		return ReviewResponse.from(review);
+	}
+
+	private ImagesResponse saveImages(Review review, ImageUploadRequest imageUploadRequest) {
+		if (imageUploadRequest == null) {
+			return null;
+		}
+
+		ImagesResponse imagesResponse = imageService.store(imageUploadRequest);
+
+		for (String filename : imagesResponse.filenames()) {
+			ReviewImage reviewImage = ReviewImage.of(review, filename);
+			reviewImageRepository.save(reviewImage);
+		}
+
+		return imagesResponse;
 	}
 
 	@Transactional(readOnly = true)
