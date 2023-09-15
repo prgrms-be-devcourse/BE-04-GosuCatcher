@@ -1,17 +1,22 @@
 package com.foo.gosucatcher.domain.review.domain;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_REPLIER;
 import static java.lang.Boolean.FALSE;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.global.BaseEntity;
+import com.foo.gosucatcher.global.error.exception.UnsupportedReplierException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,16 +35,41 @@ public class Reply extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@OneToOne(mappedBy = "reply", cascade = CascadeType.REMOVE, orphanRemoval = true)
+	private Review parent;
+
 	private String content;
 
 	private boolean isDeleted = FALSE;
 
 	@Builder
-	public Reply(String content) {
+	public Reply(Review parent, String content) {
 		this.content = content;
+
+		parent.addReply(this);
 	}
 
-	public void update(Reply reply) {
-		content = reply.getContent();
+	public void validateWriter(long writerId) {
+		long expertId = parent.getExpert().getId();
+
+		if (writerId != expertId) {
+			throw new UnsupportedReplierException(UNSUPPORTED_REPLIER);
+		}
 	}
+
+	public void validateWriter(long writerId, Review review) {
+		Expert expert = review.getExpert();
+
+		if (expert.getId() != writerId) {
+			throw new UnsupportedReplierException(UNSUPPORTED_REPLIER);
+		}
+
+	}
+
+	public void update(Reply updated, long updaterId) {
+		validateWriter(updaterId);
+
+		content = updated.getContent();
+	}
+
 }

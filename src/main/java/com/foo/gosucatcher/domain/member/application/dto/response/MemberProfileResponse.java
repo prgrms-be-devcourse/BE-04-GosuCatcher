@@ -9,6 +9,7 @@ public record MemberProfileResponse(
 	String phoneNumber,
 	Roles role
 ) {
+
 	public static MemberProfileResponse from(Member member) {
 		String memberEmail = member.getEmail();
 		String memberName = member.getName();

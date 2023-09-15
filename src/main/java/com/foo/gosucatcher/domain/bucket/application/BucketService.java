@@ -68,10 +68,8 @@ public class BucketService {
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
-		boolean status = bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
+		return bucketRepository.findByMemberIdAndExpertId(member.getId(), expert.getId())
 			.isPresent();
-
-		return status;
 	}
 
 	@Transactional(readOnly = true)

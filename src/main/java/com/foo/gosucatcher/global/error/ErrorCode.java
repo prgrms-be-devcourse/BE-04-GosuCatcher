@@ -25,11 +25,15 @@ public enum ErrorCode {
 	NOT_FOUND_EXPERT("E001", "존재하지 않는 고수입니다."),
 	DUPLICATED_EXPERT_STORENAME("E002", "상점명이 중복될 수 없습니다."),
 	INVALID_MAX_TRAVEL_DISTANCE("E003", "최대 이동거리는 0 이상이어야 합니다."),
+	ALREADY_REGISTERED_BY_SUB_ITEM("E004", "해당 서비스로는 이미 등록되어있습니다."),
+	NOT_FOUND_EXPERT_SORT_TYPE("E005", "존재하지 않는 고수 찾기 정렬 타입입니다."),
 
 	//리뷰
 	NOT_FOUND_REVIEW("R001", "존재하지 않는 리뷰입니다"),
 	UNSUPPORTED_REPLIER("R002", "리뷰에 대한 답장은 서비스를 제공한 고수만 가능합니다."),
 	NOT_FOUND_REPLY("R003", "존재하지 않는 리뷰에 대한 답장입니다."),
+	UNSUPPORTED_MULTIPLE_REPLIES("R004", "리뷰에 대한 답장은 1개 이하만 작성할 수 있습니다"),
+	INVALID_UPDATER("R005", "본인이 작성한 리뷰만 수정할 수 있습니다"),
 
 	//회원
 	NOT_FOUND_MEMBER("M001", "존재하지 않는 회원입니다."),
@@ -39,6 +43,10 @@ public enum ErrorCode {
 	ALREADY_CERTIFIED("M005", "이미 인증된 회원입니다."),
 	INVALID_EMAIL_FORMAT("M006", "올바르지 않은 이메일 형식입니다."),
 	UNAUTHENTICATED_MEMBER("M006", "인증되지 않은 회원입니다."),
+	INCORRECT_AUTH_NUMBER("M007", "잘못된 인증번호입니다."),
+	EXPIRED_AUTH_NUMBER("M008", "인증시간이 만료되었습니다."),
+	NOT_CREATION_AUTH_MESSAGE("M009", "인증 메시지를 생성할 수 없습니다."),
+	INVALID_AUTH("M010", "유효하지 않은 인증입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
@@ -55,9 +63,12 @@ public enum ErrorCode {
 	ALREADY_REGISTERED_SUB_ITEMS("EE004", "이미 해당 서비스로 바로 견적이 등록되어 있습니다."),
 	ALREADY_REQUESTED_ESTIMATE("EE005", "이미 처리된 요청서 입니다."),
 
-	// 찜
+	//찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),
 	UNSUPPORTED_SELF_BUCKET("B002", "자기 자신을 찜할 수 없습니다."),
+
+	//고수&서비스
+	NOT_FOUND_EXPERT_ITEM("EI001", "해당 고수는 요청한 서비스를 등록하지 않았습니다."),
 
 	//채팅방
 	NOT_FOUND_CHATTING_ROOM("CR001", "채팅방이 존재하지 않습니다."),

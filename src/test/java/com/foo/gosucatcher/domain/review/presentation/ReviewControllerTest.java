@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.doNothing;
 import static org.mockito.BDDMockito.doThrow;
@@ -61,25 +62,28 @@ class ReviewControllerTest {
 			// given
 			long expertId = 0L;
 			long subItemId = 0L;
+			long writerId = 0L;
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
 			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, false,
 				new HashMap<>(), localDateTime, localDateTime);
-			given(reviewService.create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class)))
+
+			given(reviewService.create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class)))
 				.willReturn(reviewResponse);
 
 			// when
 			// then
 			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
+					.param("memberId", "1")
 					.contentType(MediaType.APPLICATION_JSON)
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
-				.andExpect(status().isOk())
+				.andExpect(status().isCreated())
 				.andExpect(jsonPath("$.id").value(0L))
 				.andExpect(jsonPath("$.expertId").value(expertId))
-				.andExpect(jsonPath("$.writerId").value(reviewCreateRequest.writerId()))
+				.andExpect(jsonPath("$.writerId").value(writerId))
 				.andExpect(jsonPath("$.subItemId").value(subItemId))
 				.andExpect(jsonPath("$.content").value(reviewCreateRequest.content()))
 				.andExpect(jsonPath("$.rating").value(reviewCreateRequest.rating()));
@@ -89,16 +93,17 @@ class ReviewControllerTest {
 		@Test
 		void createFailed_NotFoundExpert() throws Exception {
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
 
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT))
-				.when(reviewService).create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class));
+				.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class));
 
 			long subItemId = 0L;
 			// when
 			// then
 			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{subItemId}", subItemId)
 					.contentType(MediaType.APPLICATION_JSON)
+					.param("memberId", "1")
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
 				.andExpect(status().isNotFound())
@@ -110,17 +115,18 @@ class ReviewControllerTest {
 		@Test
 		void createFailed_NotFoundSubItem() throws Exception {
 			// given
-			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest(0L, "예시로 작성한 리뷰입니다", 5);
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
 			long expertId = 0L;
 			long subItemId = 0L;
 
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM))
-				.when(reviewService).create(any(Long.class), any(Long.class), any(ReviewCreateRequest.class));
+				.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class));
 
 			// when
 			// then
 			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
 					.contentType(MediaType.APPLICATION_JSON)
+					.param("memberId", "1")
 					.param("subItemId", String.valueOf(subItemId))
 					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
 				.andExpect(status().isNotFound())
@@ -137,8 +143,8 @@ class ReviewControllerTest {
 		@Test
 		void findAllByExpertId() throws Exception {
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest("예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest("예시로 작성한 두번째 리뷰입니다", 3);
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
@@ -153,13 +159,15 @@ class ReviewControllerTest {
 
 			long subItemId = 1L;
 			long expertId = 1L;
+			long writerId = 1L;
 
-			given(reviewService.findAllByExpertIdAndSubItem(any(PageRequest.class), any(Long.class), any(Long.class)))
+			given(reviewService.findAllByExpertIdAndSubItem(any(Long.class), any(Long.class), any(PageRequest.class)))
 				.willReturn(reviewsResponse);
 
 			// when
 			// then
-			mockMvc.perform(get("/api/v1/reviews/experts/{expertId}", expertId)
+			mockMvc.perform(get("/api/v1/reviews/experts", expertId)
+					.param("id", "1")
 					.param("subItemId", String.valueOf(subItemId))
 					.contentType(MediaType.APPLICATION_JSON))
 
@@ -167,7 +175,7 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.reviews[0].id").value(1L))
 				.andExpect(jsonPath("$.reviews[0].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.reviews[0].writerId").value(firstReviewCreateRequest.writerId()))
+					jsonPath("$.reviews[0].writerId").value(writerId))
 				.andExpect(jsonPath("$.reviews[0].subItemId").value(subItemId))
 				.andExpect(
 					jsonPath("$.reviews[0].content").value(
@@ -176,7 +184,7 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.reviews[1].id").value(2L))
 				.andExpect(jsonPath("$.reviews[1].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.reviews[1].writerId").value(secondReviewCreateRequest.writerId()))
+					jsonPath("$.reviews[1].writerId").value(writerId))
 				.andExpect(jsonPath("$.reviews[1].subItemId").value(subItemId))
 				.andExpect(
 					jsonPath("$.reviews[1].content").value(
@@ -195,7 +203,8 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			mockMvc.perform(get("/api/v1/reviews/experts/{expertId}/counts", expertId)
+			mockMvc.perform(get("/api/v1/reviews/counts/experts")
+					.param("id", "1")
 					.contentType(MediaType.APPLICATION_JSON))
 
 				.andExpect(status().isOk())
@@ -206,8 +215,8 @@ class ReviewControllerTest {
 		@Test
 		void findAll() throws Exception {
 			// given
-			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 첫번째 리뷰입니다", 5);
-			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest(1L, "예시로 작성한 두번째 리뷰입니다", 3);
+			ReviewCreateRequest firstReviewCreateRequest = new ReviewCreateRequest("예시로 작성한 첫번째 리뷰입니다", 5);
+			ReviewCreateRequest secondReviewCreateRequest = new ReviewCreateRequest("예시로 작성한 두번째 리뷰입니다", 3);
 
 			LocalDateTime localDateTime = LocalDateTime.now();
 
@@ -222,6 +231,7 @@ class ReviewControllerTest {
 
 			long expertId = 1L;
 			long subItemId = 1L;
+			long writerId = 1L;
 			given(reviewService.findAll(any(PageRequest.class)))
 				.willReturn(reviewsResponse);
 
@@ -233,7 +243,7 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.reviews[0].id").value(1))
 				.andExpect(jsonPath("$.reviews[0].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.reviews[0].writerId").value(firstReviewCreateRequest.writerId()))
+					jsonPath("$.reviews[0].writerId").value(writerId))
 				.andExpect(jsonPath("$.reviews[0].subItemId").value(subItemId))
 				.andExpect(
 					jsonPath("$.reviews[0].content").value(
@@ -242,7 +252,7 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.reviews[1].id").value(2))
 				.andExpect(jsonPath("$.reviews[1].expertId").value(expertId))
 				.andExpect(
-					jsonPath("$.reviews[1].writerId").value(secondReviewCreateRequest.writerId()))
+					jsonPath("$.reviews[1].writerId").value(writerId))
 				.andExpect(jsonPath("$.reviews[1].subItemId").value(subItemId))
 				.andExpect(
 					jsonPath("$.reviews[1].content").value(
@@ -255,9 +265,9 @@ class ReviewControllerTest {
 		void findById() throws Exception {
 			// given
 			LocalDateTime localDateTime = LocalDateTime.now();
+
 			ReviewResponse reviewResponse = new ReviewResponse(1L, 1L, 1L, 1L, "예시로 작성한 첫번째 리뷰입니다", 5, false,
-				new HashMap<>(), localDateTime,
-				localDateTime);
+				new HashMap<>(), localDateTime, localDateTime);
 
 			long id = 1L;
 			given(reviewService.findById(any(Long.class)))
@@ -275,7 +285,6 @@ class ReviewControllerTest {
 				.andExpect(jsonPath("$.content").value(reviewResponse.content()))
 				.andExpect(jsonPath("$.rating").value(reviewResponse.rating()));
 		}
-
 	}
 
 	@Nested
@@ -291,7 +300,7 @@ class ReviewControllerTest {
 
 			// when
 			// then
-			when(reviewService.update(id, reviewUpdateRequest))
+			when(reviewService.update(anyLong(), anyLong(), any(ReviewUpdateRequest.class)))
 				.thenReturn(id);
 
 			mockMvc.perform(patch("/api/v1/reviews/{id}", id)
@@ -309,11 +318,12 @@ class ReviewControllerTest {
 			ReviewUpdateRequest reviewUpdateRequest = new ReviewUpdateRequest("수정하고자 하는 리뷰입니다", 3);
 			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_REVIEW)).
 				when(reviewService)
-				.update(any(Long.class), any(ReviewUpdateRequest.class));
+				.update(anyLong(), anyLong(), any(ReviewUpdateRequest.class));
 
 			// when
 			// then
 			mockMvc.perform(patch("/api/v1/reviews/{id}", id)
+					.param("memberId", "1")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(reviewUpdateRequest)))
 				.andExpect(status().isNotFound())
@@ -332,7 +342,7 @@ class ReviewControllerTest {
 			long id = 0L;
 			doNothing()
 				.when(reviewService)
-				.delete(id);
+				.delete(anyLong(), anyLong());
 
 			// when
 			// then
@@ -353,85 +363,59 @@ class ReviewControllerTest {
 			long reviewId = 0L;
 
 			LocalDateTime localDateTime = LocalDateTime.now();
-			ReplyRequest replyRequest = new ReplyRequest(1L, "리뷰에 대한 답글입니다");
-			ReplyResponse replyResponse = new ReplyResponse(1L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
+			ReplyRequest replyRequest = new ReplyRequest("리뷰에 대한 답글입니다");
+			ReplyResponse replyResponse = new ReplyResponse(0L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
 
-			given(reviewService.createReply(any(Long.class), any(ReplyRequest.class)))
+			given(reviewService.createReply(anyLong(), anyLong(), any(ReplyRequest.class)))
 				.willReturn(replyResponse);
 
 			// when
 			// then
 			mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{reviewId}/replies", reviewId)
 					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(reviewId))
+					.param("memberId", "1")
 					.content(objectMapper.writeValueAsString(replyRequest)))
 				.andExpect(status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$..id").value(1))
-				.andExpect(MockMvcResultMatchers.jsonPath("$..reviewId").value(replyResponse.reviewId().intValue()))
-				.andExpect(MockMvcResultMatchers.jsonPath("$..content").value(replyRequest.content()));
+				.andExpect(jsonPath("$.id").value(0L))
+				.andExpect(jsonPath("$.reviewId").value(reviewId))
+				.andExpect(jsonPath("$.content").value(replyRequest.content()));
 		}
 
 		@DisplayName("성공 - 리뷰에 대한 답글을 수정할 수 있다")
 		@Test
 		void update() throws Exception {
 			// given
-			long reviewId = 0L;
 			long replyId = 0L;
-			LocalDateTime localDateTime = LocalDateTime.now();
-			ReplyRequest replyRequest = new ReplyRequest(0L, "리뷰에 대한 답글입니다");
+			ReplyRequest replyRequest = new ReplyRequest("리뷰에 대한 답글입니다");
 
-			given(reviewService.updateReply(any(Long.class), any(Long.class), any(ReplyRequest.class)))
+			given(reviewService.updateReply(anyLong(), any(ReplyRequest.class), anyLong()))
 				.willReturn(replyId);
 
 			// when
 			// then
-			mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
+			mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/reviews/replies")
+					.param("id", "1")
 					.contentType(MediaType.APPLICATION_JSON)
 					.content(objectMapper.writeValueAsString(replyRequest)))
 				.andExpect(status().isOk())
 				.andExpect(jsonPath("$").value(replyId));
 		}
 
-		@DisplayName("성공 - 리뷰에 대한 답글을 아이디로 조회할 수 있다")
-		@Test
-		void findById() throws Exception {
-			// given
-			long reviewId = 0L;
-			LocalDateTime localDateTime = LocalDateTime.now();
-			ReplyResponse replyResponse = new ReplyResponse(0L, reviewId, "리뷰에 대한 답글입니다", localDateTime, localDateTime);
-
-			long replyId = 1L;
-			given(reviewService.findReplyById(any(Long.class), any(Long.class)))
-				.willReturn(replyResponse);
-
-			// when
-			// then
-			mockMvc.perform(get("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
-					.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value(0L))
-				.andExpect(jsonPath("$.reviewId").value(reviewId))
-				.andExpect(jsonPath("$.content").value(replyResponse.content()));
-		}
-
 		@DisplayName("성공 - 리뷰에 대한 답글을 삭제할 수 있다")
 		@Test
 		void deleteReply() throws Exception {
 			// given
-			long reviewId = 1L;
-			long replyId = 4L;
-
 			doNothing()
 				.when(reviewService)
-				.deleteReply(replyId);
+				.deleteReply(anyLong(), anyLong());
 
 			// when
 			// then
-			mockMvc.perform(delete("/api/v1/reviews/{reviewId}/replies/{replyId}", reviewId, replyId)
+			mockMvc.perform(delete("/api/v1/reviews/replies")
+					.param("id", "1")
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isNoContent());
 
 		}
-
 	}
 }
