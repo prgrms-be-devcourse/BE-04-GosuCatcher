@@ -1,5 +1,4 @@
 server:
-  port: 7070
   servlet:
     context-path: /
     encoding:
@@ -11,6 +10,10 @@ spring:
   jwt:
     accessTokenSecretKey: DUMMY_ACCESS_TOKEN_SECRET
     refreshTokenSecretKey: DUMMY_REFRESH_TOKEN_SECRET
+  config:
+    import:
+      - classpath:application-aws.yml
+      - classpath:application-db.yml
 
   mail:
     host: smtp.gmail.com

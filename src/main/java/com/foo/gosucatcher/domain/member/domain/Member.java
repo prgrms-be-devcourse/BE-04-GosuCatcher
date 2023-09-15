@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.domain.member.domain;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.EMPTY_IMAGE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -106,7 +108,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void updateProfileImage(ImageFile profileImageFile) {
 		if (profileImageFile == null) {
-			throw new BusinessException(ErrorCode.INVALID_IMAGE);
+			throw new BusinessException(EMPTY_IMAGE);
 		}
 
 		this.profileImageFile = profileImageFile;

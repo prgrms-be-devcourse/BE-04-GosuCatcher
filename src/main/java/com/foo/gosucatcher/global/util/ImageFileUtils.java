@@ -1,5 +1,7 @@
 package com.foo.gosucatcher.global.util;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.EMPTY_IMAGE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -40,7 +42,7 @@ public class ImageFileUtils {
 
 	public static MultipartFile validateFile(MultipartFile file) {
 		if (file.isEmpty()) {
-			throw new InvalidValueException(ErrorCode.INVALID_IMAGE);
+			throw new InvalidValueException(EMPTY_IMAGE);
 		}
 
 		return file;
@@ -55,7 +57,7 @@ public class ImageFileUtils {
 				throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
 			}
 		}
-		
+
 		return root;
 	}
 

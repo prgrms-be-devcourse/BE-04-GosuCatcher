@@ -9,6 +9,8 @@ public enum ErrorCode {
 
 	//서버
 	INTERNAL_SERVER_ERROR("S001", "예기치 못한 오류가 발생했습니다."),
+	NOT_FOUND_REFRESH_TOKEN("S002", "헤더에 RefreshToken이 필요합니다."),
+	INVALID_TOKEN("S003", "유효하지 않은 토큰입니다."),
 
 	//공용
 	INVALID_INPUT_VALUE("C001", "잘못된 값을 입력하셨습니다."),
@@ -42,16 +44,17 @@ public enum ErrorCode {
 	CERTIFICATION_FAIL("M004", "회원인증에 실패했습니다."),
 	ALREADY_CERTIFIED("M005", "이미 인증된 회원입니다."),
 	INVALID_EMAIL_FORMAT("M006", "올바르지 않은 이메일 형식입니다."),
-	UNAUTHENTICATED_MEMBER("M006", "인증되지 않은 회원입니다."),
+	NOT_VALID_REFRESH_TOKEN("M006", "유효하지 않은 RefreshToken 입니다."),
 	INCORRECT_AUTH_NUMBER("M007", "잘못된 인증번호입니다."),
-	EXPIRED_AUTH_NUMBER("M008", "인증시간이 만료되었습니다."),
+	INVALID_AUTH("M008", "유효하지 않은 인증입니다."),
 	NOT_CREATION_AUTH_MESSAGE("M009", "인증 메시지를 생성할 수 없습니다."),
-	INVALID_AUTH("M010", "유효하지 않은 인증입니다."),
+	EXPIRED_AUTHENTICATION("M010", "만료된 회원인증입니다."),
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
-	INVALID_IMAGE("F002", "지원하지 않는 이미지 파일 형식입니다."),
-
+	EMPTY_IMAGE("F002", "이미지를 업로드 바랍니다."),
+	INVALID_IMAGE_FORMAT("F003", "지원하지 않는 이미지 파일 형식입니다."),
+	EXCESSIVE_IMAGE_SIZE("F004", "지원하는 이미지 파일의 용량을 초과하였습니다."),
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
 	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
