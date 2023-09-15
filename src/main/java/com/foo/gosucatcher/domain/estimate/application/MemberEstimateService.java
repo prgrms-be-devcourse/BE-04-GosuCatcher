@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.*;
 import static com.foo.gosucatcher.global.error.ErrorCode.DUPLICATE_MEMBER_ESTIMATE;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_ESTIMATE;
@@ -26,7 +27,6 @@ import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
-import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -45,9 +45,9 @@ public class MemberEstimateService {
 
 	public MemberEstimate create(Long memberId, MemberEstimateRequest memberEstimateRequest) {
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(memberEstimateRequest.subItemId())
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
 		checkDuplicatedMemberEstimate(member.getId(), subItem.getId());
 
@@ -83,7 +83,7 @@ public class MemberEstimateService {
 	@Transactional(readOnly = true)
 	public MemberEstimatesResponse findAllByMemberId(Long memberId) {
 		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
 		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByMember(member);
 
