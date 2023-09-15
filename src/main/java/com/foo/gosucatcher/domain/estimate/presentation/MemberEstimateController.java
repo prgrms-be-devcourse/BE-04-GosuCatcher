@@ -16,6 +16,7 @@ import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimat
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
+import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
@@ -68,6 +69,14 @@ public class MemberEstimateController {
 		MemberEstimateResponse memberEstimateResponse = memberEstimateService.findById(memberEstimateId);
 
 		return ResponseEntity.ok(memberEstimateResponse);
+	}
+
+	@GetMapping("/normal")
+	@CurrentExpertId
+	public ResponseEntity<MemberEstimatesResponse> findAllPendingNormalByExpertId(Long expertId) {
+		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllPendingNormalByExpertId(expertId);
+
+		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
 	@DeleteMapping("/{memberEstimateId}")

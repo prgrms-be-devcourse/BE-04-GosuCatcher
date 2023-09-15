@@ -98,6 +98,13 @@ public class MemberEstimateService {
 		return MemberEstimateResponse.from(memberEstimate);
 	}
 
+	@Transactional(readOnly = true)
+	public MemberEstimatesResponse findAllPendingNormalByExpertId(Long expertId) {
+		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByPendingAndExpertId(expertId);
+
+		return MemberEstimatesResponse.from(memberEstimates);
+	}
+
 	public void delete(Long memberEstimateId) {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER_ESTIMATE));
