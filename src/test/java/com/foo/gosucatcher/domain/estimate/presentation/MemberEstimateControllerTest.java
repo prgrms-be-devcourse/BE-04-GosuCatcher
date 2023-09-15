@@ -70,13 +70,15 @@ class MemberEstimateControllerTest {
 			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
 
-		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+		when(memberEstimateService.createNormal(anyLong(), anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{memberId}", memberId)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
-				.contentType(MediaType.APPLICATION_JSON))
+				.param("memberId", String.valueOf(memberId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.subItemId").value(subItemId))
 			.andExpect(jsonPath("$.location").value("서울 강남구 개포1동"))
@@ -96,12 +98,13 @@ class MemberEstimateControllerTest {
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
 			expertId, null, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
 
-		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+		when(memberEstimateService.createNormal(anyLong(), anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{memberId}", memberId)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
+				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value("C001"))
@@ -131,13 +134,14 @@ class MemberEstimateControllerTest {
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.", ChattingStatus.ENTER);
 
-		when(memberEstimateService.create(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
+		when(memberEstimateService.createAuto(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 		when(matchingService.match(any(MemberEstimateResponse.class))).thenReturn(new MessagesResponse(List.of(messageResponse)));
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto")
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
+				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.messagesResponse").isArray())
@@ -166,13 +170,14 @@ class MemberEstimateControllerTest {
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
 			expertId, subItemId, " ", LocalDateTime.now().plusDays(3), "추가 내용");
 
-		when(memberEstimateService.create(memberId, memberEstimateRequest)).thenReturn(
+		when(memberEstimateService.createAuto(memberId, memberEstimateRequest)).thenReturn(
 			memberEstimateResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto/{memberId}", memberId)
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto")
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
+				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value("C001"))
@@ -181,44 +186,6 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.errors[0].value").value(" "))
 			.andExpect(jsonPath("$.errors[0].reason").value("지역을 등록해주세요."))
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."));
-	}
-
-	@DisplayName("회원 요청 견적서 전체 조회 성공 테스트")
-	@Test
-	void findAll() throws Exception {
-		//given
-		Member member = Member.builder()
-			.name("성이름")
-			.password("abcd11@@")
-			.email("abcd123@abc.com")
-			.phoneNumber("010-0000-0000")
-			.build();
-
-		MainItem mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
-
-		SubItem subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
-
-		MemberEstimate memberEstimate = MemberEstimate.builder()
-			.member(member)
-			.subItem(subItem)
-			.location("서울 강남구 개포1동")
-			.preferredStartDate(LocalDateTime.now().plusDays(3))
-			.detailedDescription("추가 내용")
-			.build();
-
-		List<MemberEstimate> mockEstimates = List.of(memberEstimate);
-		MemberEstimatesResponse mockResponse = MemberEstimatesResponse.from(mockEstimates);
-
-		when(memberEstimateService.findAll()).thenReturn(mockResponse);
-
-		//when
-		//then
-		mockMvc.perform(
-				MockMvcRequestBuilders.get("/api/v1/member-estimates").contentType(MediaType.APPLICATION_JSON))
-			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.memberEstimates").isArray())
-			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
 	}
 
 	@DisplayName("회원 별 전체 요청 견적서 조회 성공 테스트")
@@ -247,13 +214,14 @@ class MemberEstimateControllerTest {
 			.build();
 
 		List<MemberEstimate> mockEstimates = List.of(memberEstimate);
-		MemberEstimatesResponse mockResponse = MemberEstimatesResponse.from(mockEstimates);
+		MemberEstimatesResponse memberEstimatesResponse = MemberEstimatesResponse.from(mockEstimates);
 
-		when(memberEstimateService.findAllByMember(memberId)).thenReturn(mockResponse);
+		when(memberEstimateService.findAllByMemberId(memberId)).thenReturn(memberEstimatesResponse);
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-estimates/members/{memberId}", memberId)
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-estimates/members")
+				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberEstimates").isArray())

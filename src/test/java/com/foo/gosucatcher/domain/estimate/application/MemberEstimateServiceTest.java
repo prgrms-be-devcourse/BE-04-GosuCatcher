@@ -101,13 +101,13 @@ class MemberEstimateServiceTest {
 		when(memberEstimateRepository.findById(memberEstimateId)).thenReturn(Optional.of(memberEstimate));
 
 		//when
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+		MemberEstimate memberEstimate = memberEstimateService.create(memberId, memberEstimateRequest);
 		MemberEstimate result = memberEstimateRepository.findById(memberEstimateId).get();
 
 		//then
-		assertThat(memberEstimateResponse.location()).isEqualTo(result.getLocation());
-		assertThat(memberEstimateResponse.preferredStartDate()).isEqualTo(result.getPreferredStartDate());
-		assertThat(memberEstimateResponse.detailedDescription()).isEqualTo(result.getDetailedDescription());
+		assertThat(memberEstimate.getLocation()).isEqualTo(result.getLocation());
+		assertThat(memberEstimate.getPreferredStartDate()).isEqualTo(result.getPreferredStartDate());
+		assertThat(memberEstimate.getDetailedDescription()).isEqualTo(result.getDetailedDescription());
 	}
 
 	@DisplayName("회원 요청 견적서 생성 실패 테스트 - 희망 시작일이 현재보다 이전인 경우")
@@ -145,7 +145,7 @@ class MemberEstimateServiceTest {
 		when(memberEstimateRepository.findAllByMember(member)).thenReturn(estimates);
 
 		//when
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
+		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMemberId(memberId);
 
 		//then
 		assertThat(memberEstimatesResponse.memberEstimates()).hasSize(2);

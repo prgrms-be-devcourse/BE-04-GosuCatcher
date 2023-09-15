@@ -16,6 +16,7 @@ import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimat
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
+import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,18 +28,20 @@ public class MemberEstimateController {
 	private final MemberEstimateService memberEstimateService;
 	private final MatchingService matchingService;
 
-	@PostMapping("/normal/{memberId}")
-	public ResponseEntity<MemberEstimateResponse> createNormal(@PathVariable Long memberId,
+	@PostMapping("/normal/{expertId}")
+	@CurrentMemberId
+	public ResponseEntity<MemberEstimateResponse> createNormal(Long memberId, @PathVariable Long expertId,
 															   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createNormal(memberId, expertId, memberEstimateRequest);
 
 		return ResponseEntity.ok(memberEstimateResponse);
 	}
 
-	@PostMapping("/auto/{memberId}")
-	public ResponseEntity<MessagesResponse> createAuto(@PathVariable Long memberId,
+	@PostMapping("/auto")
+	@CurrentMemberId
+	public ResponseEntity<MessagesResponse> createAuto(Long memberId,
 													   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.create(memberId, memberEstimateRequest);
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createAuto(memberId, memberEstimateRequest);
 
 		MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);
 
@@ -52,9 +55,10 @@ public class MemberEstimateController {
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
-	@GetMapping("/members/{memberId}")
-	public ResponseEntity<MemberEstimatesResponse> findAllByMember(@PathVariable Long memberId) {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMember(memberId);
+	@GetMapping("/members")
+	@CurrentMemberId
+	public ResponseEntity<MemberEstimatesResponse> findAllByMemberId(Long memberId) {
+		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMemberId(memberId);
 
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}

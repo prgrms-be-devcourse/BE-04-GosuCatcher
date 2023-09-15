@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.estimate.application;
 
 import static com.foo.gosucatcher.global.error.ErrorCode.DUPLICATE_MEMBER_ESTIMATE;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_ESTIMATE;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER_ESTIMATE;
 
@@ -19,6 +20,8 @@ import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.Status;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -38,8 +41,9 @@ public class MemberEstimateService {
 	private final MemberRepository memberRepository;
 	private final SubItemRepository subItemRepository;
 	private final ExpertEstimateRepository expertEstimateRepository;
+	private final ExpertRepository expertRepository;
 
-	public MemberEstimateResponse create(Long memberId, MemberEstimateRequest memberEstimateRequest) {
+	public MemberEstimate create(Long memberId, MemberEstimateRequest memberEstimateRequest) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		SubItem subItem = subItemRepository.findById(memberEstimateRequest.subItemId())
@@ -49,9 +53,24 @@ public class MemberEstimateService {
 
 		MemberEstimate memberEstimate = MemberEstimateRequest.toMemberEstimate(member, subItem, memberEstimateRequest);
 
-		MemberEstimate savedMemberEstimate = memberEstimateRepository.save(memberEstimate);
+		return memberEstimateRepository.save(memberEstimate);
+	}
 
-		return MemberEstimateResponse.from(savedMemberEstimate);
+	public MemberEstimateResponse createNormal(Long memberId, Long expertId, MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimate memberEstimate = create(memberId, memberEstimateRequest);
+
+		Expert expert = expertRepository.findById(expertId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+
+		memberEstimate.updateExpert(expert);
+
+		return MemberEstimateResponse.from(memberEstimate);
+	}
+
+	public MemberEstimateResponse createAuto(Long memberId, MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimate memberEstimate = create(memberId, memberEstimateRequest);
+
+		return MemberEstimateResponse.from(memberEstimate);
 	}
 
 	@Transactional(readOnly = true)
@@ -62,7 +81,7 @@ public class MemberEstimateService {
 	}
 
 	@Transactional(readOnly = true)
-	public MemberEstimatesResponse findAllByMember(Long memberId) {
+	public MemberEstimatesResponse findAllByMemberId(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
