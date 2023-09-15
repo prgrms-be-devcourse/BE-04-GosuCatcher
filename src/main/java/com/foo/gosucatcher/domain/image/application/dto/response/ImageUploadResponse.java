@@ -6,4 +6,8 @@ public record ImageUploadResponse(
 
 	List<String> filenames
 ) {
+
+	public static ImageUploadResponse from(List<String> filenames) {
+		return new ImageUploadResponse(filenames);
+	}
 }
