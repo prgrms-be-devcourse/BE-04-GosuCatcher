@@ -42,4 +42,8 @@ public class ReviewImage {
 			.path(path)
 			.build();
 	}
+
+	public void addReview(Review review) {
+		this.review = review;
+	}
 }

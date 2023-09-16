@@ -41,6 +41,7 @@ public class S3ImageService implements ImageService {
 
 	private static final String supportedImageExtension[] = {"jpg", "jpeg", "png"};
 	private final AmazonS3 amazonS3;
+
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 

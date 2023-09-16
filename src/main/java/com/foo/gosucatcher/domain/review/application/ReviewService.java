@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.review.application;
 
+import static com.foo.gosucatcher.global.error.ErrorCode.EXCESSIVE_IMAGE_COUNT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_REVIEW;
 import static com.foo.gosucatcher.global.error.ErrorCode.UNSUPPORTED_MULTIPLE_REPLIES;
@@ -33,6 +34,7 @@ import com.foo.gosucatcher.domain.review.domain.Review;
 import com.foo.gosucatcher.domain.review.domain.ReviewImage;
 import com.foo.gosucatcher.domain.review.domain.ReviewImageRepository;
 import com.foo.gosucatcher.domain.review.domain.ReviewRepository;
+import com.foo.gosucatcher.domain.review.exception.InvalidImageFileCountException;
 import com.foo.gosucatcher.domain.review.exception.InvalidReplyCountException;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -52,6 +54,8 @@ public class ReviewService {
 	private final ReviewImageRepository reviewImageRepository;
 	private final ImageService imageService;
 
+	private static final int IMAGE_MAX_COUNT = 5;
+
 	public ReviewResponse create(Long expertId, Long subItemId, Long writerId,
 		ReviewCreateRequest reviewCreateRequest, ImageUploadRequest imageUploadRequest) {
 		Expert expert = expertRepository.findById(expertId)
@@ -66,17 +70,18 @@ public class ReviewService {
 		Review review = ReviewCreateRequest.toReview(reviewCreateRequest, expert, writer, subItem);
 		reviewRepository.save(review);
 
-		ImagesResponse imagesResponse = saveImages(review, imageUploadRequest);
-		List<ReviewImage> reviewImages = ImagesResponse.toReviewImages(review, imagesResponse);
-
-		review.addReviewImages(reviewImages);
+		saveImages(review, imageUploadRequest);
 
 		return ReviewResponse.from(review);
 	}
 
-	private ImagesResponse saveImages(Review review, ImageUploadRequest imageUploadRequest) {
-		if (imageUploadRequest == null) {
-			return null;
+	private void saveImages(Review review, ImageUploadRequest imageUploadRequest) {
+		if (imageUploadRequest.files() == null) {
+			return;
+		}
+
+		if (imageUploadRequest.files().size() > IMAGE_MAX_COUNT) {
+			throw new InvalidImageFileCountException(EXCESSIVE_IMAGE_COUNT);
 		}
 
 		ImagesResponse imagesResponse = imageService.store(imageUploadRequest);
@@ -86,7 +91,8 @@ public class ReviewService {
 			reviewImageRepository.save(reviewImage);
 		}
 
-		return imagesResponse;
+		List<ReviewImage> reviewImages = ImagesResponse.toReviewImages(review, imagesResponse);
+		review.addReviewImages(reviewImages);
 	}
 
 	@Transactional(readOnly = true)

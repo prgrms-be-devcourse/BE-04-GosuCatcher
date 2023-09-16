@@ -1,7 +1,5 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
-import static com.foo.gosucatcher.global.error.ErrorCode.EXCESSIVE_IMAGE_COUNT;
-
 import java.net.URI;
 import java.util.List;
 
@@ -31,7 +29,6 @@ import com.foo.gosucatcher.domain.review.application.dto.request.ReviewUpdateReq
 import com.foo.gosucatcher.domain.review.application.dto.response.ReplyResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
-import com.foo.gosucatcher.domain.review.exception.InvalidImageFileCountException;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
@@ -42,8 +39,6 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private static final int DEFAULT_PAGING_SIZE = 3;
-
-	private static final int IMAGE_MAX_COUNT = 5;
 
 	private final ReviewService reviewService;
 
@@ -56,10 +51,6 @@ public class ReviewController {
 		@RequestPart(required = false) List<MultipartFile> imageFiles,
 		Long memberId
 	) {
-		if (imageFiles.size() > IMAGE_MAX_COUNT) {
-			throw new InvalidImageFileCountException(EXCESSIVE_IMAGE_COUNT);
-		}
-
 		ImageUploadRequest imageUploadRequest = new ImageUploadRequest(imageFiles);
 
 		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest,

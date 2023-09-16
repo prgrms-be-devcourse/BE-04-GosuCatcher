@@ -108,5 +108,9 @@ public class Review extends BaseEntity {
 
 	public void addReviewImages(List<ReviewImage> reviewImages) {
 		this.reviewImages = reviewImages;
+
+		for (ReviewImage reviewImage : reviewImages) {
+			reviewImage.addReview(this);
+		}
 	}
 }
