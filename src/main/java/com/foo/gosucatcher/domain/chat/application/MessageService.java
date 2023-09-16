@@ -89,6 +89,6 @@ public class MessageService {
 
     public MessageResponse sendExpertEstimateMessage(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
 
-        return create(expertNormalEstimateResponse.expertResponse().id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description(), ChattingStatus.PENDING);
+        return create(expertNormalEstimateResponse.id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description(), ChattingStatus.PENDING);
     }
 }
