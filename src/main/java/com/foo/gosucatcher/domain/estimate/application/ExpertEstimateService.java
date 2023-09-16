@@ -124,7 +124,7 @@ public class ExpertEstimateService {
 
 	@Transactional(readOnly = true)
 	public ExpertAutoEstimatesResponse findAllUnmatchedAutoByExpertId(Long expertId) {
-		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllExpertAndMemberEstimateIsNull(expertId);
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNull(expertId);
 
 		return ExpertAutoEstimatesResponse.from(expertEstimates);
 	}

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +22,13 @@ import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsRes
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
-import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,7 @@ public class ChattingRoomService {
 	private final MemberEstimateRepository memberEstimateRepository;
 	private final ChattingRoomRepository chattingRoomRepository;
 	private final MemberRepository memberRepository;
+	private final ExpertEstimateRepository expertEstimateRepository;
 	private final ObjectMapper objectMapper;
 	private static Set<WebSocketSession> sessions = new HashSet<>(); //STOMP 적용하면서 삭제될 예정
 
@@ -101,14 +103,31 @@ public class ChattingRoomService {
 	}
 
 	@Transactional(readOnly = true)
-	@CurrentExpertId
 	public ChattingRoomsResponse findAllOfNormalByExpertId(Long expertId) {
 		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByExpertId(expertId);
 
 		List<ChattingRoom> chattingRooms = memberEstimates.stream()
 			.map(chattingRoomRepository::findAllByMemberEstimate)
 			.flatMap(List::stream)
-			.collect(Collectors.toList());
+			.toList();
+
+		return ChattingRoomsResponse.from(chattingRooms);
+	}
+
+	@Transactional(readOnly = true)
+	public ChattingRoomsResponse findAllOfAutoByExpertId(Long expertId) {
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNotNull(expertId);
+
+		List<MemberEstimate> memberEstimates = expertEstimates.stream()
+			.map(ExpertEstimate::getMemberEstimate)
+			.filter(memberEstimate -> memberEstimate.getExpert() == null)
+			.filter(memberEstimate -> memberEstimate.getStatus() != Status.PENDING)
+			.toList();
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.toList();
 
 		return ChattingRoomsResponse.from(chattingRooms);
 	}
@@ -125,7 +144,7 @@ public class ChattingRoomService {
 	}
 
 	public <T> void sendMessage(WebSocketSession session, T message) {
-		try{
+		try {
 			synchronized (session) {
 				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(message)));
 			}

@@ -59,6 +59,14 @@ public class ChattingRoomController {
 		return ResponseEntity.ok(chattingRoomsResponse);
 	}
 
+	@GetMapping("/auto")
+	@CurrentExpertId
+	public ResponseEntity<ChattingRoomsResponse> findAllOfAutoByExpertId(Long expertId) {
+		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.findAllOfAutoByExpertId(expertId);
+
+		return ResponseEntity.ok(chattingRoomsResponse);
+	}
+
 	@DeleteMapping("/{chattingRoomId}")
 	public ResponseEntity<Void> delete(@PathVariable Long chattingRoomId) {
 		chattingRoomService.delete(chattingRoomId);
