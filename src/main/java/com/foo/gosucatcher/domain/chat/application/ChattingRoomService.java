@@ -103,6 +103,22 @@ public class ChattingRoomService {
 	}
 
 	@Transactional(readOnly = true)
+	public ChattingRoomsResponse findAllByExpertId(Long expertId) {
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNotNull(expertId);
+
+		List<MemberEstimate> memberEstimates = expertEstimates.stream()
+			.map(ExpertEstimate::getMemberEstimate)
+			.toList();
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.toList();
+
+		return ChattingRoomsResponse.from(chattingRooms);
+	}
+
+	@Transactional(readOnly = true)
 	public ChattingRoomsResponse findAllOfNormalByExpertId(Long expertId) {
 		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByExpertId(expertId);
 

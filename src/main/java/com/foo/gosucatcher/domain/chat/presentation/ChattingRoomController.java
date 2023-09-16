@@ -51,6 +51,14 @@ public class ChattingRoomController {
 		return ResponseEntity.ok(chattingRoomsResponse);
 	}
 
+	@GetMapping("/experts")
+	@CurrentExpertId
+	public ResponseEntity<ChattingRoomsResponse> findAllByExpertId(Long expertId) {
+		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.findAllByExpertId(expertId);
+
+		return ResponseEntity.ok(chattingRoomsResponse);
+	}
+
 	@GetMapping("/normal")
 	@CurrentExpertId
 	public ResponseEntity<ChattingRoomsResponse> findAllOfNormalByExpertId(Long expertId) {
