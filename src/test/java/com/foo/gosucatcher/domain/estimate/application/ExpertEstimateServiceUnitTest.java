@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
@@ -91,7 +93,7 @@ class ExpertEstimateServiceUnitTest {
 			.description("축구 레슨 해드립니다.")
 			.build();
 
-		memberEstimate = memberEstimate.builder()
+		memberEstimate = MemberEstimate.builder()
 			.member(member)
 			.subItem(subItem)
 			.preferredStartDate(LocalDateTime.now().plusDays(1))
@@ -103,6 +105,7 @@ class ExpertEstimateServiceUnitTest {
 			.expert(expert)
 			.memberEstimate(memberEstimate)
 			.description("메시를 만들어 드립니다")
+			.subItem(subItem)
 			.build();
 	}
 
@@ -229,5 +232,79 @@ class ExpertEstimateServiceUnitTest {
 
 		//then
 		verify(expertEstimateRepository, times(1)).delete(expertEstimate);
+	}
+
+	@Test
+	@DisplayName("조건에 맞는 모든 고수 견적서 목록 조회 성공")
+	void findAllByConditions() {
+
+		//given
+		Long subItemId = 1L;
+		String activityLocation = "서울시 강남구";
+
+		List<ExpertEstimate> expertEstimates = IntStream.range(0, 10)
+			.mapToObj(i -> ExpertEstimate.builder()
+				.totalCost(10000)
+				.expert(expert)
+				.memberEstimate(memberEstimate)
+				.description("메시를 만들어 드립니다")
+				.subItem(subItem)
+				.build())
+			.toList();
+
+		when(expertEstimateRepository.findAllBySubItemIdAndLocation(subItemId, activityLocation))
+			.thenReturn(expertEstimates);
+
+		//when
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllByConditions(subItemId, activityLocation);
+
+		//then
+		assertThat(expertAutoEstimatesResponse.expertAutoEstimateResponses()).hasSize(10);
+		assertThat(expertAutoEstimatesResponse.expertAutoEstimateResponses().get(0).description()).isEqualTo("메시를 만들어 드립니다");
+	}
+
+	@Test
+	@DisplayName("특정 회원 요청 견적서와 거래된 모든 고수 견적서 목록 조회 성공")
+	void findAllByMemberEstimateId() {
+
+		//given
+		Long memberEstimateId = 1L;
+
+		List<ExpertEstimate> expertEstimates = Arrays.asList(expertEstimate);
+
+		when(memberEstimateRepository.findById(memberEstimateId))
+			.thenReturn(Optional.of(memberEstimate));
+
+		when(expertEstimateRepository.findAllByMemberEstimate(memberEstimate))
+			.thenReturn(expertEstimates);
+
+		//when
+		ExpertEstimatesResponse expertEstimatesResponse = expertEstimateService.findAllByMemberEstimateId(memberEstimateId);
+
+		//then
+		assertThat(expertEstimatesResponse.expertEstimateResponseList()).hasSize(1);
+		assertThat(expertEstimatesResponse.expertEstimateResponseList().get(0).totalCost()).isEqualTo(
+			expertEstimate.getTotalCost());
+	}
+
+	@Test
+	@DisplayName("매칭되지 않은 상태인 특정 고수의 견적서 목록 조회 성공")
+	void findAllUnmatchedAutoByExpertId() {
+
+		//given
+		Long expertId = 1L;
+
+		List<ExpertEstimate> expertEstimates = Arrays.asList(expertEstimate);
+
+		when(expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNull(expertId))
+			.thenReturn(expertEstimates);
+
+		//when
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllUnmatchedAutoByExpertId(expertId);
+
+		//then
+		assertThat(expertAutoEstimatesResponse.expertAutoEstimateResponses()).hasSize(1);
+		assertThat(expertAutoEstimatesResponse.expertAutoEstimateResponses().get(0).totalCost()).isEqualTo(
+			expertEstimate.getTotalCost());
 	}
 }
