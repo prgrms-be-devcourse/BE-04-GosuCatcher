@@ -81,7 +81,7 @@ public class ExpertEstimateController {
 
 	@GetMapping("/auto")
 	@CurrentExpertId
-	public ResponseEntity<ExpertAutoEstimatesResponse> findAutosByExpertId(Long expertId) {
+	public ResponseEntity<ExpertAutoEstimatesResponse> findAllUnmatchedAutoByExpertId(Long expertId) {
 		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllUnmatchedAutoByExpertId(expertId);
 
 		return ResponseEntity.ok(expertAutoEstimatesResponse);

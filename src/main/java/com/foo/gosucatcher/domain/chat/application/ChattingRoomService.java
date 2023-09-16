@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
+import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 import lombok.RequiredArgsConstructor;
@@ -96,6 +98,19 @@ public class ChattingRoomService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
 		return ChattingRoomResponse.from(chattingRoom);
+	}
+
+	@Transactional(readOnly = true)
+	@CurrentExpertId
+	public ChattingRoomsResponse findAllOfNormalByExpertId(Long expertId) {
+		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByExpertId(expertId);
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.collect(Collectors.toList());
+
+		return ChattingRoomsResponse.from(chattingRooms);
 	}
 
 	public void delete(Long chattingRoomId) {

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
+import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 @RequiredArgsConstructor
@@ -46,6 +47,14 @@ public class ChattingRoomController {
 	@CurrentMemberId
 	public ResponseEntity<ChattingRoomsResponse> findAllByMemberId(Long memberId) {
 		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.findAllByMemberId(memberId);
+
+		return ResponseEntity.ok(chattingRoomsResponse);
+	}
+
+	@GetMapping("/normal")
+	@CurrentExpertId
+	public ResponseEntity<ChattingRoomsResponse> findAllOfNormalByExpertId(Long expertId) {
+		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.findAllOfNormalByExpertId(expertId);
 
 		return ResponseEntity.ok(chattingRoomsResponse);
 	}
