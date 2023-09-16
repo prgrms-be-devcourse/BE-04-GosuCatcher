@@ -33,17 +33,17 @@ public class ExpertEstimateController {
 
 	@PostMapping("/normal/{expertId}")
 	public ResponseEntity<MessageResponse> createNormal(@PathVariable Long expertId, @RequestParam Long memberEstimateId,
-														@Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
+	                                                    @Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId, memberEstimateId, request);
 
-		MessageResponse messageResponse = matchingService.sendFirstMessage(memberEstimateId, expertNormalEstimateResponse);
+		MessageResponse messageResponse = matchingService.sendFirstMessageForNormal(memberEstimateId, expertNormalEstimateResponse);
 
 		return ResponseEntity.ok(messageResponse);
 	}
 
 	@PostMapping("/auto/{expertId}")
 	public ResponseEntity<ExpertAutoEstimateResponse> createAuto(@PathVariable Long expertId,
-																 @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
+	                                                             @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
 		ExpertAutoEstimateResponse expertAutoEstimateResponse = expertEstimateService.createAuto(expertId, request);
 
 		return ResponseEntity.ok(expertAutoEstimateResponse);

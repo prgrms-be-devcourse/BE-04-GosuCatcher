@@ -1,29 +1,22 @@
 package com.foo.gosucatcher.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class WebMvcConfig {
+public class WebMvcConfig implements WebMvcConfigurer {
 
 	private static final long MAX_AGE_SECONDS = 3600;
 
-	@Bean
-	public CorsFilter corsFilter() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-
-		config.addAllowedOrigin("*");
-		config.addAllowedMethod("*");
-		config.addAllowedHeader("*");
-		config.setAllowCredentials(true);
-		config.setMaxAge(MAX_AGE_SECONDS);
-
-		source.registerCorsConfiguration("/**", config);
-
-		return new CorsFilter(source);
+	@Override
+	public void addCorsMappings(CorsRegistry registry) {
+		registry
+			.addMapping("/**")
+			.allowedOrigins("http://localhost:8080")
+			.allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+			.allowedHeaders("*")
+			.allowCredentials(true)
+			.maxAge(MAX_AGE_SECONDS);
 	}
 }
