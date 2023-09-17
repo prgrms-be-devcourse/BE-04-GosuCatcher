@@ -58,7 +58,7 @@ public enum ErrorCode {
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
 	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
 	DUPLICATE_MEMBER_ESTIMATE("ME003", "회원 요청 견적서는 중복될 수 없습니다."),
-	ALREADY_REQUESTER_HAS_SAME_SUB_ITEM("ME004", "견적을 요청하는 회원이 고수로서 제공하고 있는 서비스는 요청할 수 없습니다."),
+	ALREADY_REQUESTER_HAS_SAME_SUB_ITEM("ME004", "회원과 같은 분야의 서비스는 요청할 수 없습니다."),
 
 	//고수 응답 견적서
 	NOT_FOUND_EXPERT_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
