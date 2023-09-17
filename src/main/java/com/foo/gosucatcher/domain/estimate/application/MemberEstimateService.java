@@ -51,6 +51,7 @@ public class MemberEstimateService {
 		SubItem subItem = subItemRepository.findById(memberEstimateRequest.subItemId())
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_SUB_ITEM));
 
+		checkRequesterHasSameSubItem(member.getId(), subItem.getId());
 		checkDuplicatedMemberEstimate(member.getId(), subItem.getId());
 
 		MemberEstimate memberEstimate = MemberEstimateRequest.toMemberEstimate(member, subItem, memberEstimateRequest);
@@ -152,6 +153,15 @@ public class MemberEstimateService {
 	private void checkExpertHasSubItem(Long expertId, Long subItemId) {
 		if (!expertItemRepository.existsByExpertIdAndSubItemId(expertId, subItemId)) {
 			throw new BusinessException(NOT_FOUND_EXPERT_ITEM);
+		}
+	}
+
+	private void checkRequesterHasSameSubItem(Long memberId, Long subItemId) {
+		Expert expert = expertRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+
+		if (expertItemRepository.existsByExpertIdAndSubItemId(expert.getId(), subItemId)) {
+			throw new BusinessException(ALREADY_REQUESTER_HAS_SAME_SUB_ITEM);
 		}
 	}
 }
