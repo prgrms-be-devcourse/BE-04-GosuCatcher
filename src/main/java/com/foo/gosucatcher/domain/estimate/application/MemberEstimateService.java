@@ -146,12 +146,14 @@ public class MemberEstimateService {
 			memberId, subItemId);
 
 		Optional.ofNullable(memberEstimatesForDuplicate).filter(result -> !result.isEmpty()).ifPresent(result -> {
+
 			throw new BusinessException(DUPLICATE_MEMBER_ESTIMATE);
 		});
 	}
 
 	private void checkExpertHasSubItem(Long expertId, Long subItemId) {
 		if (!expertItemRepository.existsByExpertIdAndSubItemId(expertId, subItemId)) {
+
 			throw new BusinessException(NOT_FOUND_EXPERT_ITEM);
 		}
 	}
@@ -161,6 +163,7 @@ public class MemberEstimateService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		if (expertItemRepository.existsByExpertIdAndSubItemId(expert.getId(), subItemId)) {
+
 			throw new BusinessException(ALREADY_REQUESTER_HAS_SAME_SUB_ITEM);
 		}
 	}

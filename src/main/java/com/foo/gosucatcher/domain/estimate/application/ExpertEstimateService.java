@@ -139,6 +139,7 @@ public class ExpertEstimateService {
 			.filter(expertEstimate -> {
 				Long registeredEstimateId = expertEstimate.getMemberEstimate().getId();
 				Long requestedEstimateId = memberEstimate.getId();
+
 				return registeredEstimateId.equals(requestedEstimateId);
 			})
 			.forEach(expertEstimate -> {
@@ -155,6 +156,7 @@ public class ExpertEstimateService {
 
 	private void checkExpertHasSubItem(Long expertId, Long subItemId) {
 		if (!expertItemRepository.existsByExpertIdAndSubItemId(expertId, subItemId)) {
+
 			throw new BusinessException(NOT_REGISTERED_SUB_ITEMS);
 		}
 	}
