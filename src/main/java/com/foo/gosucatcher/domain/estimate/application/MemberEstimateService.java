@@ -22,6 +22,7 @@ import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertItemRepository;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -42,6 +43,7 @@ public class MemberEstimateService {
 	private final SubItemRepository subItemRepository;
 	private final ExpertEstimateRepository expertEstimateRepository;
 	private final ExpertRepository expertRepository;
+	private final ExpertItemRepository expertItemRepository;
 
 	public MemberEstimate create(Long memberId, MemberEstimateRequest memberEstimateRequest) {
 		Member member = memberRepository.findById(memberId)
@@ -57,6 +59,8 @@ public class MemberEstimateService {
 	}
 
 	public MemberEstimateResponse createNormal(Long memberId, Long expertId, MemberEstimateRequest memberEstimateRequest) {
+		checkExpertHasSubItem(expertId, memberEstimateRequest.subItemId());
+
 		MemberEstimate memberEstimate = create(memberId, memberEstimateRequest);
 
 		Expert expert = expertRepository.findById(expertId)
@@ -143,5 +147,11 @@ public class MemberEstimateService {
 		Optional.ofNullable(memberEstimatesForDuplicate).filter(result -> !result.isEmpty()).ifPresent(result -> {
 			throw new BusinessException(DUPLICATE_MEMBER_ESTIMATE);
 		});
+	}
+
+	private void checkExpertHasSubItem(Long expertId, Long subItemId) {
+		if (!expertItemRepository.existsByExpertIdAndSubItemId(expertId, subItemId)) {
+			throw new BusinessException(UNAVAILABLE_REQUEST_TO_EXPERT_FOR_NOT_REGISTERED_SERVICE);
+		}
 	}
 }
