@@ -18,8 +18,7 @@ public class MessageController {
 
 	@MessageMapping("/message")
 	public void sendMessage(MessageRequest messageRequest) {
-		template.convertAndSend("/sub/chat/room/" + messageRequest.chattingRoomId(), messageRequest);
-
 		messageService.create(messageRequest);
+		template.convertAndSend("/sub/chat/room/" + messageRequest.chattingRoomId(), messageRequest);
 	}
 }
