@@ -188,9 +188,47 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."));
 	}
 
+	@DisplayName("전체 견적서 목록 조회 성공 테스트")
+	@Test
+	void findAll() throws Exception {
+		//given
+		Member member = Member.builder()
+			.name("성이름")
+			.password("abcd11@@")
+			.email("abcd123@abc.com")
+			.phoneNumber("010-0000-0000")
+			.build();
+
+		MainItem mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		SubItem subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		MemberEstimate memberEstimate = MemberEstimate.builder()
+			.member(member)
+			.subItem(subItem)
+			.location("서울 강남구 개포1동")
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
+			.detailedDescription("추가 내용")
+			.build();
+
+		List<MemberEstimate> mockEstimates = List.of(memberEstimate);
+		MemberEstimatesResponse memberEstimatesResponse = MemberEstimatesResponse.from(mockEstimates);
+
+		when(memberEstimateService.findAll()).thenReturn(memberEstimatesResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-estimates")
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.memberEstimates").isArray())
+			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
+	}
+
 	@DisplayName("회원 별 전체 요청 견적서 조회 성공 테스트")
 	@Test
-	void findAllByMember() throws Exception {
+	void findAllByMemberId() throws Exception {
 		//given
 		Long memberId = 1L;
 
@@ -271,6 +309,47 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.code").value("ME001"))
 			.andExpect(jsonPath("$.errors").isArray())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 회원 요청 견적서입니다."));
+	}
+
+	@DisplayName("고수의 응답을 받기까지 대기중인 고수 별 일반 요청 견적서 목록 조회 성공 테스트")
+	@Test
+	void findAllPendingNormalByExpertId() throws Exception {
+		//given
+		Long expertId = 1L;
+
+		Member member = Member.builder()
+			.name("성이름")
+			.password("abcd11@@")
+			.email("abcd123@abc.com")
+			.phoneNumber("010-0000-0000")
+			.build();
+
+		MainItem mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		SubItem subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		MemberEstimate memberEstimate = MemberEstimate.builder()
+			.member(member)
+			.subItem(subItem)
+			.location("서울 강남구 개포1동")
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
+			.detailedDescription("추가 내용")
+			.build();
+
+		List<MemberEstimate> mockEstimates = List.of(memberEstimate);
+		MemberEstimatesResponse memberEstimatesResponse = MemberEstimatesResponse.from(mockEstimates);
+
+		when(memberEstimateService.findAllPendingNormalByExpertId(expertId)).thenReturn(memberEstimatesResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/member-estimates/normal")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.memberEstimates").isArray())
+			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
 	}
 
 	@DisplayName("회원 요청 견적서 삭제 성공 테스트")
