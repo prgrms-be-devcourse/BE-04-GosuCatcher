@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public abstract class Image {
 
-	private String filename;
+	protected String filename;
 
 	public Image(String filename) {
 		this.filename = filename;
