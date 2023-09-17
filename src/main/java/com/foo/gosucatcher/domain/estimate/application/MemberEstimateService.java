@@ -151,7 +151,7 @@ public class MemberEstimateService {
 
 	private void checkExpertHasSubItem(Long expertId, Long subItemId) {
 		if (!expertItemRepository.existsByExpertIdAndSubItemId(expertId, subItemId)) {
-			throw new BusinessException(UNAVAILABLE_REQUEST_TO_EXPERT_FOR_NOT_REGISTERED_SERVICE);
+			throw new BusinessException(NOT_FOUND_EXPERT_ITEM);
 		}
 	}
 }
