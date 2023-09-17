@@ -1,18 +1,22 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import java.util.List;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.multipart.MultipartFile;
 
+import com.foo.gosucatcher.domain.image.ImageService;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
-import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.domain.member.domain.Member;
-import com.foo.gosucatcher.domain.member.domain.MemberProfileRepository;
+import com.foo.gosucatcher.domain.member.domain.MemberImage;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -26,9 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MemberProfileService {
 
-	private final MemberProfileRepository memberProfileRepository;
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final ImageService imageService;
 
 	public MemberProfileResponse findMemberProfile(Long memberId) {
 		Member member = memberRepository.findById(memberId)
@@ -48,30 +52,40 @@ public class MemberProfileService {
 		return MemberProfileChangeResponse.from(member);
 	}
 
-	public void uploadProfileImage(ProfileImageUploadRequest profileImageUploadRequest) {
-		long memberId = profileImageUploadRequest.memberId();
+	public ImageUploadResponse uploadProfileImage(Long memberId, ImageUploadRequest request) {
+		ImageUploadResponse uploadResponse = imageService.store(request);
+
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		MultipartFile file = profileImageUploadRequest.file();
-		ImageFile imageFile = memberProfileRepository.uploadImage(member, file);
+		List<String> filenames = uploadResponse.filenames();
+		String filename = filenames.get(0);
+		MemberImage newProfileImage = new MemberImage(filename);
 
-		member.updateProfileImage(imageFile);
+		member.updateProfileImage(newProfileImage);
+
+		memberRepository.save(member);
+
+		return uploadResponse;
 	}
 
 	@Transactional(readOnly = true)
-	public ImageFile findProfileImage(Long memberId) {
+	public ImageResponse getProfileImage(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		String filename = member.getProfileMemberImage().getFilename();
 
-		return memberProfileRepository.findImage(member);
+		return new ImageResponse(List.of(filename));
 	}
 
 	public void deleteProfileImage(Long memberId) {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
-		ImageFile profileImageFile = member.getProfileImageFile();
-		memberProfileRepository.deleteImage(profileImageFile);
+		String filename = member.getProfileMemberImage().getFilename();
+		imageService.delete(new ImageDeleteRequest(List.of(filename)));
+
+		member.getProfileMemberImage().changePathToDefault();
+		memberRepository.save(member);
 	}
 }
