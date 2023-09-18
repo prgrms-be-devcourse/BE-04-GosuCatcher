@@ -30,7 +30,7 @@ import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -171,9 +171,9 @@ public class ExpertService {
 		return SlicedExpertsResponse.from(expertsSlice);
 	}
 
-	public ImageUploadResponse uploadImage(Long expertId, ImageUploadRequest request) {
+	public ImagesResponse uploadImage(Long expertId, ImageUploadRequest request) {
 
-		ImageUploadResponse response = imageService.store(request);
+		ImagesResponse response = imageService.store(request);
 
 		Expert expert = expertRepository.findById(expertId)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));

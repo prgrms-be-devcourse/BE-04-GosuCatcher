@@ -11,7 +11,7 @@ import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
@@ -52,8 +52,8 @@ public class MemberProfileService {
 		return MemberProfileChangeResponse.from(member);
 	}
 
-	public ImageUploadResponse uploadProfileImage(Long memberId, ImageUploadRequest request) {
-		ImageUploadResponse uploadResponse = imageService.store(request);
+	public ImagesResponse uploadProfileImage(Long memberId, ImageUploadRequest request) {
+		ImagesResponse uploadResponse = imageService.store(request);
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));

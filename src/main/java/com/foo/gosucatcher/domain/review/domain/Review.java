@@ -2,23 +2,29 @@ package com.foo.gosucatcher.domain.review.domain;
 
 import static com.foo.gosucatcher.global.error.ErrorCode.INVALID_UPDATER;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.domain.review.exception.UnsupportedReplierException;
 import com.foo.gosucatcher.global.BaseEntity;
-import com.foo.gosucatcher.global.error.exception.UnsupportedUpdateException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -52,6 +58,10 @@ public class Review extends BaseEntity {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "reply_id")
 	private Reply reply;
+
+	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
+	private List<ReviewImage> reviewImages;
 
 	private String content;
 
@@ -91,11 +101,19 @@ public class Review extends BaseEntity {
 		long writerId = writer.getId();
 
 		if (writerId != updaterId) {
-			throw new UnsupportedUpdateException(INVALID_UPDATER);
+			throw new UnsupportedReplierException(INVALID_UPDATER);
 		}
 	}
 
 	public void addReply(Reply reply) {
 		this.reply = reply;
+	}
+
+	public void addReviewImages(List<ReviewImage> reviewImages) {
+		this.reviewImages = reviewImages;
+
+		for (ReviewImage reviewImage : reviewImages) {
+			reviewImage.addReview(this);
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package com.foo.gosucatcher.domain.review.presentation;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -15,9 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReplyRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
@@ -35,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class ReviewController {
 
 	private static final int DEFAULT_PAGING_SIZE = 3;
+
 	private final ReviewService reviewService;
 
 	@PostMapping("/{expertId}")
@@ -42,10 +47,14 @@ public class ReviewController {
 	public ResponseEntity<ReviewResponse> create(
 		@PathVariable Long expertId,
 		@RequestParam Long subItemId,
-		@Validated @RequestBody ReviewCreateRequest reviewCreateRequest,
+		@Validated @RequestPart ReviewCreateRequest reviewCreateRequest,
+		@RequestPart(required = false) List<MultipartFile> imageFiles,
 		Long memberId
 	) {
-		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest);
+		ImageUploadRequest imageUploadRequest = new ImageUploadRequest(imageFiles);
+
+		ReviewResponse response = reviewService.create(expertId, subItemId, memberId, reviewCreateRequest,
+			imageUploadRequest);
 
 		URI uri = ServletUriComponentsBuilder
 			.fromCurrentRequest()

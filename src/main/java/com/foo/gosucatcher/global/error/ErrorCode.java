@@ -52,7 +52,10 @@ public enum ErrorCode {
 
 	//파일
 	NOT_FOUND_IMAGE("F001", "존재하지 않는 이미지 입니다."),
-	INVALID_IMAGE("F002", "지원하지 않는 이미지 파일 형식입니다."),
+	EMPTY_IMAGE("F002", "이미지를 업로드 바랍니다."),
+	INVALID_IMAGE_FORMAT("F003", "지원하지 않는 이미지 파일 형식입니다."),
+	EXCESSIVE_IMAGE_COUNT("F004", "업로드 가능한 이미지 최대 개수를 초과하였습니다."),
+
 
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),

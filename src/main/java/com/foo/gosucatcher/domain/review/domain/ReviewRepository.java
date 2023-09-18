@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-	Page<Review> findAllByOrderByCreatedAt(Pageable pageable);
+	Page<Review> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
 	Optional<Review> findById(Long id);
 
