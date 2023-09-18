@@ -4,7 +4,6 @@ import static com.foo.gosucatcher.global.error.ErrorCode.ALREADY_REGISTERED_BY_S
 import static com.foo.gosucatcher.global.error.ErrorCode.DUPLICATED_EXPERT_STORENAME;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT_ITEM;
-import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_SUB_ITEM;
 
 import java.util.List;
@@ -16,7 +15,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
@@ -36,7 +34,6 @@ import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResp
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
-import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -56,16 +53,15 @@ public class ExpertService {
 	private final ImageService imageService;
 	private final ExpertImageRepository expertImageRepository;
 
-	public ExpertResponse create(ExpertCreateRequest request, long memberId) {
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+	public ExpertResponse create(long expertId, ExpertUpdateRequest request) {
+		Expert existingExpert = expertRepository.findById(expertId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
 
 		duplicatedStoreNameCheck(request.storeName());
 
-		Expert newExpert = ExpertCreateRequest.toExpert(member, request);
-		expertRepository.save(newExpert);
+		existingExpert.update(ExpertUpdateRequest.toExpert(request));
 
-		return ExpertResponse.from(newExpert);
+		return ExpertResponse.from(existingExpert);
 	}
 
 	@Transactional(readOnly = true)

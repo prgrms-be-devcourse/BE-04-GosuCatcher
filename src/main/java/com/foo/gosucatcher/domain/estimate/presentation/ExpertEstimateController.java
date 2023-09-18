@@ -39,7 +39,7 @@ public class ExpertEstimateController {
 														@Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId, memberEstimateId, request);
 
-		MessageResponse messageResponse = matchingService.sendFirstMessage(memberEstimateId, expertNormalEstimateResponse);
+		MessageResponse messageResponse = matchingService.sendFirstMessageForNormal(memberEstimateId, expertNormalEstimateResponse);
 
 		return ResponseEntity.ok(messageResponse);
 	}

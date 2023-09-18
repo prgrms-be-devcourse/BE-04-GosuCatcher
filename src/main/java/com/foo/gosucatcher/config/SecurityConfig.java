@@ -27,7 +27,8 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			.antMatchers("/h2-console/**");
+			.antMatchers("/h2-console/**")
+			.antMatchers("/gs-chat/**");
 	}
 
 	@Bean
@@ -40,7 +41,7 @@ public class SecurityConfig {
 			.and()
 			.authorizeRequests()
 			.antMatchers("/api/v1/**").permitAll()
-			.antMatchers("/ws/**").permitAll() //채팅
+			.antMatchers("/gs-chat/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
