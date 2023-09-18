@@ -7,15 +7,24 @@ import java.util.stream.Collectors;
 
 import org.springframework.validation.BindingResult;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public record ErrorResponse(
-		LocalDateTime timestamp,
-		String code,
-		List<FieldError> errors,
-		String message
+	@JsonSerialize(using = LocalDateTimeSerializer.class)
+	@JsonDeserialize(using = LocalDateTimeDeserializer.class)
+	@JsonFormat(pattern = "yyyy-MM-dd kk:mm:ss")
+	LocalDateTime timestamp,
+	String code,
+	List<FieldError> errors,
+	String message
 ) {
 
 	private ErrorResponse(ErrorCode code, List<FieldError> errors) {
@@ -61,11 +70,11 @@ public record ErrorResponse(
 		private static List<FieldError> of(final BindingResult bindingResult) {
 			final List<org.springframework.validation.FieldError> fieldErrors = bindingResult.getFieldErrors();
 			return fieldErrors.stream()
-					.map(error -> new FieldError(
-							error.getField(),
-							error.getRejectedValue() == null ? "" : error.getRejectedValue().toString(),
-							error.getDefaultMessage()))
-					.collect(Collectors.toList());
+				.map(error -> new FieldError(
+					error.getField(),
+					error.getRejectedValue() == null ? "" : error.getRejectedValue().toString(),
+					error.getDefaultMessage()))
+				.collect(Collectors.toList());
 		}
 	}
 }

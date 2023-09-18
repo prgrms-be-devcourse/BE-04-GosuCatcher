@@ -56,7 +56,6 @@ public enum ErrorCode {
 	INVALID_IMAGE_FORMAT("F003", "지원하지 않는 이미지 파일 형식입니다."),
 	EXCESSIVE_IMAGE_COUNT("F004", "업로드 가능한 이미지 최대 개수를 초과하였습니다."),
 
-
 	//회원 요청 견적서
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
 	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
@@ -82,7 +81,18 @@ public enum ErrorCode {
 	CHATTING_ROOM_ASSIGNMENT_FAILED("CR002", "채팅방 할당에 실패했습니다."),
 
 	//채팅 메시지
-	NOT_FOUND_MESSAGE("CM001", "채팅 메시지가 존재하지 않습니다.");
+	NOT_FOUND_MESSAGE("CM001", "채팅 메시지가 존재하지 않습니다."),
+
+	//JWT
+	MALFORMED_JWT("JT001", "유효한 Jws의 형태가 아닙니다."),
+	EXPIRED_JWT("JT002", "Jwt의 유효시간이 만료되었습니다."),
+	UNSUPPORTED_JWT("JT003", "지원하지 않는 Jws 값입니다."),
+	INVALID_SIGNATURE("JT004", "서명이 올바르지 않습니다."),
+	EMPTY_OR_NULL_JWT("JT005", "Jwt값이 비어있거나 NULL입니다."),
+	INVALID_SECRET_KEY("JT006", "잘못된 Secret Key 값입니다."),
+	NOT_EXIST_CLAIM("JT007", "해당  Claim이 존재하지 않습니다."),
+	EMPTY_OR_NULL_CLAIM("JT008", "해당 Claim이 비어있거나 NULL입니다."),
+	SHORT_OF_JWT_LENGTH("JT009", "Jwt의 길이가 너무 짧거나 Bearer가 없습니다.");
 
 	private final String code;
 	private final String message;
