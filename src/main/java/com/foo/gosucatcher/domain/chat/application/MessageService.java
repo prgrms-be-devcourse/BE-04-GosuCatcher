@@ -2,6 +2,7 @@ package com.foo.gosucatcher.domain.chat.application;
 
 import static com.foo.gosucatcher.global.error.ErrorCode.CHATTING_ROOM_ASSIGNMENT_FAILED;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_CHATTING_ROOM;
+import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_EXPERT;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MEMBER;
 import static com.foo.gosucatcher.global.error.ErrorCode.NOT_FOUND_MESSAGE;
 
@@ -22,6 +23,8 @@ import com.foo.gosucatcher.domain.chat.domain.Message;
 import com.foo.gosucatcher.domain.chat.domain.MessageRepository;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -37,6 +40,7 @@ public class MessageService {
 	private final MessageRepository messageRepository;
 	private final ChattingRoomRepository chattingRoomRepository;
 	private final MemberRepository memberRepository;
+	private final ExpertRepository expertRepository;
 
 	public MessageResponse create(MessageRequest messageRequest) {
 		Member sender = memberRepository.findById(messageRequest.senderId())
@@ -81,11 +85,10 @@ public class MessageService {
 
 		List<MessageResponse> messageResponses = IntStream.range(0, chattingRoomResponses.size())
 			.mapToObj(count -> {
-				MessageRequest messageRequest = new MessageRequest(
-					expertAutoEstimateResponses.get(count).expert().id(),
-					chattingRoomResponses.get(count).id(),
-					expertAutoEstimateResponses.get(count).description()
-				);
+				Expert expert = expertRepository.findById(expertAutoEstimateResponses.get(count).expert().id())
+					.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+
+				MessageRequest messageRequest = MessageRequest.of(expert.getMember().getId(), chattingRoomResponses.get(count), expertAutoEstimateResponses.get(count));
 
 				return create(messageRequest);
 			})
@@ -95,7 +98,10 @@ public class MessageService {
 	}
 
 	public MessageResponse sendExpertEstimateMessageForNormal(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
-		MessageRequest messageRequest = MessageRequest.from(chattingRoomResponse, expertNormalEstimateResponse);
+		Expert expert = expertRepository.findById(expertNormalEstimateResponse.expertResponse().id())
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_EXPERT));
+
+		MessageRequest messageRequest = MessageRequest.of(expert.getMember().getId(), chattingRoomResponse, expertNormalEstimateResponse);
 
 		return create(messageRequest);
 	}
