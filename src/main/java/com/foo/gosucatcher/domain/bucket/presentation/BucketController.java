@@ -18,6 +18,7 @@ import com.foo.gosucatcher.domain.bucket.application.BucketService;
 import com.foo.gosucatcher.domain.bucket.dto.request.BucketRequest;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketResponse;
 import com.foo.gosucatcher.domain.bucket.dto.response.BucketsResponse;
+import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,8 +36,9 @@ public class BucketController {
 		return ResponseEntity.ok(bucketsResponse);
 	}
 
-	@GetMapping("/{memberId}")
-	public ResponseEntity<BucketsResponse> findAllByMemberId(@PathVariable Long memberId, Pageable pageable) {
+	@GetMapping("/members")
+	@CurrentMemberId
+	public ResponseEntity<BucketsResponse> findAllByMemberId(@RequestParam Long memberId, Pageable pageable) {
 		BucketsResponse bucketsResponse = bucketService.findAllByMemberId(memberId, pageable);
 
 		return ResponseEntity.ok(bucketsResponse);

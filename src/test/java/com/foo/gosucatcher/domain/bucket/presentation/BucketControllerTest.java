@@ -125,7 +125,6 @@ class BucketControllerTest {
 	void findAllByMemberId() throws Exception {
 
 		// given
-		long memberId = 3L;
 		BucketsResponse bucketsResponse = new BucketsResponse(
 			List.of(
 				new BucketResponse(1L, 2L, 3L),
@@ -138,8 +137,8 @@ class BucketControllerTest {
 
 		// when
 		// then
-		mockMvc.perform(get("/api/v1/buckets/{memberId}", memberId)
-				// mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/buckets/3")
+		mockMvc.perform(get("/api/v1/buckets/members")
+				.param("memberId", "3")
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.buckets[0].id").value(1L))
