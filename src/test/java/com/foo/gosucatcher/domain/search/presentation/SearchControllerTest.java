@@ -1,6 +1,8 @@
 package com.foo.gosucatcher.domain.search.presentation;
 
+import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +24,8 @@ import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemRespo
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.search.application.SearchService;
 import com.foo.gosucatcher.domain.search.application.dto.response.SearchListResponse;
+import com.foo.gosucatcher.domain.search.application.dto.response.SearchRankingListResponse;
+import com.foo.gosucatcher.domain.search.application.dto.response.SearchRankingResponse;
 import com.foo.gosucatcher.domain.search.application.dto.response.SearchResponse;
 
 @WebMvcTest(value = {SearchController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
@@ -77,6 +81,34 @@ class SearchControllerTest {
 				.accept(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.searchResponseList[0].keyword").value("영어"))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("인기 검색 목록 반환 성공")
+	void getPopularSearchListTest() throws Exception {
+
+		//given
+		List<SearchRankingResponse> popularKeywords = List.of(
+			SearchRankingResponse.of(1, "Java"),
+			SearchRankingResponse.of(2, "Spring"),
+			SearchRankingResponse.of(3, "REST"));
+
+		//when
+		SearchRankingListResponse searchRankingListResponse = new SearchRankingListResponse(popularKeywords);
+
+		when(searchService.getPopularKeywords()).thenReturn(searchRankingListResponse);
+
+		//then
+		mockMvc.perform(get("/api/v1/search/popularity")
+				.contentType(APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.searchRankingList[0].rating").value(1))
+			.andExpect(jsonPath("$.searchRankingList[0].keyword").value("Java"))
+			.andExpect(jsonPath("$.searchRankingList[1].rating").value(2))
+			.andExpect(jsonPath("$.searchRankingList[1].keyword").value("Spring"))
+			.andExpect(jsonPath("$.searchRankingList[2].rating").value(3))
+			.andExpect(jsonPath("$.searchRankingList[2].keyword").value("REST"))
 			.andDo(print());
 	}
 }

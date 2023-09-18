@@ -8,14 +8,10 @@ import lombok.Getter;
 @Getter
 public abstract class Image {
 
-	private String filename;
-	private String url;
-	private Long size;
+	protected String filename;
 
-	public Image(String filename, String url, Long size) {
+	public Image(String filename) {
 		this.filename = filename;
-		this.url = url;
-		this.size = size;
 	}
 
 	public Image() {

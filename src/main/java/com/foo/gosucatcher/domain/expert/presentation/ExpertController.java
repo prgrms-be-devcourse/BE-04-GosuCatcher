@@ -21,15 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
-import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertCreateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertSubItemRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.request.ExpertUpdateRequest;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsResponse;
 import com.foo.gosucatcher.domain.expert.domain.SortType;
-import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.global.aop.CurrentExpertId;
 
@@ -41,28 +40,26 @@ import lombok.RequiredArgsConstructor;
 public class ExpertController {
 
 	private final ExpertService expertService;
-	private final ImageService imageService;
 
 	@CurrentExpertId
 	@PostMapping
-	public ResponseEntity<ExpertResponse> create(@Validated @RequestBody ExpertCreateRequest request,
-		@RequestParam Long memberId) {
-		ExpertResponse expertResponse = expertService.create(request, memberId);
-
+	public ResponseEntity<ExpertResponse> create(Long expertId, @Validated @RequestBody ExpertUpdateRequest request) {
+		ExpertResponse expertResponse = expertService.create(expertId, request);
 		return ResponseEntity.ok(expertResponse);
 	}
 
 	@CurrentExpertId
-	@GetMapping("/{expertId}")
-	public ResponseEntity<ExpertResponse> findOne(@PathVariable Long expertId) {
+	@GetMapping
+	public ResponseEntity<ExpertResponse> findOne(Long expertId) {
+
 		ExpertResponse expert = expertService.findById(expertId);
 
 		return ResponseEntity.ok(expert);
 	}
 
 	@CurrentExpertId
-	@PatchMapping("/{expertId}")
-	public ResponseEntity<Long> update(@PathVariable Long expertId,
+	@PatchMapping
+	public ResponseEntity<Long> update(Long expertId,
 		@Validated @RequestBody ExpertUpdateRequest request) {
 		Long updatedExpertId = expertService.update(expertId, request);
 
@@ -70,65 +67,63 @@ public class ExpertController {
 	}
 
 	@CurrentExpertId
-	@DeleteMapping("/{expertId}")
-	public ResponseEntity<Void> delete(@PathVariable Long expertId) {
+	@DeleteMapping
+	public ResponseEntity<Void> delete(Long expertId) {
 		expertService.delete(expertId);
 
 		return ResponseEntity.ok(null);
 	}
 
 	@CurrentExpertId
-	@PostMapping("/{id}/sub-items")
-	public ResponseEntity<Long> addSubItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
-		Long expertId = expertService.addSubItem(id, request);
+	@PostMapping("/sub-items")
+	public ResponseEntity<Long> addSubItem(Long expertId, @RequestBody ExpertSubItemRequest request) {
+		Long id = expertService.addSubItem(expertId, request);
 
-		return ResponseEntity.ok(expertId);
+		return ResponseEntity.ok(id);
 	}
 
 	@CurrentExpertId
-	@DeleteMapping("/{id}/sub-items")
-	public ResponseEntity<Object> removeItem(@PathVariable Long id, @RequestBody ExpertSubItemRequest request) {
-		expertService.removeSubItem(id, request);
+	@DeleteMapping("/sub-items")
+	public ResponseEntity<Object> removeItem(Long expertId, @RequestBody ExpertSubItemRequest request) {
+		expertService.removeSubItem(expertId, request);
 
 		return ResponseEntity.noContent()
 			.build();
 	}
 
 	@CurrentExpertId
-	@GetMapping("/{id}/sub-items")
-	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(@PathVariable Long id) {
-		SubItemsResponse response = expertService.getSubItemsByExpertId(id);
+	@GetMapping("/sub-items")
+	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(Long expertId) {
+		SubItemsResponse response = expertService.getSubItemsByExpertId(expertId);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@CurrentExpertId
-	@PostMapping("/{expertId}/images")
-	public ResponseEntity<ImagesResponse> uploadImage(@PathVariable Long expertId, MultipartFile file) throws
-		IOException {
+	@PostMapping("/images")
+	public ResponseEntity<ImageUploadResponse> uploadImage(Long expertId, MultipartFile file) throws IOException {
 		ImageUploadRequest request = new ImageUploadRequest(List.of(file));
-		ImagesResponse response = expertService.uploadImage(expertId, request);
+		ImageUploadResponse response = expertService.uploadImage(expertId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	@CurrentExpertId
-	@DeleteMapping("/{expertId}/images/{filename}")
-	public ResponseEntity<String> deleteImage(@PathVariable Long expertId, @PathVariable String filename) {
+	@DeleteMapping("/images/{filename}")
+	public ResponseEntity<String> deleteImage(Long expertId, @PathVariable String filename) {
 		expertService.deleteImage(expertId, filename);
 
 		return ResponseEntity.ok(null);
 	}
 
 	@CurrentExpertId
-	@GetMapping("/{expertId}/images")
-	public ResponseEntity<ImagesResponse> getAllImages(@PathVariable Long expertId) {
-		ImagesResponse response = expertService.getAllImages(expertId);
+	@GetMapping("/images")
+	public ResponseEntity<ImageResponse> getAllImages(Long expertId) {
+		ImageResponse response = expertService.getAllImages(expertId);
 
 		return ResponseEntity.ok(response);
 	}
 
-	@CurrentExpertId
 	@GetMapping("/search")
 	public ResponseEntity<SlicedExpertsResponse> searchExperts(
 		@RequestParam(required = false) String subItem,

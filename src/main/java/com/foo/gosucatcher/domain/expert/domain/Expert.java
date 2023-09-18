@@ -67,6 +67,7 @@ public class Expert extends BaseEntity {
 	@Column(name = "review_count", nullable = false, columnDefinition = "int default 0")
 	private int reviewCount;
 
+	@Column(name = "is_deleted")
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Builder

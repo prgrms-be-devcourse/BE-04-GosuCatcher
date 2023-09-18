@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,6 +34,7 @@ import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEst
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
@@ -84,6 +84,8 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateSuccessTest() throws Exception {
 
 		//given
+		Long expertId = 1L;
+
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
 
@@ -91,11 +93,13 @@ class ExpertEstimateControllerTest {
 			100, "서울시 강남구", "상세설명을씁니다");
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
 			.willReturn(expertNormalEstimateResponse);
-		given(matchingService.sendFirstMessage(anyLong(), any())).willReturn(messageResponse);
+		given(matchingService.sendFirstMessageForNormal(anyLong(), any())).willReturn(messageResponse);
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/normal?memberEstimateId={memberEstimateId}", 1L)
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertNormalEstimateCreateRequest)))
 			.andExpect(jsonPath("$.id").value(1))
 			.andExpect(jsonPath("$.senderId").value(1))
@@ -114,12 +118,16 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateFailTest_notFoundExpert() throws Exception {
 
 		//given
+		Long expertId = 1L;
+
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/normal?memberEstimateId={memberEstimateId}", 1L)
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertNormalEstimateCreateRequest)))
 			.andExpect(status().isNotFound())
 			.andExpect(status().isNotFound())
@@ -135,12 +143,16 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateFailTest_notFoundMemberEstimate() throws Exception {
 
 		//given
+		Long expertId = 1L;
+
 		given(expertEstimateService.createNormal(anyLong(), anyLong(), any()))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER_ESTIMATE));
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/normal?memberEstimateId={memberEstimateId}", 1L)
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertNormalEstimateCreateRequest)))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -154,12 +166,16 @@ class ExpertEstimateControllerTest {
 	void createExpertEstimateFailTest_invalidValue() throws Exception {
 
 		//given
+		Long expertId = 1L;
+
 		expertNormalEstimateCreateRequest =
 			new ExpertNormalEstimateCreateRequest(100, "서울시 강남구", "짧은 설명");
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/normal/{expertId}?memberEstimateId={memberEstimateId}", 1L, 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/normal?memberEstimateId={memberEstimateId}", 1L)
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertNormalEstimateCreateRequest)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -174,6 +190,8 @@ class ExpertEstimateControllerTest {
 	@DisplayName("고수 바로 견적서 등록 성공")
 	public void createAuto() throws Exception {
 		//given
+		Long expertId = 1L;
+
 		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(1L, 10000, "서울시 강남구", "설명을 작성합니다");
 
 		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5);
@@ -184,8 +202,10 @@ class ExpertEstimateControllerTest {
 			.willReturn(expertAutoEstimateResponse);
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/auto/{expertId}", 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/auto")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertAutoEstimateCreateRequest)))
 			.andExpect(jsonPath("$.id").value(1))
 			.andExpect(jsonPath("$.expert.id").value(1))
@@ -204,6 +224,8 @@ class ExpertEstimateControllerTest {
 	@DisplayName("고수 바로 견적서 등록 실패")
 	public void createAutoFailed() throws Exception {
 		//given
+		Long expertId = 1L;
+
 		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(null, 10000, "서울시 강남구", "설명을 작성합니다");
 
 		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5);
@@ -214,8 +236,10 @@ class ExpertEstimateControllerTest {
 			.willReturn(expertAutoEstimateResponse);
 
 		//when -> then
-		mockMvc.perform(post(baseUrl + "/auto/{expertId}", 1L)
-				.contentType(APPLICATION_JSON)
+		mockMvc.perform(post(baseUrl + "/auto")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(expertAutoEstimateCreateRequest)))
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
@@ -315,5 +339,52 @@ class ExpertEstimateControllerTest {
 			.andExpect(jsonPath("$.code").value("EE001"))
 			.andExpect(jsonPath("$.errors").isArray())
 			.andExpect(jsonPath("$.message").value("존재하지 않는 고수가 응답한 견적서 입니다."));
+	}
+
+	@Test
+	@DisplayName("특정 회원 요청 견적서와 거래된 모든 고수 견적서 목록 조회 성공 테스트")
+	void findAllByMemberEstimateId() throws Exception {
+		//given
+		Long memberEstimateId = 1L;
+
+		ExpertEstimatesResponse estimatesResponse = new ExpertEstimatesResponse(
+			List.of(new ExpertEstimateResponse(1L, expertResponse, memberEstimateResponse, 100, "서울시 강남구", "설명을 적어보세요")
+			));
+
+		given(expertEstimateService.findAllByMemberEstimateId(memberEstimateId)).willReturn(estimatesResponse);
+
+		//when -> then
+		mockMvc.perform(get(baseUrl + "/member-estimates/{memberEstimateId}", memberEstimateId))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].id").value(1))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].totalCost").value(100))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].activityLocation").value("서울시 강남구"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].description").value("설명을 적어보세요"))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("매칭되지 않은 상태인 특정 고수의 견적서 목록 조회 성공 테스트")
+	void findAllUnmatchedAutoByExpertId() throws Exception {
+		//given
+		Long expertId = 1L;
+
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = new ExpertAutoEstimatesResponse(
+			List.of(new ExpertAutoEstimateResponse(1L, expertResponse, 1L, 100, "서울시 강남구", "설명을 적어보세요"))
+		);
+
+		given(expertEstimateService.findAllUnmatchedAutoByExpertId(expertId)).willReturn(expertAutoEstimatesResponse);
+
+		//when -> then
+		mockMvc.perform(get(baseUrl + "/auto")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].id").value(1))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].totalCost").value(100))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].activityLocation").value("서울시 강남구"))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].description").value("설명을 적어보세요"))
+			.andDo(print());
 	}
 }

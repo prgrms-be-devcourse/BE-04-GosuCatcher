@@ -34,60 +34,69 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class MessageService {
 
-    private final MessageRepository messageRepository;
-    private final ChattingRoomRepository chattingRoomRepository;
-    private final MemberRepository memberRepository;
+	private final MessageRepository messageRepository;
+	private final ChattingRoomRepository chattingRoomRepository;
+	private final MemberRepository memberRepository;
 
-    public MessageResponse create(Long senderId, Long chattingRoomId, String content) {
-        Member sender = memberRepository.findById(senderId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
+	public MessageResponse create(MessageRequest messageRequest) {
+		Member sender = memberRepository.findById(messageRequest.senderId())
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MEMBER));
 
-        ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
+		ChattingRoom chattingRoom = chattingRoomRepository.findById(messageRequest.chattingRoomId())
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
-        Message message = MessageRequest.toMessage(sender, chattingRoom, content);
-        Message savedMessage = messageRepository.save(message);
+		Message message = MessageRequest.toMessage(sender, chattingRoom, messageRequest.content());
+		Message savedMessage = messageRepository.save(message);
 
-        chattingRoom.addMessage(message);
+		chattingRoom.addMessage(message);
 
-        return MessageResponse.from(savedMessage);
-    }
+		return MessageResponse.from(savedMessage);
+	}
 
-    @Transactional(readOnly = true)
-    public MessagesResponse findAllByChattingRoomId(Long chattingRoomId) {
-        ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
+	@Transactional(readOnly = true)
+	public MessagesResponse findAllByChattingRoomId(Long chattingRoomId) {
+		ChattingRoom chattingRoom = chattingRoomRepository.findById(chattingRoomId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
-        List<Message> messages = messageRepository.findAllByChattingRoom(chattingRoom);
+		List<Message> messages = messageRepository.findAllByChattingRoom(chattingRoom);
 
-        return MessagesResponse.from(messages);
-    }
+		return MessagesResponse.from(messages);
+	}
 
-    public void delete(Long messageId) {
-        Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE));
+	public void delete(Long messageId) {
+		Message message = messageRepository.findById(messageId)
+			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_MESSAGE));
 
-        ChattingRoom chattingRoom = message.getChattingRoom();
+		ChattingRoom chattingRoom = message.getChattingRoom();
 
-        messageRepository.delete(message);
+		messageRepository.delete(message);
 
-        chattingRoom.removeMessage(message);
-    }
+		chattingRoom.removeMessage(message);
+	}
 
-    public MessagesResponse sendExpertEstimateMessage(List<ChattingRoomResponse> chattingRoomResponses, List<ExpertAutoEstimateResponse> expertAutoEstimateResponses) {
-        if (chattingRoomResponses.size() != expertAutoEstimateResponses.size()) {
-            throw new BusinessException(CHATTING_ROOM_ASSIGNMENT_FAILED);
-        }
+	public MessagesResponse sendExpertEstimateMessageForAuto(List<ChattingRoomResponse> chattingRoomResponses, List<ExpertAutoEstimateResponse> expertAutoEstimateResponses) {
+		if (chattingRoomResponses.size() != expertAutoEstimateResponses.size()) {
+			throw new BusinessException(CHATTING_ROOM_ASSIGNMENT_FAILED);
+		}
 
-        List<MessageResponse> messageResponses = IntStream.range(0, chattingRoomResponses.size())
-                .mapToObj(count -> create(expertAutoEstimateResponses.get(count).expert().id(), chattingRoomResponses.get(count).id(), expertAutoEstimateResponses.get(count).description()))
-                .collect(Collectors.toList());
+		List<MessageResponse> messageResponses = IntStream.range(0, chattingRoomResponses.size())
+			.mapToObj(count -> {
+				MessageRequest messageRequest = new MessageRequest(
+					expertAutoEstimateResponses.get(count).expert().id(),
+					chattingRoomResponses.get(count).id(),
+					expertAutoEstimateResponses.get(count).description()
+				);
 
-        return MessagesResponse.valueOf(messageResponses);
-    }
+				return create(messageRequest);
+			})
+			.collect(Collectors.toList());
 
-    public MessageResponse sendExpertEstimateMessage(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
+		return MessagesResponse.valueOf(messageResponses);
+	}
 
-        return create(expertNormalEstimateResponse.id(), chattingRoomResponse.id(), expertNormalEstimateResponse.description());
-    }
+	public MessageResponse sendExpertEstimateMessageForNormal(ChattingRoomResponse chattingRoomResponse, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
+		MessageRequest messageRequest = MessageRequest.from(chattingRoomResponse, expertNormalEstimateResponse);
+
+		return create(messageRequest);
+	}
 }

@@ -14,6 +14,8 @@ spring:
     import:
       - classpath:application-aws.yml
       - classpath:application-db.yml
+    accessTokenExpiredTime: 1
+    refreshTokenExpiredTime: 30
 
   mail:
     host: smtp.gmail.com

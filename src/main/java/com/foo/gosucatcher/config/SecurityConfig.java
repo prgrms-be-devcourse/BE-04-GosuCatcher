@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.foo.gosucatcher.global.security.JwtAccessTokenFilter;
+import com.foo.gosucatcher.global.security.JwtAuthenticationFilter;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,8 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			.antMatchers("/h2-console/**");
+			.antMatchers("/h2-console/**")
+			.antMatchers("/gs-chat/**");
 	}
 
 	@Bean
@@ -40,9 +41,10 @@ public class SecurityConfig {
 			.and()
 			.authorizeRequests()
 			.antMatchers("/api/v1/**").permitAll()
+			.antMatchers("/gs-chat/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
-			.addFilterBefore(new JwtAccessTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}

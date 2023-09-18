@@ -61,12 +61,14 @@ public enum ErrorCode {
 	NOT_FOUND_MEMBER_ESTIMATE("ME001", "존재하지 않는 회원 요청 견적서입니다."),
 	INVALID_MEMBER_ESTIMATE_START_DATE("ME002", "시작 희망 날짜는 현재보다 이전일 수 없습니다."),
 	DUPLICATE_MEMBER_ESTIMATE("ME003", "회원 요청 견적서는 중복될 수 없습니다."),
+	ALREADY_REQUESTER_HAS_SAME_SUB_ITEM("ME004", "회원과 같은 분야의 서비스는 요청할 수 없습니다."),
 
 	//고수 응답 견적서
 	NOT_FOUND_EXPERT_ESTIMATE("EE001", "존재하지 않는 고수가 응답한 견적서 입니다."),
 	TOTAL_AMOUNT_CANNOT_BE_LESS_THAN_ZERO("EE002", "총 금액은 0원보다 적을 수 없습니다."),
 	ALREADY_REGISTERED_SUB_ITEMS("EE004", "이미 해당 서비스로 바로 견적이 등록되어 있습니다."),
 	ALREADY_REQUESTED_ESTIMATE("EE005", "이미 처리된 요청서 입니다."),
+	NOT_REGISTERED_SUB_ITEMS("EE006", "등록하지 않은 서비스에 대한 견적서는 만들 수 없습니다."),
 
 	//찜
 	NOT_FOUND_BUCKET("B001", "찜 내역이 존재하지 않습니다."),

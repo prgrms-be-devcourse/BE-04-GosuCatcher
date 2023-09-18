@@ -1,11 +1,8 @@
 package com.foo.gosucatcher.domain.estimate.application.dto.response;
 
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
-import com.foo.gosucatcher.domain.expert.domain.Expert;
 
 public record MemberEstimateResponse(
 	Long id,
