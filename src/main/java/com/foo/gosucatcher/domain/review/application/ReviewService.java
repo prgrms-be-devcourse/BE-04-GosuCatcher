@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.image.ImageService;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
@@ -86,11 +87,6 @@ public class ReviewService {
 
 		ImagesResponse imagesResponse = imageService.store(imageUploadRequest);
 
-		for (String filename : imagesResponse.filenames()) {
-			ReviewImage reviewImage = ReviewImage.of(review, filename);
-			reviewImageRepository.save(reviewImage);
-		}
-
 		List<ReviewImage> reviewImages = ImagesResponse.toReviewImages(review, imagesResponse);
 		review.addReviewImages(reviewImages);
 	}
@@ -132,7 +128,10 @@ public class ReviewService {
 		Review review = reviewRepository.findById(id)
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_REVIEW));
 
+		imageService.delete(ImageDeleteRequest.from(review.getReviewImages()));
+
 		review.delete(updaterId);
+
 		reviewRepository.deleteById(id);
 	}
 

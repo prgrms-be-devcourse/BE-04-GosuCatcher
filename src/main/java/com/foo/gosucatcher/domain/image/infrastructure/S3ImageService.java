@@ -23,6 +23,9 @@ import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest;
+import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
+import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageDeleteRequest;
@@ -39,8 +42,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class S3ImageService implements ImageService {
 
-	private static final String supportedImageExtension[] = {"jpg", "jpeg", "png"};
 	private final AmazonS3 amazonS3;
+	private static final String supportedImageExtension[] = {"jpg", "jpeg", "png"};
+
+	@Value("${cloud.aws.s3.url}")
+	private String url;
 
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
@@ -48,6 +54,7 @@ public class S3ImageService implements ImageService {
 	@Override
 	public ImagesResponse store(ImageUploadRequest request) {
 		List<String> paths = new ArrayList<>();
+
 		for (MultipartFile multipartFile : request.files()) {
 			validateFile(multipartFile);
 			File file = convertToFile(multipartFile);
@@ -61,10 +68,49 @@ public class S3ImageService implements ImageService {
 
 	@Override
 	public void delete(ImageDeleteRequest request) {
-		for (String fileName : request.filenames()) {
-			DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, fileName);
-			amazonS3.deleteObject(deleteObjectRequest);
+		if (request.filenames().size() > 1) {
+			deleteAll(request);
 		}
+
+		String fileName = request.filenames().get(0);
+		fileName = parseFileName(fileName);
+
+		DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, fileName);
+
+		try {
+			amazonS3.deleteObject(deleteObjectRequest);
+		} catch (SdkClientException exception) {
+			throw new ImageIOException(INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	public void deleteAll(ImageDeleteRequest request) {
+		ArrayList<KeyVersion> paths = new ArrayList<>();
+
+		for (String fileName : request.filenames()) {
+			fileName = parseFileName(fileName);
+
+			paths.add(new KeyVersion(fileName));
+		}
+
+		DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest(bucket)
+			.withKeys(paths)
+			.withQuiet(false);
+
+		try {
+			DeleteObjectsResult delObjRes = amazonS3.deleteObjects(multiObjectDeleteRequest);
+			int successfulDeletes = delObjRes.getDeletedObjects().size();
+
+			if (successfulDeletes != paths.size()) {
+				throw new ImageIOException(INTERNAL_SERVER_ERROR);
+			}
+		} catch (SdkClientException exception) {
+			throw new ImageIOException(INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	private String parseFileName(String path) {
+		return path.replaceAll(url, "");
 	}
 
 	private String store(File uploadFile) {
@@ -85,7 +131,8 @@ public class S3ImageService implements ImageService {
 			throw new ImageIOException(INTERNAL_SERVER_ERROR);
 		}
 
-		return amazonS3.getUrl(bucket, fileName).toString();
+		return amazonS3.getUrl(bucket, fileName)
+			.toString();
 	}
 
 	private void removeTemporaryFile(File targetFile) {
