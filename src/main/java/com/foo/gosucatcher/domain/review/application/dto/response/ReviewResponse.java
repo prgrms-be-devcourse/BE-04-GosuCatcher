@@ -51,9 +51,14 @@ public record ReviewResponse(
 			reply.put("UpdatedAt", review.getReply().getUpdatedAt().toString());
 		}
 
+		List<String> reviewImages = List.of();
+		if (review.getReviewImages() != null) {
+			reviewImages = review.getReviewImages().stream().map(ReviewImage::getPath).toList();
+		}
+
 		return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getWriter().getId(),
 			review.getSubItem().getId(), review.getContent(), review.getRating(), replyExisted,
-			reply, review.getReviewImages().stream().map(ReviewImage::getPath).toList(), review.getCreatedAt(),
+			reply, reviewImages, review.getCreatedAt(),
 			review.getUpdatedAt());
 	}
 }
