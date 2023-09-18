@@ -15,6 +15,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -58,6 +60,7 @@ public class Review extends BaseEntity {
 	private Reply reply;
 
 	@OneToMany(mappedBy = "review", cascade = CascadeType.ALL)
+	@Fetch(FetchMode.SUBSELECT)
 	private List<ReviewImage> reviewImages;
 
 	private String content;

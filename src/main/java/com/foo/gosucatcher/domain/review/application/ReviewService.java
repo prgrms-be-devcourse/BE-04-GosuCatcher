@@ -97,7 +97,7 @@ public class ReviewService {
 
 	@Transactional(readOnly = true)
 	public ReviewsResponse findAll(Pageable pageable) {
-		Page<Review> reviews = reviewRepository.findAllByOrderByCreatedAt(pageable);
+		Page<Review> reviews = reviewRepository.findAllByOrderByCreatedAtDesc(pageable);
 
 		return ReviewsResponse.from(reviews);
 	}
