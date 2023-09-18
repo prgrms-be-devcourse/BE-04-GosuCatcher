@@ -16,10 +16,12 @@ import com.foo.gosucatcher.domain.estimate.application.ExpertEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertAutoEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.ExpertNormalEstimateCreateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
+import com.foo.gosucatcher.global.aop.CurrentExpertId;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,9 +33,10 @@ public class ExpertEstimateController {
 	private final ExpertEstimateService expertEstimateService;
 	private final MatchingService matchingService;
 
-	@PostMapping("/normal/{expertId}")
-	public ResponseEntity<MessageResponse> createNormal(@PathVariable Long expertId, @RequestParam Long memberEstimateId,
-	                                                    @Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
+	@PostMapping("/normal")
+	@CurrentExpertId
+	public ResponseEntity<MessageResponse> createNormal(Long expertId, @RequestParam Long memberEstimateId,
+														@Validated @RequestBody ExpertNormalEstimateCreateRequest request) {
 		ExpertNormalEstimateResponse expertNormalEstimateResponse = expertEstimateService.createNormal(expertId, memberEstimateId, request);
 
 		MessageResponse messageResponse = matchingService.sendFirstMessageForNormal(memberEstimateId, expertNormalEstimateResponse);
@@ -41,9 +44,9 @@ public class ExpertEstimateController {
 		return ResponseEntity.ok(messageResponse);
 	}
 
-	@PostMapping("/auto/{expertId}")
-	public ResponseEntity<ExpertAutoEstimateResponse> createAuto(@PathVariable Long expertId,
-	                                                             @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
+	@PostMapping("/auto")
+	@CurrentExpertId
+	public ResponseEntity<ExpertAutoEstimateResponse> createAuto(Long expertId, @Validated @RequestBody ExpertAutoEstimateCreateRequest request) {
 		ExpertAutoEstimateResponse expertAutoEstimateResponse = expertEstimateService.createAuto(expertId, request);
 
 		return ResponseEntity.ok(expertAutoEstimateResponse);
@@ -68,5 +71,20 @@ public class ExpertEstimateController {
 		expertEstimateService.delete(id);
 
 		return ResponseEntity.ok(null);
+	}
+
+	@GetMapping("/member-estimates/{memberEstimateId}")
+	public ResponseEntity<ExpertEstimatesResponse> findAllByMemberEstimateId(@PathVariable Long memberEstimateId) {
+		ExpertEstimatesResponse expertEstimatesResponse = expertEstimateService.findAllByMemberEstimateId(memberEstimateId);
+
+		return ResponseEntity.ok(expertEstimatesResponse);
+	}
+
+	@GetMapping("/auto")
+	@CurrentExpertId
+	public ResponseEntity<ExpertAutoEstimatesResponse> findAllUnmatchedAutoByExpertId(Long expertId) {
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllUnmatchedAutoByExpertId(expertId);
+
+		return ResponseEntity.ok(expertAutoEstimatesResponse);
 	}
 }

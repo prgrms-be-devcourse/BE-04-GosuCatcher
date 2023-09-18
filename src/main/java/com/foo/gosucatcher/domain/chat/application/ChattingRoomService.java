@@ -16,6 +16,7 @@ import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -86,6 +87,52 @@ public class ChattingRoomService {
 			.orElseThrow(() -> new EntityNotFoundException(NOT_FOUND_CHATTING_ROOM));
 
 		return ChattingRoomResponse.from(chattingRoom);
+	}
+
+	@Transactional(readOnly = true)
+	public ChattingRoomsResponse findAllByExpertId(Long expertId) {
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNotNull(expertId);
+
+		List<MemberEstimate> memberEstimates = expertEstimates.stream()
+			.map(ExpertEstimate::getMemberEstimate)
+			.toList();
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.toList();
+
+		return ChattingRoomsResponse.from(chattingRooms);
+	}
+
+	@Transactional(readOnly = true)
+	public ChattingRoomsResponse findAllOfNormalByExpertId(Long expertId) {
+		List<MemberEstimate> memberEstimates = memberEstimateRepository.findAllByExpertId(expertId);
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.toList();
+
+		return ChattingRoomsResponse.from(chattingRooms);
+	}
+
+	@Transactional(readOnly = true)
+	public ChattingRoomsResponse findAllOfAutoByExpertId(Long expertId) {
+		List<ExpertEstimate> expertEstimates = expertEstimateRepository.findAllByExpertIdAndMemberEstimateIsNotNull(expertId);
+
+		List<MemberEstimate> memberEstimates = expertEstimates.stream()
+			.map(ExpertEstimate::getMemberEstimate)
+			.filter(memberEstimate -> memberEstimate.getExpert() == null)
+			.filter(memberEstimate -> memberEstimate.getStatus() != Status.PENDING)
+			.toList();
+
+		List<ChattingRoom> chattingRooms = memberEstimates.stream()
+			.map(chattingRoomRepository::findAllByMemberEstimate)
+			.flatMap(List::stream)
+			.toList();
+
+		return ChattingRoomsResponse.from(chattingRooms);
 	}
 
 	public void delete(Long chattingRoomId) {

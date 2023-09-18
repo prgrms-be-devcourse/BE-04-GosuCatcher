@@ -37,7 +37,7 @@ class ChattingRoomControllerTest {
 	@MockBean
 	private ChattingRoomService chattingRoomService;
 
-	@DisplayName("채팅방 전체 조회 테스트")
+	@DisplayName("채팅방 전체 조회 성공 테스트")
 	@Test
 	void findAll() throws Exception {
 		//given
@@ -66,7 +66,7 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
 	}
 
-	@DisplayName("채팅방 단건 조회 테스트")
+	@DisplayName("채팅방 단건 조회 성공 테스트")
 	@Test
 	void findById() throws Exception {
 		//given
@@ -90,7 +90,7 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.memberEstimateResponse.detailedDescription").value("세부 설명"));
 	}
 
-	@DisplayName("회원 요청 견적서 별 전체 채팅방 조회 테스트")
+	@DisplayName("회원 요청 견적서 별 전체 채팅방 조회 성공 테스트")
 	@Test
 	void findAllByMemberEstimateId() throws Exception {
 		//given
@@ -121,7 +121,7 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
 	}
 
-	@DisplayName("회원 별 전체 채팅방 조회 테스트")
+	@DisplayName("회원 별 전체 채팅방 조회 성공 테스트")
 	@Test
 	void findAllByMemberId() throws Exception {
 		//given
@@ -149,6 +149,105 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(memberId))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+	}
+
+	@DisplayName("고수 별 전체 채팅방 조회 성공 테스트")
+	@Test
+	void findAllByExpertId() throws Exception {
+		//given
+		Long expertId = 2L;
+
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
+
+		List<ChattingRoomResponse> chattingRoomResponses = List.of(chattingRoomResponse, chattingRoomResponse2);
+
+		ChattingRoomsResponse chattingRoomsResponse = new ChattingRoomsResponse(chattingRoomResponses);
+
+		when(chattingRoomService.findAllByExpertId(expertId)).thenReturn(chattingRoomsResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/chatting-rooms/experts")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.chattingRoomsResponse").isArray())
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+	}
+
+	@DisplayName("고수의 일반 견적 관련 채팅방 목록 조회 성공 테스트")
+	@Test
+	void findAllOfNormalByExpertId() throws Exception {
+		//given
+		Long expertId = 2L;
+
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
+
+		List<ChattingRoomResponse> chattingRoomResponses = List.of(chattingRoomResponse, chattingRoomResponse2);
+
+		ChattingRoomsResponse chattingRoomsResponse = new ChattingRoomsResponse(chattingRoomResponses);
+
+		when(chattingRoomService.findAllOfNormalByExpertId(expertId)).thenReturn(chattingRoomsResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/chatting-rooms/normal")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.chattingRoomsResponse").isArray())
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+	}
+
+	@DisplayName("고수의 바로 견적 관련 채팅방 목록 조회 성공 테스트")
+	@Test
+	void findAllOfAutoByExpertId() throws Exception {
+		//given
+		Long expertId = 2L;
+
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+
+		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
+		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
+
+		List<ChattingRoomResponse> chattingRoomResponses = List.of(chattingRoomResponse, chattingRoomResponse2);
+
+		ChattingRoomsResponse chattingRoomsResponse = new ChattingRoomsResponse(chattingRoomResponses);
+
+		when(chattingRoomService.findAllOfAutoByExpertId(expertId)).thenReturn(chattingRoomsResponse);
+
+		//when
+		//then
+		mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/chatting-rooms/auto")
+				.param("expertId", String.valueOf(expertId))
+				.contentType(MediaType.APPLICATION_JSON)
+				.accept(MediaType.APPLICATION_JSON))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.chattingRoomsResponse").isArray())
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
