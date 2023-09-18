@@ -14,6 +14,8 @@ import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResp
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoomRepository;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.ExpertEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.estimate.domain.Status;
@@ -33,6 +35,7 @@ public class ChattingRoomService {
 	private final MemberEstimateRepository memberEstimateRepository;
 	private final ChattingRoomRepository chattingRoomRepository;
 	private final MemberRepository memberRepository;
+	private final ExpertEstimateRepository expertEstimateRepository;
 
 	public ChattingRoomsResponse create(Long memberEstimateId) {
 		MemberEstimate memberEstimate = memberEstimateRepository.findById(memberEstimateId)

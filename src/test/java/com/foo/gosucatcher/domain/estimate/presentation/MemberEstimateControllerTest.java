@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessageResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.MessagesResponse;
-import com.foo.gosucatcher.domain.chat.domain.ChattingStatus;
 import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimateRequest;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
@@ -132,7 +131,7 @@ class MemberEstimateControllerTest {
 		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description", 4.0, 6);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
-		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.", ChattingStatus.ENTER);
+		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
 
 		when(memberEstimateService.createAuto(anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 		when(matchingService.match(any(MemberEstimateResponse.class))).thenReturn(new MessagesResponse(List.of(messageResponse)));

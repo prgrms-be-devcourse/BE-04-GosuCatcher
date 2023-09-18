@@ -32,6 +32,8 @@ import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimateRepository;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
 import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.expert.domain.ExpertItemRepository;
+import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
@@ -54,6 +56,12 @@ class MemberEstimateServiceTest {
 	@Mock
 	private ExpertEstimateRepository expertEstimateRepository;
 
+	@Mock
+	private ExpertRepository expertRepository;
+
+	@Mock
+	private ExpertItemRepository expertItemRepository;
+
 	@InjectMocks
 	private MemberEstimateService memberEstimateService;
 
@@ -61,6 +69,7 @@ class MemberEstimateServiceTest {
 	private MainItem mainItem;
 	private SubItem subItem;
 	private MemberEstimate memberEstimate;
+	private Expert expert;
 
 	@BeforeEach
 	void setUp() {
@@ -69,6 +78,16 @@ class MemberEstimateServiceTest {
 			.password("abcd11@@")
 			.email("abcd123@abc.com")
 			.phoneNumber("010-0000-0000")
+			.build();
+
+		expert = Expert.builder()
+			.member(member)
+			.description("tjfaudtjfasdfasdf")
+			.location("서울시 강남구")
+			.storeName("애플 하우스")
+			.maxTravelDistance(100)
+			.rating(1)
+			.reviewCount(20)
 			.build();
 
 		mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
@@ -99,7 +118,8 @@ class MemberEstimateServiceTest {
 		when(subItemRepository.findById(subItemId)).thenReturn(Optional.of(subItem));
 		when(memberEstimateRepository.save(any(MemberEstimate.class))).thenReturn(memberEstimate);
 		when(memberEstimateRepository.findById(memberEstimateId)).thenReturn(Optional.of(memberEstimate));
-
+		when(expertRepository.findByMemberId(null)).thenReturn(Optional.of(expert));
+		when(expertItemRepository.existsByExpertIdAndSubItemId(null, null)).thenReturn(false);
 		//when
 		MemberEstimate memberEstimate = memberEstimateService.create(memberId, memberEstimateRequest);
 		MemberEstimate result = memberEstimateRepository.findById(memberEstimateId).get();

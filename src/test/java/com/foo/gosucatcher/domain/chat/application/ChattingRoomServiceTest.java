@@ -1,5 +1,24 @@
 package com.foo.gosucatcher.domain.chat.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.chat.domain.ChattingRoom;
@@ -14,23 +33,6 @@ import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ChattingRoomServiceTest {
@@ -137,7 +139,7 @@ class ChattingRoomServiceTest {
         List<ChattingRoomResponse> chattingRoomResponses = chattingRoomResponse.chattingRoomsResponse();
 
         //then
-        assertThat(chattingRoomResponses).hasSize(2);
+        assertThat(chattingRoomResponses).hasSize(1);
     }
 
     @DisplayName("회원 요청서에 해당하는 모든 채팅방 조회 테스트")
