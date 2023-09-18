@@ -183,7 +183,7 @@ class MemberControllerTest {
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("F002"))
 			.andExpect(jsonPath("$.errors").isEmpty())
-			.andExpect(jsonPath("$.message").value("지원하지 않는 이미지 파일 형식입니다."))
+			.andExpect(jsonPath("$.message").value("이미지를 업로드 바랍니다."))
 			.andDo(print());
 	}
 
