@@ -44,7 +44,7 @@ import com.foo.gosucatcher.domain.expert.domain.Expert;
 import com.foo.gosucatcher.domain.expert.domain.ExpertRepository;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
@@ -256,7 +256,7 @@ class ExpertControllerTest {
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		ImageUploadResponse response = new ImageUploadResponse(List.of("test.jpg"));
+		ImagesResponse response = new ImagesResponse(List.of("test.jpg"));
 		given(expertService.uploadImage(any(Long.class), any())).willReturn(response);
 
 		// when -> then
@@ -274,7 +274,7 @@ class ExpertControllerTest {
 		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
 
 		given(expertService.uploadImage(any(Long.class), any())).willThrow(
-			new InvalidValueException(ErrorCode.INVALID_IMAGE));
+			new InvalidValueException(ErrorCode.EMPTY_IMAGE));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/experts/images")

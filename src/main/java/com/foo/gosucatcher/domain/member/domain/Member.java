@@ -105,7 +105,7 @@ public class Member extends BaseEntity implements UserDetails {
 
 	public void updateProfileImage(MemberImage profileMemberImage) {
 		if (profileMemberImage == null) {
-			throw new BusinessException(ErrorCode.INVALID_IMAGE);
+			throw new BusinessException(ErrorCode.EMPTY_IMAGE);
 		}
 
 		this.profileMemberImage = profileMemberImage;

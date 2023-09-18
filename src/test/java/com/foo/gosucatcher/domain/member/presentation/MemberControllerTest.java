@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.domain.image.ImageService;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.member.application.MemberProfileService;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -156,7 +156,7 @@ class MemberControllerTest {
 		MockMultipartFile multipartFile = new MockMultipartFile("file", "test.jpg", "image/jpeg",
 			"test image content".getBytes());
 
-		ImageUploadResponse response = new ImageUploadResponse(List.of("test.jpg"));
+		ImagesResponse response = new ImagesResponse(List.of("test.jpg"));
 		given(memberProfileService.uploadProfileImage(any(Long.class), any())).willReturn(response);
 
 		// when -> then
@@ -174,7 +174,7 @@ class MemberControllerTest {
 		MockMultipartFile emptyFile = new MockMultipartFile("file", "", "image/jpeg", new byte[0]);
 
 		given(memberProfileService.uploadProfileImage(any(Long.class), any())).willThrow(
-			new InvalidValueException(ErrorCode.INVALID_IMAGE));
+			new InvalidValueException(ErrorCode.EMPTY_IMAGE));
 
 		// when -> then
 		mockMvc.perform(multipart("/api/v1/members/profile/images")

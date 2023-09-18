@@ -28,7 +28,7 @@ import com.foo.gosucatcher.domain.expert.application.dto.response.SlicedExpertsR
 import com.foo.gosucatcher.domain.expert.domain.SortType;
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.global.aop.CurrentExpertId;
 
@@ -101,9 +101,9 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@PostMapping("/images")
-	public ResponseEntity<ImageUploadResponse> uploadImage(Long expertId, MultipartFile file) throws IOException {
+	public ResponseEntity<ImagesResponse> uploadImage(Long expertId, MultipartFile file) throws IOException {
 		ImageUploadRequest request = new ImageUploadRequest(List.of(file));
-		ImageUploadResponse response = expertService.uploadImage(expertId, request);
+		ImagesResponse response = expertService.uploadImage(expertId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}

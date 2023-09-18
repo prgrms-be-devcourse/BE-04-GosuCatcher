@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
-import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.member.application.MemberProfileService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
@@ -53,10 +53,10 @@ public class MemberProfileController {
 
 	@CurrentMemberId
 	@PostMapping("/images")
-	public ResponseEntity<ImageUploadResponse> uploadProfileImage(Long memberId, @RequestParam MultipartFile file) {
+	public ResponseEntity<ImagesResponse> uploadProfileImage(Long memberId, @RequestParam MultipartFile file) {
 
 		ImageUploadRequest request = new ImageUploadRequest(List.of(file));
-		ImageUploadResponse response = memberProfileService.uploadProfileImage(memberId, request);
+		ImagesResponse response = memberProfileService.uploadProfileImage(memberId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(response);
