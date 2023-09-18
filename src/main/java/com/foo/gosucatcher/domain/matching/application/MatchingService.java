@@ -1,7 +1,5 @@
 package com.foo.gosucatcher.domain.matching.application;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +13,8 @@ import com.foo.gosucatcher.domain.estimate.application.MemberEstimateService;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertAutoEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -31,18 +31,18 @@ public class MatchingService {
 
 		Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
-		return sendFirstMessage(memberEstimateId, expertAutoEstimatesResponse);
+		return sendFirstMessageForAuto(memberEstimateId, expertAutoEstimatesResponse);
 	}
 
-	public MessageResponse sendFirstMessage(Long memberEstimateId, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
+	public MessageResponse sendFirstMessageForNormal(Long memberEstimateId, ExpertNormalEstimateResponse expertNormalEstimateResponse) {
 		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
 
-		return messageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse().get(0), expertNormalEstimateResponse);
+		return messageService.sendExpertEstimateMessageForNormal(chattingRoomsResponse.chattingRoomsResponse().get(0), expertNormalEstimateResponse);
 	}
 
-	private MessagesResponse sendFirstMessage(Long memberEstimateId, ExpertAutoEstimatesResponse expertAutoEstimatesResponse) {
+	private MessagesResponse sendFirstMessageForAuto(Long memberEstimateId, ExpertAutoEstimatesResponse expertAutoEstimatesResponse) {
 		ChattingRoomsResponse chattingRoomsResponse = chattingRoomService.create(memberEstimateId);
 
-		return messageService.sendExpertEstimateMessage(chattingRoomsResponse.chattingRoomsResponse(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
+		return messageService.sendExpertEstimateMessageForAuto(chattingRoomsResponse.chattingRoomsResponse(),expertAutoEstimatesResponse.expertAutoEstimateResponses());
 	}
 }
