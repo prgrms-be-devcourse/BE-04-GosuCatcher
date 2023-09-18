@@ -1,15 +1,13 @@
 package com.foo.gosucatcher.domain.member.presentation;
 
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,15 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageUploadResponse;
 import com.foo.gosucatcher.domain.member.application.MemberProfileService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberProfileChangeRequest;
-import com.foo.gosucatcher.domain.member.application.dto.request.ProfileImageUploadRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileChangeResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberProfileResponse;
-import com.foo.gosucatcher.domain.member.application.dto.response.ProfileImageUploadResponse;
-import com.foo.gosucatcher.domain.member.domain.ImageFile;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
-import com.foo.gosucatcher.global.util.ImageFileUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,37 +51,30 @@ public class MemberProfileController {
 		return ResponseEntity.ok(response);
 	}
 
-	//todo: 리팩토링 예정
 	@CurrentMemberId
 	@PostMapping("/images")
-	public ResponseEntity<ProfileImageUploadResponse> uploadProfileImage(Long memberId,
-		@RequestParam MultipartFile file) {
-		ProfileImageUploadRequest request = new ProfileImageUploadRequest(memberId, file);
-		memberProfileService.uploadProfileImage(request);
+	public ResponseEntity<ImageUploadResponse> uploadProfileImage(Long memberId, @RequestParam MultipartFile file) {
 
-		ProfileImageUploadResponse response = new ProfileImageUploadResponse(memberId, file.getOriginalFilename());
+		ImageUploadRequest request = new ImageUploadRequest(List.of(file));
+		ImageUploadResponse response = memberProfileService.uploadProfileImage(memberId, request);
 
 		return ResponseEntity.status(HttpStatus.CREATED)
 			.body(response);
 	}
 
-	@GetMapping("/{id}/images")
-	public ResponseEntity<Resource> findProfileImage(@PathVariable Long id) {
-		ImageFile profileImage = memberProfileService.findProfileImage(id);
+	@CurrentMemberId
+	@GetMapping("/images")
+	public ResponseEntity<ImageResponse> getProfileImage(Long memberId) {
+		ImageResponse response = memberProfileService.getProfileImage(memberId);
 
-		String contentDisposition = ImageFileUtils.makeImageFileContentDisposition(profileImage);
-		UrlResource resource = ImageFileUtils.makeImageFileUrlResource(profileImage);
-
-		return ResponseEntity.status(HttpStatus.OK)
-			.header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-			.body(resource);
+		return ResponseEntity.ok(response);
 	}
 
 	@CurrentMemberId
 	@DeleteMapping("/images")
-	public ResponseEntity<Void> deleteProfileImage(Long memberId) {
+	public ResponseEntity<String> deleteProfileImage(Long memberId) {
 		memberProfileService.deleteProfileImage(memberId);
 
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok(null);
 	}
 }

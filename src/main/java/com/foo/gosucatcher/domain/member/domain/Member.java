@@ -59,8 +59,7 @@ public class Member extends BaseEntity implements UserDetails {
 	private boolean isDeleted = Boolean.FALSE;
 
 	@Embedded
-	@Column(name = "profile_image_file")
-	private ImageFile profileImageFile;
+	private MemberImage profileMemberImage;
 
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
@@ -71,13 +70,13 @@ public class Member extends BaseEntity implements UserDetails {
 
 	@Builder
 	public Member(String name, String password, String email, String phoneNumber, Roles role,
-		ImageFile profileImageFile) {
+		MemberImage profileMemberImage) {
 		this.name = name;
 		this.password = password;
 		this.email = email;
 		this.phoneNumber = phoneNumber;
 		this.role = role;
-		this.profileImageFile = profileImageFile;
+		this.profileMemberImage = profileMemberImage;
 	}
 
 	public void authenticate(Member requestMember, PasswordEncoder passwordEncoder) {
@@ -104,12 +103,12 @@ public class Member extends BaseEntity implements UserDetails {
 		return passwordEncoder.encode(password);
 	}
 
-	public void updateProfileImage(ImageFile profileImageFile) {
-		if (profileImageFile == null) {
+	public void updateProfileImage(MemberImage profileMemberImage) {
+		if (profileMemberImage == null) {
 			throw new BusinessException(ErrorCode.INVALID_IMAGE);
 		}
 
-		this.profileImageFile = profileImageFile;
+		this.profileMemberImage = profileMemberImage;
 	}
 
 	public void updateMemberRole(Roles role) {
