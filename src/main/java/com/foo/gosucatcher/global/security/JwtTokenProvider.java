@@ -36,7 +36,7 @@ public class JwtTokenProvider {
 
 	public JwtTokenProvider(CustomUserDetailsService customUserDetailsService, JwtProperties jwtProperties) {
 		this.customUserDetailsService = customUserDetailsService;
-		this.ACCESS_TOKEN_EXPIRED_TIME = Duration.ofSeconds(jwtProperties.getAccessTokenExpiredTime()).toMillis();
+		this.ACCESS_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getAccessTokenExpiredTime()).toMillis();
 		this.REFRESH_TOKEN_EXPIRED_TIME = Duration.ofDays(jwtProperties.getRefreshTokenExpiredTime()).toMillis();
 		this.ACCESS_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getAccessTokenSecretKey());
 		this.REFRESH_TOKEN_SECRET_KEY = getTokenSecretKey(jwtProperties.getRefreshTokenSecretKey());

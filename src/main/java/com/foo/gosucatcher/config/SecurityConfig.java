@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.config;
 
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,9 @@ public class SecurityConfig {
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
 			.antMatchers("/h2-console/**")
-			.antMatchers("/gs-chat/**");
+			.antMatchers("/gs-chat/**")
+			.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+			.antMatchers("/resources/**");
 	}
 
 	@Bean
@@ -42,6 +45,7 @@ public class SecurityConfig {
 			.authorizeRequests()
 			.antMatchers("/api/v1/**").permitAll()
 			.antMatchers("/gs-chat/**").permitAll()
+			.antMatchers("/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
