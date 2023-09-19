@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        .section {
+            width: 33.33%;
+            float: left;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+
+</body>
+
+</html>

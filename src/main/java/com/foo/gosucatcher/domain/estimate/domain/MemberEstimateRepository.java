@@ -20,5 +20,4 @@ public interface MemberEstimateRepository extends JpaRepository<MemberEstimate, 
 	List<MemberEstimate> findAllByPendingAndExpertId(@Param("expertId") Long expertId);
 
 	@Query("SELECT m FROM MemberEstimate m WHERE m.expert.id = :expertId")
-	List<MemberEstimate> findAllByExpertId(Long expertId);
-}
+	List<MemberEstimate> findAllByExpertId(@Param("expertId") Long expertId);}

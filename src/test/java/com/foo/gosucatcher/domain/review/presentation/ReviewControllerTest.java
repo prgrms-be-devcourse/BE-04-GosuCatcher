@@ -25,11 +25,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.foo.gosucatcher.domain.image.application.dto.request.ImageUploadRequest;
 import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReplyRequest;
 import com.foo.gosucatcher.domain.review.application.dto.request.ReviewCreateRequest;
@@ -56,83 +58,110 @@ class ReviewControllerTest {
 	@DisplayName("<리뷰 등록>")
 	class createTest {
 
-		// @DisplayName("성공 - 리뷰를 추가할 수 있다")
-		// @Test
-		// void create() throws Exception {
-		// 	// given
-		// 	long expertId = 0L;
-		// 	long subItemId = 0L;
-		// 	long writerId = 0L;
-		//
-		// 	LocalDateTime localDateTime = LocalDateTime.now();
-		//
-		// 	ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
-		// 	ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, false,
-		// 		new HashMap<>(), localDateTime, localDateTime);
-		//
-		// 	given(reviewService.create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class)))
-		// 		.willReturn(reviewResponse);
-		//
-		// 	// when
-		// 	// then
-		// 	mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
-		// 			.param("memberId", "1")
-		// 			.contentType(MediaType.APPLICATION_JSON)
-		// 			.param("subItemId", String.valueOf(subItemId))
-		// 			.content(objectMapper.writeValueAsString(reviewCreateRequest)))
-		// 		.andExpect(status().isCreated())
-		// 		.andExpect(jsonPath("$.id").value(0L))
-		// 		.andExpect(jsonPath("$.expertId").value(expertId))
-		// 		.andExpect(jsonPath("$.writerId").value(writerId))
-		// 		.andExpect(jsonPath("$.subItemId").value(subItemId))
-		// 		.andExpect(jsonPath("$.content").value(reviewCreateRequest.content()))
-		// 		.andExpect(jsonPath("$.rating").value(reviewCreateRequest.rating()));
-		// }
-		//
-		// @DisplayName("실패 - 존재하지 않는 고수에 대해 리뷰를 등록할 수 없다")
-		// @Test
-		// void createFailed_NotFoundExpert() throws Exception {
-		// 	// given
-		// 	ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
-		//
-		// 	doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT))
-		// 		.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class));
-		//
-		// 	long subItemId = 0L;
-		// 	// when
-		// 	// then
-		// 	mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{subItemId}", subItemId)
-		// 			.contentType(MediaType.APPLICATION_JSON)
-		// 			.param("memberId", "1")
-		// 			.param("subItemId", String.valueOf(subItemId))
-		// 			.content(objectMapper.writeValueAsString(reviewCreateRequest)))
-		// 		.andExpect(status().isNotFound())
-		// 		.andExpect(jsonPath("$.code")
-		// 			.value("E001"));
-		// }
-		//
-		// @DisplayName("실패 - 존재하지 않는 하위 서비스에 대해 리뷰를 등록할 수 없다")
-		// @Test
-		// void createFailed_NotFoundSubItem() throws Exception {
-		// 	// given
-		// 	ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
-		// 	long expertId = 0L;
-		// 	long subItemId = 0L;
-		//
-		// 	doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM))
-		// 		.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class));
-		//
-		// 	// when
-		// 	// then
-		// 	mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/reviews/{expertId}", expertId)
-		// 			.contentType(MediaType.APPLICATION_JSON)
-		// 			.param("memberId", "1")
-		// 			.param("subItemId", String.valueOf(subItemId))
-		// 			.content(objectMapper.writeValueAsString(reviewCreateRequest)))
-		// 		.andExpect(status().isNotFound())
-		// 		.andExpect(jsonPath("$.code")
-		// 			.value("SI001"));
-		// }
+		@DisplayName("성공 - 리뷰를 추가할 수 있다")
+		@Test
+		void create() throws Exception {
+			// given
+			long expertId = 0L;
+			long subItemId = 0L;
+			long writerId = 0L;
+
+			LocalDateTime localDateTime = LocalDateTime.now();
+
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
+			ReviewResponse reviewResponse = new ReviewResponse(0L, 0L, 0L, 0L, "예시로 작성한 리뷰입니다", 5, false,
+				new HashMap<>(), List.of(), localDateTime, localDateTime);
+
+			given(reviewService.create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class), any(
+				ImageUploadRequest.class)))
+				.willReturn(reviewResponse);
+
+			MockMultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "file".getBytes());
+			MockMultipartFile request = new MockMultipartFile("reviewCreateRequest", "reviewCreateRequest",
+				"application/json",
+				objectMapper.writeValueAsString(reviewCreateRequest).getBytes());
+			mockMvc.perform(MockMvcRequestBuilders
+					.multipart("/api/v1/reviews/{expertId}", expertId)
+					.file(file)
+					.file(request)
+					.contentType(MediaType.MULTIPART_FORM_DATA)
+					.accept(MediaType.APPLICATION_JSON)
+					.param("memberId", "1")
+					.param("subItemId", String.valueOf(subItemId))
+				)
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id").value(0L))
+				.andExpect(jsonPath("$.expertId").value(expertId))
+				.andExpect(jsonPath("$.writerId").value(writerId))
+				.andExpect(jsonPath("$.subItemId").value(subItemId))
+				.andExpect(jsonPath("$.content").value(reviewCreateRequest.content()))
+				.andExpect(jsonPath("$.rating").value(reviewCreateRequest.rating()));
+		}
+
+		@DisplayName("실패 - 존재하지 않는 고수에 대해 리뷰를 등록할 수 없다")
+		@Test
+		void createFailed_NotFoundExpert() throws Exception {
+			// given
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
+
+			MockMultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "file".getBytes());
+			MockMultipartFile request = new MockMultipartFile("reviewCreateRequest", "reviewCreateRequest",
+				"application/json",
+				objectMapper.writeValueAsString(reviewCreateRequest).getBytes());
+
+			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT))
+				.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class), any(
+					ImageUploadRequest.class));
+
+			long expertId = 0L;
+			long subItemId = 0L;
+			// when
+			// then
+			mockMvc.perform(MockMvcRequestBuilders
+					.multipart("/api/v1/reviews/{expertId}", expertId)
+					.file(file)
+					.file(request)
+					.contentType(MediaType.MULTIPART_FORM_DATA)
+					.param("memberId", "1")
+					.param("subItemId", String.valueOf(subItemId))
+					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code")
+					.value("E001"));
+		}
+
+		@DisplayName("실패 - 존재하지 않는 하위 서비스에 대해 리뷰를 등록할 수 없다")
+		@Test
+		void createFailed_NotFoundSubItem() throws Exception {
+			// given
+			ReviewCreateRequest reviewCreateRequest = new ReviewCreateRequest("예시로 작성한 리뷰입니다", 5);
+			long expertId = 0L;
+			long subItemId = 0L;
+
+			MockMultipartFile file = new MockMultipartFile("image", "test.png", "image/png", "file".getBytes());
+			MockMultipartFile request = new MockMultipartFile("reviewCreateRequest", "reviewCreateRequest",
+				"application/json",
+				objectMapper.writeValueAsString(reviewCreateRequest).getBytes());
+
+			doThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_SUB_ITEM))
+				.when(reviewService).create(anyLong(), anyLong(), anyLong(), any(ReviewCreateRequest.class), any(
+					ImageUploadRequest.class));
+
+			// when
+			// then
+			mockMvc.perform(MockMvcRequestBuilders
+					.multipart("/api/v1/reviews/{expertId}", expertId)
+					.file(file)
+					.file(request)
+					.contentType(MediaType.MULTIPART_FORM_DATA)
+					.accept(MediaType.APPLICATION_JSON)
+					.param("memberId", "1")
+					.param("subItemId", String.valueOf(subItemId))
+					.content(objectMapper.writeValueAsString(reviewCreateRequest)))
+				.andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.code")
+					.value("SI001"));
+		}
 	}
 
 	@Nested
