@@ -1,0 +1,40 @@
+<!-- sub_items.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <style>
+        h2 {
+            text-align: center;
+        }
+
+        .section {
+            width: 100%;
+            text-align: center;
+        }
+
+        .sub-item {
+            display: inline-block;
+            width: 16.66%;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<div class="section">
+    <h2><span th:text="${mainItemName}"></span></h2>
+
+    <div class="sub-item">
+        <div th:each="subItem : ${subItems.subItemSlicesResponse()}">
+            <div th:text="${subItem.name()}"></div>
+        </div>
+    </div>
+</div>
+
+
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>
