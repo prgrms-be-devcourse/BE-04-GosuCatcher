@@ -15,8 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
+import com.foo.gosucatcher.global.error.ErrorCode;
+import com.foo.gosucatcher.global.error.exception.AopException;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -36,14 +40,23 @@ public class CurrentMemberEmailAop {
 		HttpServletRequest request = requestAttributes.getRequest();
 
 		String token = jwtTokenProvider.resolveAccessToken(request);
-		token = jwtTokenProvider.removeBearer(token);
 
-		Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
-		String memberEmail = authentication.getPrincipal().toString();
+		try {
+			token = jwtTokenProvider.removeBearer(token);
 
-		Object[] modifiedArgs = modifyArgsWithMemberEmail(memberEmail, proceedingJoinPoint);
+			Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
+			String memberEmail = authentication.getPrincipal().toString();
 
-		return proceedingJoinPoint.proceed(modifiedArgs);
+			Object[] modifiedArgs = modifyArgsWithMemberEmail(memberEmail, proceedingJoinPoint);
+
+			return proceedingJoinPoint.proceed(modifiedArgs);
+		} catch (ExpiredJwtException e) {
+			throw new MemberCertifiedFailException(ErrorCode.EXPIRED_AUTHENTICATION);
+		} catch (RuntimeException e) {
+			throw new MemberCertifiedFailException(ErrorCode.INVALID_TOKEN);
+		} catch (Throwable e) {
+			throw new AopException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	private Object[] modifyArgsWithMemberEmail(String memberEmail, ProceedingJoinPoint proceedingJoinPoint) {
