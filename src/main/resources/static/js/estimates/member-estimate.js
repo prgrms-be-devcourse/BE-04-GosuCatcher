@@ -178,7 +178,7 @@ $(document).ready(function () {
 
             },
             error: function (xhr, status, error) {
-                window.alert("견적 요청이 실패했습니다.");
+                window.alert("견적 요청에 실패했습니다.");
             }
         });
     });
