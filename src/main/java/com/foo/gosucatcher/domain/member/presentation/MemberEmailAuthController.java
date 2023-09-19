@@ -12,7 +12,7 @@ import com.foo.gosucatcher.domain.member.application.MemberEmailAuthService;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
-import com.foo.gosucatcher.domain.member.domain.Email;
+import com.foo.gosucatcher.domain.member.domain.MemberEmailRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +24,9 @@ public class MemberEmailAuthController {
 	private final MemberEmailAuthService memberEmailAuthService;
 
 	@PostMapping
-	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestBody @Validated Email email) {
-		memberEmailAuthService.checkDuplicatedEmail(email);
-		MemberEmailSendResponse authenticateResponse = memberEmailAuthService.sendAuthEmail(email);
+	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestBody @Validated MemberEmailRequest memberEmailRequest) {
+		memberEmailAuthService.checkDuplicatedEmail(memberEmailRequest);
+		MemberEmailSendResponse authenticateResponse = memberEmailAuthService.sendAuthEmail(memberEmailRequest);
 
 		return ResponseEntity.ok(authenticateResponse);
 	}

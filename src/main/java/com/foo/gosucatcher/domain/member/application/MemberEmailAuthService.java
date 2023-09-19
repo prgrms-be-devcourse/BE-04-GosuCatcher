@@ -11,7 +11,7 @@ import com.foo.gosucatcher.config.EmailAuthProperties;
 import com.foo.gosucatcher.domain.member.application.dto.request.MemberEmailAuthRequest;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAuthResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
-import com.foo.gosucatcher.domain.member.domain.Email;
+import com.foo.gosucatcher.domain.member.domain.MemberEmailRequest;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.member.exception.EmailAuthException;
 import com.foo.gosucatcher.global.error.ErrorCode;
@@ -52,16 +52,16 @@ public class MemberEmailAuthService {
 	}
 
 	@Transactional(readOnly = true)
-	public void checkDuplicatedEmail(Email email) {
-		String requestEmail = email.getEmail();
+	public void checkDuplicatedEmail(MemberEmailRequest memberEmailRequest) {
+		String requestEmail = memberEmailRequest.getEmail();
 		if (memberRepository.existsByEmail(requestEmail)) {
 			throw new EmailAuthException(ErrorCode.DUPLICATED_MEMBER);
 		}
 	}
 
-	public MemberEmailSendResponse sendAuthEmail(Email email) {
+	public MemberEmailSendResponse sendAuthEmail(MemberEmailRequest memberEmailRequest) {
 		String authNumber = RandomNumberUtils.createAuthenticationStringNumber();
-		String requestEmail = email.getEmail();
+		String requestEmail = memberEmailRequest.getEmail();
 		MimeMessage message = createAuthenticationEmail(authNumber, requestEmail);
 		javaMailSender.send(message);
 

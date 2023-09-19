@@ -15,4 +15,9 @@ public class MemberViewController {
 	public String myPage() {
 		return "members/my-page";
 	}
+
+	@GetMapping("/joinForm")
+	public String joinForm() {
+		return "members/joinForm";
+	}
 }
