@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/gosu-catcher")
-public class ItemController {
+public class ItemViewController {
 
 	private final MainItemService mainItemService;
 	private final SubItemService subItemService;
