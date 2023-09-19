@@ -28,6 +28,24 @@ let index = {
             return false;
         }
 
+        if (email.length === 0) {
+            alert("이메일을 입력해 주세요");
+            $("#email").focus();
+            return false;
+        }
+
+        if (password.length < 5 || password.length > 20) {
+            alert("비밀번호는 5~20자 사이만 입력 가능합니다!");
+            $("#password").focus();
+            return false;
+        }
+
+        if (password.length === 0) {
+            alert("비밀번호를 입력해 주세요");
+            $("#password").focus();
+            return false;
+        }
+
         $.ajax({
             type: "POST",
             url: "/api/v1/members/signup",
