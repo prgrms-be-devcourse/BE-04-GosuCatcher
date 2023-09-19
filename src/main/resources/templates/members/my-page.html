@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="/layout/header.html :: fragment-header"></div>
+<div th:fragment="fragment-nav" style="background-color: white">
+    <nav class="navbar navbar-expand-md" style="background-color: #ffffff;">
+        <a class="navbar-brand" href="/gosu-catcher" style="color: #0abab5; font-weight: bold">Gosu Catcher</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/posts/writeForm" style="color: black;">견적요청</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/posts/writeForm" style="color: black;">고수찾기</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/updateForm" style="color: black;">받은견적</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/joinForm" style="color: black;">채팅</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/members/my-page" style="color: black;">내정보</a>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+    <br>
+</div>
+<body>
+<!--<section style="background-color: #eee;">-->
+<div class="container py-5">
+
+    <div class="col">
+        <!--            <div class="row-lg-4">-->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" alt="avatar"
+                     class="rounded-circle img-fluid" style="width: 150px;">
+                <h5 class="my-3">John Smith</h5>
+                <p class="text-muted mb-1">Full Stack Developer</p>
+                <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
+            </div>
+        </div>
+        <!--            </div>-->
+        <div class="col">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">이름</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0" id="name"> 불러오는 중</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">이메일</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0" id="email"> 불러오는 중</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">비밀번호</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0" id="password"> ****** </p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <p class="mb-0">휴대전화 번호</p>
+                        </div>
+                        <div class="col-sm-9">
+                            <p class="text-muted mb-0"  id="phone"> 휴대폰 번호를 추가해주세요</p>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--</section>-->
+<script>
+    // Ajax를 사용하여 사용자 정보를 가져오는 함수
+    function fetchUserInfo() {
+        let memberId = 1;
+        $.ajax({
+            url: '/api/v1/members/profile/' + memberId, // 사용자 정보를 반환하는 API 엔드포인트
+            method: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                // API 요청 성공 시 페이지 업데이트
+                $('#name').text(data.name);
+                $('#email').text(data.email);
+                $('#phone').text(data.phoneNumber);
+
+                // 이메일, 휴대전화 번호도 동일한 방식으로 업데이트 가능
+            },
+            error: function () {
+                // API 요청 실패 시 처리할 내용
+                console.error('API 요청 실패');
+            }
+        });
+    }
+
+    // 페이지 로드 시 사용자 정보 가져오기
+    $(document).ready(function () {
+        fetchUserInfo();
+    });
+</script>
+</body>
+</html>
