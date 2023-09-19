@@ -167,6 +167,11 @@ $(document).ready(function () {
             return;
         }
 
+        if (memberEstimateRequest.detailedDescription.length > 500) {
+            alert("추가로 알리고 싶은 사항은 500자 이하여야 합니다.");
+            return;
+        }
+
         $.ajax({
             type: "POST",
             url: "/api/v1/member-estimates/normal/" + memberId + "/" + expertId,
