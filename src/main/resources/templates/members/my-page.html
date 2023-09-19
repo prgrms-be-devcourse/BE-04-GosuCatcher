@@ -7,6 +7,11 @@
             text-align: left;
             display: block;
         }
+        #editLink {
+            color: black;
+            text-align: left;
+            display: block;
+        }
     </style>
     <title>Gosu Catcher</title>
 </head>
@@ -51,12 +56,32 @@
     <div class="col">
         <div class="card mb-4">
             <div class="card-body text-center">
+                <div>
                 <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" alt="avatar"
                      class="rounded-circle img-fluid" style="width: 150px;">
+
+                </div>
+                <!-- Small modal -->
+
+                <button type="button" class="badge badge-light" data-toggle="modal" data-target=".bd-example-modal-sm">프로필 사진 수정</button>
+                <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+                    <div class="modal-dialog bd-example-modal-lg">
+                        <div class="modal-content">
+                            프로필 사진 등록
+                            <div class="btn-group-vertical">
+                                <button type="button" class="btn btn-secondary btn-block" data-th-align="center">사진 등록하기</button>
+
+                                <button type="button" class="btn btn-secondary btn-block">기본 이미지로 변경</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <h5 class="my-3">John Smith</h5>
                 <p class="text-muted mb-1">Full Stack Developer</p>
                 <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
             </div>
+
+
         </div>
         <div class="col">
             <div class="card-body">
@@ -96,13 +121,20 @@
                     </div>
                 </div>
                 <hr>
+                <br>
                 <div class="row">
                     <div class="col-sm-3">
                         <p class="mb-0">
                             <a class="mb-0" href="#" id="withdrawLink">회원탈퇴</a>
                         </p>
                     </div>
+                    <div class="col-sm-3">
+                        <p class="mb-0">
+                            <a class="mb-0" href="#" id="editLink">회원정보수정</a>
+                        </p>
+                    </div>
                 </div>
+                <hr>
             </div>
         </div>
     </div>
@@ -127,7 +159,7 @@
         });
     }
 
-    function deleteUser() {
+    function deleteMember() {
         let memberId = 1;
         $.ajax({
             url: '/api/v1/members/' + memberId,
@@ -140,7 +172,7 @@
         fetchUserInfo();
         $('#withdrawLink').on('click', function (e) {
             e.preventDefault(); // 기본 동작(링크 이동)을 막음
-            deleteUser();
+            deleteMember();
         });
     });
 </script>
