@@ -20,7 +20,7 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
 		LEFT JOIN FETCH e.expertItemList
 		WHERE e.member.id = :memberId
 		""")
-	Optional<Expert> findByMemberIdWithFetchJoin(Long memberId);
+	Optional<Expert> findByMemberIdWithFetchJoin(@Param("") Long memberId);
 
 	List<Expert> findAll();
 
