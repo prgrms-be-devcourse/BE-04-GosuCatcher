@@ -17,6 +17,7 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupRe
 import com.foo.gosucatcher.domain.member.domain.Member;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.member.domain.Roles;
+import com.foo.gosucatcher.domain.member.exception.EmailAuthException;
 import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -38,6 +39,8 @@ public class MemberAuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public MemberSignupResponse signup(MemberSignupRequest memberSignUpRequest) {
+		checkDuplicatedEmail(memberSignUpRequest);
+
 		Member signupMember = MemberSignupRequest.toMember(memberSignUpRequest);
 
 		String password = signupMember.getPassword();
@@ -112,8 +115,8 @@ public class MemberAuthService {
 		refreshToken = jwtTokenProvider.removeBearer(refreshToken);
 		UserDetails userDetails = getCustomUserDetailsByRefreshToken(refreshToken);
 
-		Member member = ((CustomUserDetails)userDetails).getMember();
-		Expert expert = ((CustomUserDetails)userDetails).getExpert();
+		Member member = ((CustomUserDetails) userDetails).getMember();
+		Expert expert = ((CustomUserDetails) userDetails).getExpert();
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
@@ -148,5 +151,11 @@ public class MemberAuthService {
 		String reissuedAccessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId, expertId);
 
 		return new JwtReissueResponse(reissuedAccessToken);
+	}
+
+	private void checkDuplicatedEmail(MemberSignupRequest memberSignUpRequest) {
+		if (memberRepository.existsByEmail(memberSignUpRequest.email())) {
+			throw new EmailAuthException(ErrorCode.DUPLICATED_MEMBER);
+		}
 	}
 }
