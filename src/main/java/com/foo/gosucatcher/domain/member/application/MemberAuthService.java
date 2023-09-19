@@ -1,6 +1,5 @@
 package com.foo.gosucatcher.domain.member.application;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,15 +107,14 @@ public class MemberAuthService {
 	}
 
 	public JwtReissueResponse reissue(String refreshToken) {
-		if (!jwtTokenProvider.isValidRefreshToken(refreshToken)) {
-			throw new MemberCertifiedFailException(ErrorCode.NOT_VALID_REFRESH_TOKEN);
-		}
+		jwtTokenProvider.checkValidRefreshToken(refreshToken);
 
 		refreshToken = jwtTokenProvider.removeBearer(refreshToken);
-		UserDetails userDetails = getCustomUserDetailsByRefreshToken(refreshToken);
+		CustomUserDetails customUserDetails = (CustomUserDetails)(jwtTokenProvider.getCustomUserDetailsByRefreshToken(
+			refreshToken));
 
-		Member member = ((CustomUserDetails) userDetails).getMember();
-		Expert expert = ((CustomUserDetails) userDetails).getExpert();
+		Member member = customUserDetails.getMember();
+		Expert expert = customUserDetails.getExpert();
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
@@ -127,28 +125,16 @@ public class MemberAuthService {
 	}
 
 	private MemberCertifiedResponse getMemberCertifiedResponse(Member member, Expert expert) {
-		String memberEmail = member.getEmail();
-		Long memberId = member.getId();
-		Long expertId = expert.getId();
-
-		String accessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId, expertId);
-		String refreshToken = jwtTokenProvider.createRefreshToken(memberEmail, memberId, expertId);
+		String accessToken = jwtTokenProvider.createAccessToken(member, expert);
+		String refreshToken = jwtTokenProvider.createRefreshToken(member, expert);
 
 		member.refreshToken(refreshToken);
 
 		return MemberCertifiedResponse.from(accessToken, refreshToken);
 	}
 
-	private UserDetails getCustomUserDetailsByRefreshToken(String refreshToken) {
-		return jwtTokenProvider.getMemberAndExpertByRefreshToken(refreshToken);
-	}
-
 	private JwtReissueResponse createJwtReissueResponse(Member member, Expert expert) {
-		Long memberId = member.getId();
-		String memberEmail = member.getEmail();
-		Long expertId = expert.getId();
-
-		String reissuedAccessToken = jwtTokenProvider.createAccessToken(memberEmail, memberId, expertId);
+		String reissuedAccessToken = jwtTokenProvider.createAccessToken(member, expert);
 
 		return new JwtReissueResponse(reissuedAccessToken);
 	}

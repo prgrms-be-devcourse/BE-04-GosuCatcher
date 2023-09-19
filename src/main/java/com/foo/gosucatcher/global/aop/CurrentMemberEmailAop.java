@@ -15,12 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import com.foo.gosucatcher.domain.member.exception.MemberCertifiedFailException;
-import com.foo.gosucatcher.global.error.ErrorCode;
-import com.foo.gosucatcher.global.error.exception.AopException;
+import com.foo.gosucatcher.global.security.CustomUserDetails;
 import com.foo.gosucatcher.global.security.JwtTokenProvider;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -39,24 +36,17 @@ public class CurrentMemberEmailAop {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
 
-		String token = jwtTokenProvider.resolveAccessToken(request);
+		String AuthorizationHeaderValue = request.getHeader("Authorization");
 
-		try {
-			token = jwtTokenProvider.removeBearer(token);
+		String token = jwtTokenProvider.removeBearer(AuthorizationHeaderValue);
 
-			Authentication authentication = jwtTokenProvider.getAccessTokenAuthenticationByMemberEmail(token);
-			String memberEmail = authentication.getPrincipal().toString();
+		Authentication authentication = jwtTokenProvider.getAccessTokenAuthentication(token);
+		CustomUserDetails principal = (CustomUserDetails)authentication.getPrincipal();
+		String memberEmail = principal.getMember().getEmail();
 
-			Object[] modifiedArgs = modifyArgsWithMemberEmail(memberEmail, proceedingJoinPoint);
+		Object[] modifiedArgs = modifyArgsWithMemberEmail(memberEmail, proceedingJoinPoint);
 
-			return proceedingJoinPoint.proceed(modifiedArgs);
-		} catch (ExpiredJwtException e) {
-			throw new MemberCertifiedFailException(ErrorCode.EXPIRED_AUTHENTICATION);
-		} catch (RuntimeException e) {
-			throw new MemberCertifiedFailException(ErrorCode.INVALID_TOKEN);
-		} catch (Throwable e) {
-			throw new AopException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
+		return proceedingJoinPoint.proceed(modifiedArgs);
 	}
 
 	private Object[] modifyArgsWithMemberEmail(String memberEmail, ProceedingJoinPoint proceedingJoinPoint) {

@@ -2,7 +2,6 @@ package com.foo.gosucatcher.global.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.foo.gosucatcher.domain.expert.domain.Expert;
@@ -22,21 +21,13 @@ public class CustomUserDetailsService implements UserDetailsService {
 	private final ExpertRepository expertRepository;
 
 	@Override
-	public UserDetails loadUserByUsername(String memberEmail) throws UsernameNotFoundException {
-		return memberRepository.findByEmail(memberEmail)
+	public UserDetails loadUserByUsername(String memberEmail) {
+		Member member = memberRepository.findByEmail(memberEmail)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-	}
 
-	public UserDetails loadUserByUserId(Long memberId) throws UsernameNotFoundException {
-		return memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
-	}
-
-	public UserDetails loadMemberAndExpertByMemberId(Long memberId) {
-		Expert expert = expertRepository.findByMemberId(memberId)
+		Long memberId = member.getId();
+		Expert expert = expertRepository.findByMemberIdWithFetchJoin(memberId)
 			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_EXPERT));
-		Member member = memberRepository.findById(memberId)
-			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 
 		return new CustomUserDetails(member, expert);
 	}
