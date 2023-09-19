@@ -14,8 +14,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.ErrorResponse;
+import com.foo.gosucatcher.global.error.exception.JwtTokenException;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,8 +26,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-		FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(
+		HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+	) throws ServletException, IOException {
 		String accessToken = jwtTokenProvider.resolveAccessToken(request);
 		String refreshToken = jwtTokenProvider.resolveRefreshToken(request);
 
@@ -45,17 +46,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			}
 
 			filterChain.doFilter(request, response);
-		} catch (ExpiredJwtException e) {
+		} catch (JwtTokenException e) {
 			response.setStatus(401);
 			response.setContentType("application/json");
 			response.setCharacterEncoding("utf-8");
 
-			ErrorResponse errorResponse;
-			if (jwtTokenProvider.isValidAccessToken(accessToken)) {
-				errorResponse = ErrorResponse.of(ErrorCode.EXPIRED_AUTHENTICATION);
-			} else {
-				errorResponse = ErrorResponse.of(ErrorCode.NOT_VALID_REFRESH_TOKEN);
-			}
+			ErrorCode errorCode = e.getErrorCode();
+			ErrorResponse errorResponse = ErrorResponse.of(errorCode);
+
 			new ObjectMapper().writeValue(response.getWriter(), errorResponse);
 		}
 	}

@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.member.application;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -109,9 +110,10 @@ public class MemberAuthService {
 		}
 
 		refreshToken = jwtTokenProvider.removeBearer(refreshToken);
-		CustomUserDetails userDetails = getCustomUserDetailsByRefreshToken(refreshToken);
-		Member member = userDetails.getMember();
-		Expert expert = userDetails.getExpert();
+		UserDetails userDetails = getCustomUserDetailsByRefreshToken(refreshToken);
+
+		Member member = ((CustomUserDetails)userDetails).getMember();
+		Expert expert = ((CustomUserDetails)userDetails).getExpert();
 
 		String memberRefreshToken = member.getRefreshToken();
 		if (!memberRefreshToken.equals(refreshToken)) {
@@ -134,7 +136,7 @@ public class MemberAuthService {
 		return MemberCertifiedResponse.from(accessToken, refreshToken);
 	}
 
-	private CustomUserDetails getCustomUserDetailsByRefreshToken(String refreshToken) {
+	private UserDetails getCustomUserDetailsByRefreshToken(String refreshToken) {
 		return jwtTokenProvider.getMemberAndExpertByRefreshToken(refreshToken);
 	}
 
