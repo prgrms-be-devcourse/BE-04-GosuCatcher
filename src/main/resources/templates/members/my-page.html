@@ -175,17 +175,18 @@
 </div>
 <footer th:replace="/layout/footer.html :: fragment-footer"></footer>
 <script>
+
     function modifyUserInfo() {
         const token = 'bearer ' + localStorage.getItem('accessToken');
 
         const path = '/api/v1/members/profile/';
 
-        if(document.getElementById('inputPhoneNumber').value.length !== 11){
+        if (document.getElementById('inputPhoneNumber').value.length !== 11) {
             window.alert("핸드폰 번호를 숫자만 11자로 입력해주세요")
             return;
         }
 
-        if(document.getElementById('inputPassword').value.length < 5){
+        if (document.getElementById('inputPassword').value.length < 5) {
             window.alert("비밀번호를 5자 이상 입력해주세요")
             return;
         }
@@ -242,7 +243,7 @@
                 'Authorization': token,
             },
             success: function (data) {
-                $('#profile_image').text(data.filenames[0]);
+                document.querySelector('img').src = data.filenames[0];
             },
             error: function () {
                 window.alert('회원 프로필 이미지 조회에 실패했습니다. 새로고침 바랍니다.')
@@ -250,38 +251,13 @@
         });
     }
 
-    function loadFile(input) {
-        let memberId = 1;
-        $.ajax({
-            url: '/api/v1/members/profile/images/' + memberId,
-            method: 'POST',
-            dataType: 'multipart'
-        });
-        // var file = input.files[0];	//선택된 파일 가져오기
-        //
-        // //미리 만들어 놓은 div에 text(파일 이름) 추가
-        // var name = document.getElementById('fileName');
-        // name.textContent = file.name;
-        //
-        // //새로운 이미지 div 추가
-        // var newImage = document.createElement("img");
-        // newImage.setAttribute("class", 'img');
-        //
-        // //이미지 source 가져오기
-        // newImage.src = URL.createObjectURL(file);
-        //
-        // newImage.style.width = "70%";
-        // newImage.style.height = "70%";
-        // newImage.style.visibility = "hidden";   //버튼을 누르기 전까지는 이미지를 숨긴다
-        // newImage.style.objectFit = "contain";
-        //
-        // //이미지를 image-show div에 추가
-        // var container = document.getElementById('image-show');
-        // container.appendChild(newImage);
-    }
-
     function setDefaultProfileImage() {
-        const token = sessionStorage.getItem('Authorization');
+        const token = 'bearer ' + localStorage.getItem('accessToken');
+        const defaultUrl = 'https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png';
+        if(document.querySelector('img').src === defaultUrl){
+            return;
+        }
+
         fetch('/api/v1/members/profile/images', {
             method: 'DELETE',
             headers: {
