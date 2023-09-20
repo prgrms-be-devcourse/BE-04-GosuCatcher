@@ -42,8 +42,8 @@
         }
 
         .card-container {
-            white-space: nowrap; /* 줄 바꿈 방지 */
-            overflow-x: auto; /* 가로 스크롤 활성화 */
+            white-space: nowrap;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -65,22 +65,30 @@
         <div class="card-container">
             <div class="card">
                 <div class="card-content">
-                    <span th:text="${item1.name()}"></span>
+                    <a href="#" th:onclick="'navigateToAuto(' + ${item1.id()} + '); return false;'">
+                        <span th:text="${item1.name()}"></span>
+                    </a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
-                    <span th:text="${item3.name()}"></span>
+                    <a href="#" th:onclick="'navigateToAuto(' + ${item3.id()} + '); return false;'">
+                        <span th:text="${item3.name()}"></span>
+                    </a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
-                    <span th:text="${item5.name()}"></span>
+                    <a href="#" th:onclick="'navigateToAuto(' + ${item5.id()} + '); return false;'">
+                        <span th:text="${item5.name()}"></span>
+                    </a>
                 </div>
             </div>
             <div class="card">
                 <div class="card-content">
-                    <span th:text="${item7.name()}"></span>
+                    <a href="#" th:onclick="'navigateToAuto(' + ${item7.id()} + '); return false;'">
+                        <span th:text="${item7.name()}"></span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -91,7 +99,9 @@
             <div th:each="cleaningItem : ${cleaner.subItemSlicesResponse()}" style="display: inline-block;">
                 <div class="card">
                     <div class="card-content">
-                        <span th:text="${cleaningItem.name()}"></span>
+                        <a href="#" th:onclick="'navigateToAuto(' + ${cleaningItem.id()} + '); return false;'">
+                            <span th:text="${cleaningItem.name()}"></span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -103,14 +113,16 @@
             <div th:each="partTimeJobItem : ${partTimeJob.subItemSlicesResponse()}" style="display: inline-block;">
                 <div class="card">
                     <div class="card-content">
-                        <span th:text="${partTimeJobItem.name()}"></span>
+                        <a href="#" th:onclick="'navigateToAuto(' + ${partTimeJobItem.id()} + '); return false;'">
+                            <span th:text="${partTimeJobItem.name()}"></span>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<script src="/js/members/member.js"></script>
 <footer th:replace="/layout/footer.html :: fragment-footer"></footer>
 </body>
 </html>

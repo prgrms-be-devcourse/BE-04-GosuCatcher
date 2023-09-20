@@ -25,6 +25,7 @@ public class HomeController {
 
 	@GetMapping
 	public String home(Model model, @PageableDefault(page = 0, size = 10) Pageable pageable) {
+
 		MainItemsResponse mainItems = mainItemService.findAll();
 		SubItemResponse item1 = subItemService.findById(1L);
 		SubItemResponse item3 = subItemService.findById(3L);
