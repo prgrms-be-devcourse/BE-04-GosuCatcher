@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link rel="stylesheet" href="/css/members/estimates.css">
+<!--    <script src="/js/members/requests.js" defer></script>-->
+</head>
+<body>
+<header th:replace="/layout/nav.html :: fragment-nav"></header>
+<main>
+    <h2>받은 견적</h2>
+    <div id="cardContainer"></div>
+</main>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

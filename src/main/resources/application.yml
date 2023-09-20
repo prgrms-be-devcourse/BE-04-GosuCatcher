@@ -16,19 +16,7 @@ spring:
     import:
       - classpath:application-aws.yml
       - classpath:application-db.yml
-
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: DUMMY_EMAIL_ADDRESS
-    password: DUMMY_PASSWORD
-    properties:
-      mail:
-        smtp:
-          auth: true
-          timeout: 5000
-          starttls:
-            enable: true
+      - classpath:application-mail.yml
 
 secret:
   coolsms:

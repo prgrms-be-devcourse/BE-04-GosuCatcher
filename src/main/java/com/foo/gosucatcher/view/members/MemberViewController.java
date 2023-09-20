@@ -28,7 +28,17 @@ public class MemberViewController {
 	}
 
 	@GetMapping("/login")
-	public String login(){
+	public String login() {
 		return "members/login";
+	}
+
+	@GetMapping("/requests/send")
+	public String estimate() {
+		return "members/estimate";
+	}
+
+	@GetMapping("/recovery/password")
+	public String recoveryPassword() {
+		return "members/recoveryPassword";
 	}
 }
