@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberImage extends Image {
 
-	private static final String DEFAULT_PATH = "/Users/GosuCatcher/static/image/default.png";
+	private static final String DEFAULT_PATH = "https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png";
 
 	public MemberImage(String fileName) {
 		super(fileName);
