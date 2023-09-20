@@ -7,25 +7,6 @@
             text-align: left;
             display: block;
         }
-
-        #editLink {
-            color: black;
-            text-align: left;
-            display: block;
-        }
-
-        .user_interface {
-        }
-
-        button.btn1 {
-            position: inherit;
-            top: 85px;
-            left: 150px;
-            width: 1em;
-            height: 1em;
-            bottom: 0;
-            right: 0;
-        }
     </style>
     <title>Gosu Catcher</title>
 </head>
@@ -46,42 +27,51 @@
 <div class="container d-flex justify-content-center" style="max-width: 750px;">
     <div class="col ">
         <h2>계정 설정</h2>
+
         <div class="profile-image d-flex justify-content-center my-5">
             <div class="user_interface">
                 <div class="my-3">
-                    <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" id="profile_image" alt="avatar"
+                    <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" id="profile_image"
+                         alt="avatar"
                          class="rounded-circle img-fluid" style="width: 100px; position: inherit">
                 </div>
-                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
-                        type="button" data-toggle="modal" data-target="#exampleModalCenter">
-                    사진 등록하기
-                </button>
-                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
-                        type="button" onclick="setDefaultProfileImage()">
-                    기본 이미지로 변경
-                </button>
+                <div class="image_post" style="margin-bottom: 1em">
 
-                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
-                     aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered" role="document">
-                        <div class="modal-content">
+                    <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
+                            type="button" data-toggle="modal" data-target="#exampleModalCenter">
+                        사진 등록하기
+                    </button>
 
-                            <input type="file" class="real-upload" accept="image/*" required multiple>
-                            <script>
-                                const realUpload = document.querySelector('.real-upload');
-                                const upload = document.querySelector('.upload');
-
-                                upload.addEventListener('click', () => realUpload.click());
-                                realUpload.addEventListener('change', uploadProfileImage)
-                            </script>
-
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle">프로필 사진 등록하기</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <input id="file" name="file" type="file">
+                                    <button onclick="uploadProfileImage()" data-dismiss="modal">완료</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <div class="image_reset">
+                    <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
+                            type="button" onclick="setDefaultProfileImage()">
+                        기본 이미지로 변경
+                    </button>
 
+                </div>
 
             </div>
         </div>
+
 
         <div class="card-body">
             <div class="row">
@@ -123,13 +113,14 @@
             <br>
             <div class="row">
                 <div class="col-sm-3">
-                    <button type="button" class="btn btn-light" id="withdrawLink" onclick="deleteMember()">
+                    <button type="button" class="btn btn-light" id="withdrawLink" onclick="deleteMember()"
+                            style="background-color: white;border-color: white">
                         회원 탈퇴
                     </button>
                 </div>
                 <div class="col-sm-3">
                     <button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModal"
-                            data-whatever="@mdo">회원정보 수정
+                            data-whatever="@mdo" style="background-color: white;border-color: white">회원정보 수정
                     </button>
                 </div>
 
@@ -254,7 +245,7 @@
     function setDefaultProfileImage() {
         const token = 'bearer ' + localStorage.getItem('accessToken');
         const defaultUrl = 'https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png';
-        if(document.querySelector('img').src === defaultUrl){
+        if (document.querySelector('img').src === defaultUrl) {
             return;
         }
 
@@ -290,25 +281,29 @@
     }
 
 
-    function uploadProfileImage(input) {
-        let file = input.currentTarget.files;
+    function uploadProfileImage() {
+        const token = 'bearer ' + localStorage.getItem('accessToken');
+        var image = $('input[name="file"]').get(0).files[0];
 
-        const token = sessionStorage.getItem('Authorization');
+        var formData = new FormData();
+        formData.append('file', image);
 
-
-        let formData = new FormData();
-        formData.append('file', file.files[0]);
-
-        fetch('/api/v1/members/profile/images', {
-            method: 'POST',
+        $.ajax({
+            type: 'POST',
+            url: '/api/v1/members/profile/images',
+            processData: false,
+            contentType: false,
+            data: formData,
             headers: {
-                'Authorization': token
+                "Authorization": token
             },
-            body: formData
-        }).then(response => response.json()).then(data => {
-            alert('프로필 이미지가 성공적으로 업로드되었습니다.');
-        }).catch(error => {
-            alert('프로필 이미지 업로드 중 오류가 발생했습니다.');
+            success: function (json) {
+                alert("등록되었습니다.");
+
+            },
+            error: function (xhr, status, error) {
+                alert("가입에 실패했습니다." + error);
+            }
         });
     }
 </script>
