@@ -14,6 +14,7 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberCertifie
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberPasswordFoundResponse;
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberSignupResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.domain.member.domain.MemberImage;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.domain.member.domain.Roles;
 import com.foo.gosucatcher.domain.member.exception.EmailAuthException;
@@ -54,7 +55,8 @@ public class MemberAuthService {
 			.build();
 		expertRepository.save(expert);
 
-		//todo: 여기에 프로필 사진 초기화 메서드 추가
+		MemberImage defaultMemberImage = new MemberImage(MemberImage.DEFAULT_PATH);
+		signupMember.updateProfileImage(defaultMemberImage);
 
 		return MemberSignupResponse.from(savedMember);
 	}
