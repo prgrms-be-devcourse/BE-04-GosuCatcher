@@ -174,12 +174,12 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/api/v1/member-estimates/normal/" + memberId + "/" + expertId,
+            url: "/api/v1/member-estimates/auto?memberId=" + memberId,
             contentType: "application/json",
             data: JSON.stringify(memberEstimateRequest),
             success: function (response) {
                 window.alert("견적이 성공적으로 요청되었습니다.");
-                window.location.href = '/gosu-catcher/home';
+                window.location.href = '/gosu-catcher';
 
             },
             error: function (xhr, status, error) {
