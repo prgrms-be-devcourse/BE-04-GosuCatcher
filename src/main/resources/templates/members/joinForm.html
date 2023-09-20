@@ -2,76 +2,14 @@
 
 <head>
     <div th:replace="/layout/header.html :: fragment-header"></div>
-    <style>
-        h2 {
-            font-size: 28px;
-            text-align: center;
-            position: absolute;
-            top: 85px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-        }
-
-        .wrap {
-            width: 100%;
-            height: 70vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.03);
-        }
-
-        .joinForm {
-            width: 30%;
-            height: 80%;
-            background: white;
-            border-radius: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-        }
-
-        .form-group {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            margin-bottom: 15px;
-
-        }
-
-        .form-group label {
-            margin-bottom: 5px;
-
-            text-align: left;
-        }
-
-        .form-group input[type="text"],
-        .form-group input[type="memberEmailRequest"],
-        .form-group input[type="password"] {
-            width: 150%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 16px;
-            justify-content: center;
-        }
-
-        #btn-join {
-            width: 50%;
-            background-color: #0abab5;
-            color: #ffffff;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/members/joinForm-style.css">
 </head>
 
 <body>
 <div th:replace="/layout/nav.html :: fragment-nav"></div>
 
 <div class="wrap">
-    <h2 style="margin-bottom: 30px">숨고에 오신것을 환영합니다</h2>
+    <h2>숨고에 오신것을 환영합니다</h2>
     <div class="joinForm">
         <form>
             <div class="form-group">
@@ -79,8 +17,8 @@
                 <input type="text" class="form-control" placeholder="이름(실명)을 입력해주세요" id="name">
             </div>
             <div class="form-group">
-                <label for="memberEmailRequest" style="font-size: x-large;">이메일</label>
-                <input type="memberEmailRequest" class="form-control" placeholder="example@example.com" id="memberEmailRequest">
+                <label for="email" style="font-size: x-large;">이메일</label>
+                <input type="email" class="form-control" placeholder="example@example.com" id="email">
             </div>
             <div class="form-group">
                 <label for="password" style="font-size: x-large;">패스워드</label>
