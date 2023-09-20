@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<div th:fragment="fragment-nav">
+<header th:fragment="fragment-nav">
     <nav class="navbar navbar-expand-md" style="background-color: #ffffff;">
         <a class="navbar-brand" href="/gosu-catcher" style="color: #0abab5; font-weight: bold">Gosu Catcher</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
@@ -18,7 +18,7 @@
                 </li>
             </ul>
 
-            <ul class="navbar-nav">
+            <ul class="navbar-nav" style="display: flex;">
                 <li class="nav-item">
                     <a class="nav-link" href="/user/updateForm" style="color: black;">받은견적</a>
                 </li>
@@ -33,7 +33,7 @@
             <div sec:authorize="isAnonymous()">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/posts/writeForm" style="color: black;">로그인</a>
+                        <a class="nav-link" href="/gosu-catcher/login" style="color: black;">로그인</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/gosu-catcher/joinForm" style="color: black;">회원가입</a>
@@ -43,5 +43,5 @@
         </div>
     </nav>
     <br>
-</div>
+</header>
 </html>

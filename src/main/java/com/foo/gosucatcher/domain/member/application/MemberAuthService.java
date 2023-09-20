@@ -25,7 +25,9 @@ import com.foo.gosucatcher.global.security.JwtTokenProvider;
 import com.foo.gosucatcher.global.util.RandomNumberUtils;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -129,6 +131,9 @@ public class MemberAuthService {
 		String refreshToken = jwtTokenProvider.createRefreshToken(member, expert);
 
 		member.refreshToken(refreshToken);
+
+		log.info("accessToken 생성 완료 : {}", accessToken);
+		log.info("refreshToken 생성 완료 : {}", refreshToken);
 
 		return MemberCertifiedResponse.from(accessToken, refreshToken);
 	}

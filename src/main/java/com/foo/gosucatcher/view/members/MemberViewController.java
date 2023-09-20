@@ -20,4 +20,9 @@ public class MemberViewController {
 	public String joinForm() {
 		return "members/joinForm";
 	}
+
+	@GetMapping("/login")
+	public String login(){
+		return "members/login";
+	}
 }
