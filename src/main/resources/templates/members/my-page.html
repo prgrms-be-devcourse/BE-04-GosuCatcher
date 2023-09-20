@@ -7,139 +7,162 @@
             text-align: left;
             display: block;
         }
+
         #editLink {
             color: black;
             text-align: left;
             display: block;
         }
+
+        .user_interface {
+        }
+
+        button.btn1 {
+            position: inherit;
+            top: 85px;
+            left: 150px;
+            width: 1em;
+            height: 1em;
+            bottom: 0;
+            right: 0;
+        }
     </style>
     <title>Gosu Catcher</title>
 </head>
-<div th:replace="/layout/header.html :: fragment-header"></div>
-<div th:fragment="fragment-nav" style="background-color: white">
-    <nav class="navbar navbar-expand-md" style="background-color: #ffffff;">
-        <a class="navbar-brand" href="/gosu-catcher" style="color: #0abab5; font-weight: bold">Gosu Catcher</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="collapsibleNavbar">
-
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/posts/writeForm" style="color: black;">견적요청</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/posts/writeForm" style="color: black;">고수찾기</a>
-                </li>
-            </ul>
-
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/updateForm" style="color: black;">받은견적</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/user/joinForm" style="color: black;">채팅</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/members/my-page" style="color: black;">내정보</a>
-                </li>
-            </ul>
-
-        </div>
-    </nav>
-    <br>
-</div>
 <body>
-<div class="container py-5">
+<div th:replace="/layout/header.html :: fragment-header"></div>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
 
-    <div class="col">
-        <div class="card mb-4">
-            <div class="card-body text-center">
-                <div>
+
+<div class="container d-flex justify-content-center" style="max-width: 750px;">
+    <div class="col ">
+        <h2>계정 설정</h2>
+        <div class="profile-image d-flex justify-content-center my-5">
+            <div class="user_interface">
                 <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" alt="avatar"
-                     class="rounded-circle img-fluid" style="width: 150px;">
+                     class="rounded-circle img-fluid" style="width: 100px; position: inherit">
 
-                </div>
-                <!-- Small modal -->
+                <!-- Button trigger modal -->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
 
-                <button type="button" class="badge badge-light" data-toggle="modal" data-target=".bd-example-modal-sm">프로필 사진 수정</button>
-                <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-                    <div class="modal-dialog bd-example-modal-lg">
+                    Launch demo modal
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
                         <div class="modal-content">
-                            프로필 사진 등록
-                            <div class="btn-group-vertical">
-                                <button type="button" class="btn btn-secondary btn-block" data-th-align="center">사진 등록하기</button>
-
-                                <button type="button" class="btn btn-secondary btn-block">기본 이미지로 변경</button>
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">프로필 사진 등록</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
+                                        type="button">
+                                    사진 등록하기
+                                </button>
+                                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
+                                        type="button">
+                                    기본 이미지로 변경
+                                </button>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light " data-dismiss="modal">취소</button>
+<!--                                <button type="button" class="btn btn-primary">Save changes</button>-->
                             </div>
                         </div>
                     </div>
                 </div>
-                <h5 class="my-3">John Smith</h5>
-                <p class="text-muted mb-1">Full Stack Developer</p>
-                <p class="text-muted mb-4">Bay Area, San Francisco, CA</p>
-            </div>
 
 
-        </div>
-        <div class="col">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p class="mb-0">이름</p>
-                    </div>
-                    <div class="col-sm-9">
-                        <p class="text-muted mb-0" id="name"> 불러오는 중</p>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p class="mb-0">이메일</p>
-                    </div>
-                    <div class="col-sm-9">
-                        <p class="text-muted mb-0" id="email"> 불러오는 중</p>
-                    </div>
-                </div>
-                <hr>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p class="mb-0">비밀번호</p>
-                    </div>
-                    <div class="col-sm-9">
-                        <p class="text-muted mb-0" id="password"> ****** </p>
+
+                <div aria-hidden="true" aria-labelledby="profileImageModalLabel" class="modal fade"
+                     id="profileImageModal" role="dialog"
+                     tabindex="-1">
+                    <div class="modal-dialog modal-md modal-dialog-centered modal-select-profile-image"
+                         style="max-width: 150%;">
+                        <div class="modal-content">
+                            <header class="modal-header">
+                                <h5 class="modal-title">프로필 사진 등록</h5>
+                                <button class="btn btn-outline-custom btn-block" onclick="setDefaultProfileImage()"
+                                        type="button">
+                                    기본 이미지로 변경
+                                </button>
+                                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal"
+                                        type="button">
+                                    취소
+                                </button>
+                                <!--                    <button class="btn1" type="button" onclick="sensorBtnClick('btn1');">-->
+                                <!--                        <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/camera_icon.png">-->
+                                <!--                    </button>-->
+                            </header>
+                        </div>
                     </div>
                 </div>
-                <hr>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p class="mb-0">휴대전화 번호</p>
-                    </div>
-                    <div class="col-sm-9">
-                        <p class="text-muted mb-0" id="phone"> 휴대폰 번호를 추가해주세요</p>
-                    </div>
-                </div>
-                <hr>
-                <br>
-                <div class="row">
-                    <div class="col-sm-3">
-                        <p class="mb-0">
-                            <a class="mb-0" href="#" id="withdrawLink">회원탈퇴</a>
-                        </p>
-                    </div>
-                    <div class="col-sm-3">
-                        <p class="mb-0">
-                            <a class="mb-0" href="#" id="editLink">회원정보수정</a>
-                        </p>
-                    </div>
-                </div>
-                <hr>
+
+
             </div>
         </div>
+
+        <!--        <div class="col">-->
+        <div class="card-body">
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">이름</p>
+                </div>
+                <div class="col-sm-9">
+                    <p class="text-muted mb-0" id="name"> 불러오는 중</p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">이메일</p>
+                </div>
+                <div class="col-sm-9">
+                    <p class="text-muted mb-0" id="email"> 불러오는 중</p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">비밀번호</p>
+                </div>
+                <div class="col-sm-9">
+                    <p class="text-muted mb-0" id="password"> ****** </p>
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">휴대전화 번호</p>
+                </div>
+                <div class="col-sm-9">
+                    <p class="text-muted mb-0" id="phone"> 휴대폰 번호를 추가해주세요</p>
+                </div>
+            </div>
+            <hr>
+            <br>
+            <div class="row">
+                <div class="col-sm-3">
+                    <p class="mb-0">
+                        <a class="mb-0" href="#" id="withdrawLink">회원탈퇴</a>
+                    </p>
+                </div>
+                <div class="col-sm-3">
+                    <p class="mb-0">
+                        <a class="mb-0" href="#" id="editLink">회원정보수정</a>
+                    </p>
+                </div>
+            </div>
+            <hr>
+        </div>
+        <!--        </div>-->
     </div>
 </div>
-
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
 <script>
     function fetchUserInfo() {
         let memberId = 1;
@@ -148,7 +171,6 @@
             method: 'GET',
             dataType: 'json',
             success: function (data) {
-                // API 요청 성공 시 페이지 업데이트
                 $('#name').text(data.name);
                 $('#email').text(data.email);
                 $('#phone').text(data.phoneNumber);
@@ -157,6 +179,36 @@
                 console.error('사용자 정보 반환 실패');
             }
         });
+    }
+
+    function loadFile(input) {
+        let memberId = 1;
+        $.ajax({
+            url: '/api/v1/members/profile/images/' + memberId,
+            method: 'POST',
+            dataType: 'multipart'
+        });
+        // var file = input.files[0];	//선택된 파일 가져오기
+        //
+        // //미리 만들어 놓은 div에 text(파일 이름) 추가
+        // var name = document.getElementById('fileName');
+        // name.textContent = file.name;
+        //
+        // //새로운 이미지 div 추가
+        // var newImage = document.createElement("img");
+        // newImage.setAttribute("class", 'img');
+        //
+        // //이미지 source 가져오기
+        // newImage.src = URL.createObjectURL(file);
+        //
+        // newImage.style.width = "70%";
+        // newImage.style.height = "70%";
+        // newImage.style.visibility = "hidden";   //버튼을 누르기 전까지는 이미지를 숨긴다
+        // newImage.style.objectFit = "contain";
+        //
+        // //이미지를 image-show div에 추가
+        // var container = document.getElementById('image-show');
+        // container.appendChild(newImage);
     }
 
     function deleteMember() {
@@ -176,5 +228,6 @@
         });
     });
 </script>
+
 </body>
 </html>
