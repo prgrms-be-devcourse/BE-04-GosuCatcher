@@ -9,7 +9,8 @@ public record ExpertResponse(
 	int maxTravelDistance,
 	String description,
 	double rating,
-	int reviewCount
+	int reviewCount,
+	String filename
 ) {
 
 	public static ExpertResponse from(Expert expert) {
@@ -20,7 +21,8 @@ public record ExpertResponse(
 			expert.getMaxTravelDistance(),
 			expert.getDescription(),
 			expert.getRating(),
-			expert.getReviewCount()
+			expert.getReviewCount(),
+			null
 		);
 	}
 }
