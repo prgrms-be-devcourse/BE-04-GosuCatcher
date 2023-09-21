@@ -177,7 +177,7 @@ class MemberEstimateControllerTest {
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
 			expertId, subItemResponse, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용", Status.PROCEEDING);
 
-		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description", 4.0, 6);
+		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description", 4.0, 6,null);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		MessageResponse messageResponse = new MessageResponse(1L, expertResponse.id(), chattingRoomResponse, "고수 견적서 내용입니다.");
