@@ -33,7 +33,7 @@ public class MemberViewController {
 	}
 
 	@GetMapping("/requests/send/details")
-	public String estimatesDetails(@RequestParam Long id) {
+	public String estimatesDetails(@RequestParam Long id, @RequestParam String date) {
 		return "members/estimates-detail";
 	}
 

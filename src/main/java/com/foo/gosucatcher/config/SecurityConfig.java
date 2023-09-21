@@ -43,12 +43,12 @@ public class SecurityConfig {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests()
-			.antMatchers("/gosu-catcher", "/gosu-catcher/login", "/gosu-catcher/joinForm").permitAll()
-			.antMatchers("/gosu-catcher/pro/**").hasAnyRole("EXPERT", "ADMIN")
-			.antMatchers("/gosu-catcher/**").hasAnyRole("USER", "ADMIN")
+			.antMatchers("/gosu-catcher/**").permitAll()
 			.antMatchers("/api/v1/**").permitAll()
 			.antMatchers("/gs-chat/**").permitAll()
 			.anyRequest().authenticated()
+			.and()
+			.anonymous().authorities("ROLE_ANONYMOUS")
 			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 

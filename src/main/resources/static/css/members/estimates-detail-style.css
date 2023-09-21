@@ -1,9 +1,45 @@
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: calc(100vh - 80px - 100px);
+    text-align: center;
+}
+
+.preferred-date::after {
+    content: "";
+    display: block;
+    width: 1000px;
+    height: 1px;
+    background-color: #999999; /* 원하는 색상으로 변경하세요 */
+    margin-top: 10px;
+    margin-bottom: 30px;
+    /* 왼쪽 정렬을 위한 추가 스타일 */
+    margin-left: 0; /* 왼쪽 여백 제거 */
+    text-align: left; /* 내용을 왼쪽으로 정렬 */
+    border-radius: 5px; /* 구분선을 둥글게 만듭니다. */
+}
+.sub-item-name {
+    font-size: 50px;
+}
+
+p.date {
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.sub-item-name, .preferred-date {
+    margin-top: 10px;
+}
+
 .user-card {
     width: 300px;
     padding: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     text-align: center;
+    margin-top: 10px;
 }
 
 .user-card img {

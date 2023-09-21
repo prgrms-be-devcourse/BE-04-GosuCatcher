@@ -20,9 +20,7 @@ import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member-estimates")
 @RestController
@@ -34,8 +32,9 @@ public class MemberEstimateController {
 	@PostMapping("/normal/{expertId}")
 	@CurrentMemberId
 	public ResponseEntity<MemberEstimateResponse> createNormal(Long memberId, @PathVariable Long expertId,
-															   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createNormal(memberId, expertId, memberEstimateRequest);
+		@Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createNormal(memberId, expertId,
+			memberEstimateRequest);
 
 		return ResponseEntity.ok(memberEstimateResponse);
 	}
@@ -43,8 +42,9 @@ public class MemberEstimateController {
 	@PostMapping("/auto")
 	@CurrentMemberId
 	public ResponseEntity<MessagesResponse> createAuto(Long memberId,
-													   @Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
-		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createAuto(memberId, memberEstimateRequest);
+		@Validated @RequestBody MemberEstimateRequest memberEstimateRequest) {
+		MemberEstimateResponse memberEstimateResponse = memberEstimateService.createAuto(memberId,
+			memberEstimateRequest);
 
 		MessagesResponse messagesResponse = matchingService.match(memberEstimateResponse);
 
@@ -55,7 +55,6 @@ public class MemberEstimateController {
 	public ResponseEntity<MemberEstimatesResponse> findAll() {
 		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
 
-
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
@@ -64,7 +63,6 @@ public class MemberEstimateController {
 	public ResponseEntity<MemberEstimatesResponse> findAllByMemberId(Long memberId) {
 		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMemberId(memberId);
 
-		log.warn(memberEstimatesResponse.toString());
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
@@ -78,7 +76,8 @@ public class MemberEstimateController {
 	@GetMapping("/normal")
 	@CurrentExpertId
 	public ResponseEntity<MemberEstimatesResponse> findAllPendingNormalByExpertId(Long expertId) {
-		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllPendingNormalByExpertId(expertId);
+		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllPendingNormalByExpertId(
+			expertId);
 
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
