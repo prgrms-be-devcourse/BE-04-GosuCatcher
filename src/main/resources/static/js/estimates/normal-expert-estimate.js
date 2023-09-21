@@ -191,7 +191,6 @@ async function checkToken() {
 }
 
 async function loadMemberEstimate(memberEstimateId) {
-
     try {
         const options = {
             method: 'GET',
@@ -206,24 +205,49 @@ async function loadMemberEstimate(memberEstimateId) {
     }
 }
 
-// function displayMemberEstimate(memberEstimateResponse) {
-    //
-    // document.getElementById('memberEstimateId').innerText = memberEstimateResponse.memberId;
-    // document.getElementById('reviewCount').innerText = memberEstimateResponse.reviewCount;
-    // document.getElementById('storeName').innerText = memberEstimateResponse.storeName;
-    // document.getElementById('description').innerText = memberEstimateResponse.description;
-    // document.getElementById('location').innerText = memberEstimateResponse.location;
-    // document.getElementById('maxTravelDistance').innerText = memberEstimateResponse.maxTravelDistance + 'km';
-//
-//
-//
-// }
-function displayMemberEstimate(memberEstimateResponse) {
-    console.log('memberId:', memberEstimateResponse.memberId);
-    console.log('reviewCount:', memberEstimateResponse.reviewCount);
-    console.log('storeName:', memberEstimateResponse.storeName);
-    console.log('description:', memberEstimateResponse.description);
-    console.log('location:', memberEstimateResponse.location);
-    console.log('maxTravelDistance:', memberEstimateResponse.maxTravelDistance + 'km');
+async function displayMemberEstimate(memberEstimateResponse) {
+    try {
+        const memberProfile = await getMemberName(memberEstimateResponse.memberId);
 
+        document.getElementById('member-name').innerText = memberProfile.name;
+        document.getElementById('member-email').innerText = memberProfile.email;
+        document.getElementById('member-phone-number').innerText = memberProfile.phoneNumber;
+
+        document.getElementById('sub-item-name').innerText = memberEstimateResponse.subItemResponse.name;
+        document.getElementById('location').innerText = memberEstimateResponse.location;
+        document.getElementById('preferredStartDate').innerText = formatPreferredStartDate(memberEstimateResponse.preferredStartDate);
+        document.getElementById('detailedDescription').innerText = memberEstimateResponse.detailedDescription;
+
+
+    } catch (error) {
+        console.error('멤버 정보 표시 중 오류 발생:', error);
+    }
 };
+
+function formatPreferredStartDate(preferredStartDate) {
+    const date = new Date(preferredStartDate);
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // 월은 0부터 시작하므로 +1 해주고 2자리로 포맷
+    const day = date.getDate().toString().padStart(2, '0'); // 일을 2자리로 포맷
+
+    return `${year}년 ${month}월 ${day}일`;
+}
+
+async function getMemberName(memberId) {
+    try {
+        const options = {
+            method: 'GET',
+        };
+
+        const response = await fetch("/api/v1/members/profile/" + memberId, options);
+
+        const member = await response.json();
+
+        console.log('member.name', member.name);
+
+        return member;
+    } catch (error) {
+        console.error('멤버 이름을 가져오는 동안 오류 발생:', error);
+        throw error;
+    }
+}
