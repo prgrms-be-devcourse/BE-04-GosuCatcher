@@ -3,148 +3,7 @@
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <div th:replace="/layout/header.html :: fragment-header"></div>
-    <style>
-        h2 {
-            text-align: center;
-        }
-
-        .section {
-            width: 33.33%;
-            float: left;
-            padding: 20px;
-        }
-
-        .btn-outline-custom {
-            background-color: #fff;
-            border-color: #00c7ae;
-            color: #00c7ae;
-        }
-
-        .profile-section {
-            width: 80%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .profile-pic {
-            width: 160px;
-            height: 160px;
-            background-size: cover;
-            border-radius: 10px;
-            margin-right: 30px;
-            background-image: url('/img/white.png');
-        }
-
-        .info {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .overview {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: gray;
-        }
-
-        .item {
-            margin-right: 20px;
-            text-align: center;
-        }
-
-        .point {
-            font-weight: bold;
-            color: black;
-            font-size: 2em;
-        }
-
-        .item:last-child {
-            margin-right: 0;
-            padding-left: 20px;
-            border-left: 1px solid #ccc;
-        }
-
-        .btn-outline-primary {
-            color: #00c7ae;
-            border-color: #00c7ae;
-        }
-
-        .my-profile-body {
-            margin-top: 60px;
-        }
-
-        .my-profile-body span:first-child {
-            color: black;
-        }
-
-        .my-profile-body span:last-child {
-            color: gray;
-        }
-
-        .key-font {
-            font-weight: bold;
-            color: black;
-            font-size: 20px;
-            margin-bottom: 5px;
-        }
-
-        .value-font {
-            color: gray;
-            font-size: 17px
-        }
-
-        .button-font {
-            color: #00c7ae !important;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .my-profile-body {
-            margin-top: 60px;
-            padding-bottom: 20px;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-        }
-
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 50%;
-            position: relative;
-        }
-
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 20px;
-        }
-
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-    </style>
+    <link href="/css/experts/experts-search.css" rel="stylesheet">
 </head>
 <body>
 <div th:replace="/layout/nav.html :: fragment-nav"></div>
@@ -213,7 +72,7 @@
                      style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                     <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
                         <div style="display: flex; flex-direction: column; align-items: start;">
-                            <span ; class="key-font">이동가능거리</span>
+                            <span ; class="key-font">이동 가능 거리</span>
                             <span class="value-font" id="maxTravelDistance">5km</span>
                         </div>
                     </div>
@@ -249,7 +108,8 @@
         </div>
     </div>
 
-    <div aria-hidden="true" aria-labelledby="profileImageModalLabel" class="modal fade" id="profileImageModal" role="dialog"
+    <div aria-hidden="true" aria-labelledby="profileImageModalLabel" class="modal fade" id="profileImageModal"
+         role="dialog"
          tabindex="-1">
         <div class="modal-dialog modal-md modal-dialog-centered modal-select-profile-image" style="max-width: 150%;">
             <div class="modal-content">
@@ -286,27 +146,6 @@
         <span class="close">&times;</span>
         <p style="color: #00c7ae;">서비스 아이템 선택:</p>
         <select id="subItemSelect" style="margin-bottom: 20px;">
-            <option value="화장실 청소">화장실 청소</option>
-            <option value="주방 청소">주방 청소</option>
-            <option value="욕실 청소">욕실 청소</option>
-            <option value="이사 청소">이사 청소</option>
-            <option value="영어 과외 알바">영어 과외 알바</option>
-            <option value="베이커리 알바">베이커리 알바</option>
-            <option value="베이커리 알바">목공소 알바</option>
-            <option value="베이커리 알바">단기 알바</option>
-            <option value="베이커리 알바">웹 개발</option>
-            <option value="베이커리 알바">앱 개발</option>
-            <option value="베이커리 알바">게임 개발</option>
-            <option value="베이커리 알바">소프트웨어 개발</option>
-            <option value="베이커리 알바">영어 레슨</option>
-            <option value="베이커리 알바">피아노 레슨</option>
-            <option value="베이커리 알바">첼로 레슨</option>
-            <option value="베이커리 알바">타악기 레슨</option>
-            <option value="포토샵 레슨">포토샵 레슨</option>
-            <option value="영어 회화">영어 회화</option>
-            <option value="중국어 회화">중국어 회화</option>
-            <option value="독일어 회화">독일어 회화</option>
-            <option value="러시아어 회화">러시아어 회화</option>
         </select>
         <button onclick="addSubItemToExpert()" style="background-color: white; color: #00c7ae; border: none;">추가하기
         </button>
@@ -316,15 +155,20 @@
 <div class="modal" id="editModal">
     <div class="modal-content">
         <span class="close" onclick="closeEditModal()">&times;</span>
-        <p style="color: #00c7ae;">프로필 수정</p>
+        <p style="color: #00c7ae;">프로필 수정 | 첫 고수 전환 시 아래 사항들을 모두 기입해주세요!</p>
 
         <label for="storeName">업체명:</label>
         <input id="storeNameInput" type="text">
 
-        <label for="location">위치:</label>
-        <input id="locationInput" type="text">
+        <label for="city">도시:</label>
+        <select id="citySelect">
+        </select>
 
-        <label for="maxTravelDistance">이동가능거리(km):</label>
+        <label for="district">구/군:</label>
+        <select id="districtSelect">
+        </select>
+
+        <label for="maxTravelDistance">이동 가능 거리(km):</label>
         <input id="maxTravelDistanceInput" type="number">
 
         <label for="description">부가 설명:</label>
@@ -363,7 +207,7 @@
 
 <footer th:replace="/layout/footer.html :: fragment-footer"></footer>
 
-<script src="/js/experts/experts.js" > </script>
+<script src="/js/experts/experts.js"></script>
 
 </body>
 </html>
