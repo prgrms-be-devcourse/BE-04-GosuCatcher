@@ -13,4 +13,10 @@ public class ExpertEstimateViewController {
 
 		return "estimates/auto-expert-estimate";
 	}
+
+	@GetMapping("/normal-response")
+	public String createNormal() {
+
+		return "estimates/normal-expert-estimate";
+	}
 }
