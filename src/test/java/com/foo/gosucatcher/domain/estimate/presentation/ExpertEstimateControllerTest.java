@@ -39,7 +39,11 @@ import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstima
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.ExpertNormalEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
@@ -63,6 +67,9 @@ class ExpertEstimateControllerTest {
 	private ExpertResponse expertResponse;
 	private MemberEstimateRequest memberEstimateRequest;
 	private MemberEstimateResponse memberEstimateResponse;
+	private SubItemResponse subItemResponse;
+	private MainItem mainItem;
+	private SubItem subItem;
 	private String baseUrl = "/api/v1/expert-estimates";
 
 	@BeforeEach
@@ -75,8 +82,14 @@ class ExpertEstimateControllerTest {
 		memberEstimateRequest = new MemberEstimateRequest(1L,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
+		mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		subItemResponse = new SubItemResponse(1L, subItem.getMainItem().getName(), subItem.getName(), subItem.getDescription());
+
 		memberEstimateResponse = new MemberEstimateResponse(1L, 1L,
-			1L, 1L, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+			1L, subItemResponse, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용", Status.PROCEEDING);
 	}
 
 	@Test
@@ -107,9 +120,13 @@ class ExpertEstimateControllerTest {
 			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.memberId").value(1))
 			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.expertId").value(1))
-			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
 			.andExpect(jsonPath("$.chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.content").value("고수 견적서 내용입니다."))
 			.andDo(print());
 	}
 
@@ -265,7 +282,25 @@ class ExpertEstimateControllerTest {
 		mockMvc.perform(get(baseUrl))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].id").value(1))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.id").value(1))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.storeName").value(expertResponse.storeName()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.location").value(expertResponse.location()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.maxTravelDistance").value(expertResponse.maxTravelDistance()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.description").value(expertResponse.description()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.rating").value(expertResponse.rating()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.reviewCount").value(expertResponse.reviewCount()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.id").value(memberEstimateResponse.id()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.memberId").value(memberEstimateResponse.memberId()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.expertId").value(memberEstimateResponse.expertId()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.mainItemName").value(memberEstimateResponse.subItemResponse().mainItemName()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.name").value(memberEstimateResponse.subItemResponse().name()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.description").value(memberEstimateResponse.subItemResponse().description()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.status").value("PROCEEDING"))
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].totalCost").value(100))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].activityLocation").value("서울시 강남구"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].description").value("설명을 적어보세요"))
 			.andDo(print());
 	}
 
@@ -281,14 +316,24 @@ class ExpertEstimateControllerTest {
 		mockMvc.perform(get(baseUrl + "/{id}", 1L))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(1))
+			.andExpect(jsonPath("$.expert.id").value(1))
+			.andExpect(jsonPath("$.expert.storeName").value(expertResponse.storeName()))
+			.andExpect(jsonPath("$.expert.location").value(expertResponse.location()))
+			.andExpect(jsonPath("$.expert.maxTravelDistance").value(expertResponse.maxTravelDistance()))
+			.andExpect(jsonPath("$.expert.description").value(expertResponse.description()))
+			.andExpect(jsonPath("$.expert.rating").value(expertResponse.rating()))
+			.andExpect(jsonPath("$.expert.reviewCount").value(expertResponse.reviewCount()))
+			.andExpect(jsonPath("$.memberEstimate.id").value(1))
+			.andExpect(jsonPath("$.memberEstimate.memberId").value(1))
+			.andExpect(jsonPath("$.memberEstimate.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.memberEstimate.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.memberEstimate.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.memberEstimate.subItemResponse.description").value(subItemResponse.description()))
+			.andExpect(jsonPath("$.memberEstimate.location").value(memberEstimateResponse.location()))
+			.andExpect(jsonPath("$.memberEstimate.detailedDescription").value(memberEstimateResponse.detailedDescription()))
 			.andExpect(jsonPath("$.totalCost").value(100))
 			.andExpect(jsonPath("$.description").value("설명을 적어보세요"))
 			.andExpect(jsonPath("$.activityLocation").value("서울시 강남구"))
-			.andExpect(jsonPath("$.memberEstimate.id").value(1))
-			.andExpect(jsonPath("$.memberEstimate.memberId").value(1))
-			.andExpect(jsonPath("$.memberEstimate.subItemId").value(1))
-			.andExpect(jsonPath("$.memberEstimate.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimate.detailedDescription").value("추가 내용"))
 			.andDo(print());
 	}
 
@@ -357,6 +402,22 @@ class ExpertEstimateControllerTest {
 		mockMvc.perform(get(baseUrl + "/member-estimates/{memberEstimateId}", memberEstimateId))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].id").value(1))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.id").value(1))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.storeName").value(expertResponse.storeName()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.location").value(expertResponse.location()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.maxTravelDistance").value(expertResponse.maxTravelDistance()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.description").value(expertResponse.description()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.rating").value(expertResponse.rating()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].expert.reviewCount").value(expertResponse.reviewCount()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.id").value(memberEstimateResponse.id()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.memberId").value(memberEstimateResponse.memberId()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.expertId").value(memberEstimateResponse.expertId()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.mainItemName").value(memberEstimateResponse.subItemResponse().mainItemName()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.name").value(memberEstimateResponse.subItemResponse().name()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.subItemResponse.description").value(memberEstimateResponse.subItemResponse().description()))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.location").value("서울 강남구 개포1동"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.expertEstimateResponseList[0].memberEstimate.status").value("PROCEEDING"))
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].totalCost").value(100))
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].activityLocation").value("서울시 강남구"))
 			.andExpect(jsonPath("$.expertEstimateResponseList[0].description").value("설명을 적어보세요"))
@@ -382,6 +443,14 @@ class ExpertEstimateControllerTest {
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].id").value(1))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.id").value(1))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.storeName").value(expertResponse.storeName()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.location").value(expertResponse.location()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.maxTravelDistance").value(expertResponse.maxTravelDistance()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.description").value(expertResponse.description()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.rating").value(expertResponse.rating()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].expert.reviewCount").value(expertResponse.reviewCount()))
+			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].subItemId").value(1))
 			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].totalCost").value(100))
 			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].activityLocation").value("서울시 강남구"))
 			.andExpect(jsonPath("$.expertAutoEstimateResponses[0].description").value("설명을 적어보세요"))

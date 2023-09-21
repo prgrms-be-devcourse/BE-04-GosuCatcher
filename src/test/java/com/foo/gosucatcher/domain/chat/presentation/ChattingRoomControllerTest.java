@@ -3,6 +3,7 @@ package com.foo.gosucatcher.domain.chat.presentation;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,10 @@ import com.foo.gosucatcher.domain.chat.application.ChattingRoomService;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomResponse;
 import com.foo.gosucatcher.domain.chat.application.dto.response.ChattingRoomsResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.domain.MainItem;
+import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
@@ -37,11 +42,24 @@ class ChattingRoomControllerTest {
 	@MockBean
 	private ChattingRoomService chattingRoomService;
 
+	private MainItem mainItem;
+	private SubItem subItem;
+	private SubItemResponse subItemResponse;
+
+	@BeforeEach
+	void setUp() {
+		mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		subItemResponse = new SubItemResponse(1L, subItem.getMainItem().getName(), subItem.getName(), subItem.getDescription());
+	}
+
 	@DisplayName("채팅방 전체 조회 성공 테스트")
 	@Test
 	void findAll() throws Exception {
 		//given
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -61,16 +79,20 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
-
+//
 	@DisplayName("채팅방 단건 조회 성공 테스트")
 	@Test
 	void findById() throws Exception {
 		//given
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		Long chattingRoomId = 1L;
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(chattingRoomId, memberEstimateResponse);
@@ -85,9 +107,13 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.id").value(chattingRoomId))
 			.andExpect(jsonPath("$.memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("회원 요청 견적서 별 전체 채팅방 조회 성공 테스트")
@@ -96,7 +122,7 @@ class ChattingRoomControllerTest {
 		//given
 		Long memberEstimateId = 2L;
 
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(memberEstimateId, 1L, 1L, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -114,11 +140,15 @@ class ChattingRoomControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.chattingRoomsResponse").isArray())
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(memberEstimateId))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("회원 별 전체 채팅방 조회 성공 테스트")
@@ -127,7 +157,7 @@ class ChattingRoomControllerTest {
 		//given
 		Long memberId = 2L;
 
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId, 1L, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -148,10 +178,14 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse").isArray())
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(memberId))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("고수 별 전체 채팅방 조회 성공 테스트")
@@ -160,7 +194,7 @@ class ChattingRoomControllerTest {
 		//given
 		Long expertId = 2L;
 
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -182,9 +216,13 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("고수의 일반 견적 관련 채팅방 목록 조회 성공 테스트")
@@ -193,7 +231,7 @@ class ChattingRoomControllerTest {
 		//given
 		Long expertId = 2L;
 
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -215,9 +253,13 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("고수의 바로 견적 관련 채팅방 목록 조회 성공 테스트")
@@ -226,7 +268,7 @@ class ChattingRoomControllerTest {
 		//given
 		Long expertId = 2L;
 
-		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, expertId, 1L, "서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명");
+		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, 1L, 1L, subItemResponse,"서울시 강남구", LocalDateTime.now().plusDays(3), "세부 설명", Status.PROCEEDING);
 
 		ChattingRoomResponse chattingRoomResponse = new ChattingRoomResponse(1L, memberEstimateResponse);
 		ChattingRoomResponse chattingRoomResponse2 = new ChattingRoomResponse(2L, memberEstimateResponse);
@@ -248,9 +290,13 @@ class ChattingRoomControllerTest {
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.id").value(1))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.memberId").value(1))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemId").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.id").value(1))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.location").value("서울시 강남구"))
-			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"));
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.detailedDescription").value("세부 설명"))
+			.andExpect(jsonPath("$.chattingRoomsResponse[0].memberEstimateResponse.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("채팅방 삭제 성공 테스트")

@@ -3,21 +3,24 @@ package com.foo.gosucatcher.domain.estimate.application.dto.response;
 import java.time.LocalDateTime;
 
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 
 public record MemberEstimateResponse(
 	Long id,
 	Long memberId,
 	Long expertId,
-	Long subItemId,
+	SubItemResponse subItemResponse,
 	String location,
 	LocalDateTime preferredStartDate,
-	String detailedDescription
+	String detailedDescription,
+	Status status
 ) {
 
 	public static MemberEstimateResponse from(MemberEstimate memberEstimate) {
 
 		if (memberEstimate == null) {
-			return new MemberEstimateResponse(null, null, null, null, null, null, null);
+			return new MemberEstimateResponse(null, null, null, null, null, null, null, null);
 		}
 
 		Long expertIdFromMemberEstimate = null;
@@ -28,8 +31,9 @@ public record MemberEstimateResponse(
 
 		return new MemberEstimateResponse(memberEstimate.getId(),
 			memberEstimate.getMember().getId(), expertIdFromMemberEstimate,
-			memberEstimate.getSubItem().getId(),
+			SubItemResponse.from(memberEstimate.getSubItem()),
 			memberEstimate.getLocation(), memberEstimate.getPreferredStartDate(),
-			memberEstimate.getDetailedDescription());
+			memberEstimate.getDetailedDescription(),
+			memberEstimate.getStatus());
 	}
 }
