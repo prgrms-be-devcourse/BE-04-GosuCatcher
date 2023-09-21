@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link rel="stylesheet" href="/css/members/estimates-detail-style.css">
+    <script src="/js/members/estimatesDetail.js" defer></script>
+</head>
+<body>
+<header th:replace="/layout/nav.html :: fragment-nav"></header>
+<main>
+    <div>
+        <h2>서브 아이템 이름</h2>
+        <p>
+            요청일<span>2023.09.21</span>
+        </p>
+    </div>
+    <div id="userCards" class="user-cards">
+    </div>
+</main>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

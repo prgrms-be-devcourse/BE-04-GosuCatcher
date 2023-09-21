@@ -13,6 +13,16 @@
 <div th:replace="/layout/header.html :: fragment-header"></div>
 <div th:replace="/layout/nav.html :: fragment-nav"></div>
 <script src="/js/members/my-page.js" defer></script>
+<script>
+    $(document).ready(function () {
+        loadUserInfo();
+        loadUserImage();
+        $('#withdrawLink').on('click', function (e) {
+            e.preventDefault(); // 기본 동작(링크 이동)을 막음
+            deleteMember();
+        });
+    });
+</script>
 
 <div class="container d-flex justify-content-center" style="position:relative; max-width: 750px;">
     <div class="col ">

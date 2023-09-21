@@ -2,26 +2,28 @@
 
 <head>
     <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link rel="stylesheet" href="/css/common/common-form-style.css">
     <link rel="stylesheet" href="/css/members/joinForm-style.css">
+    <script src="/js/members/member.js" defer></script>
 </head>
 
 <body>
 <div th:replace="/layout/nav.html :: fragment-nav"></div>
 
 <div class="wrap">
-    <h2>숨고에 오신것을 환영합니다</h2>
+    <h1>고수 캐쳐에 오신 것을 환영합니다</h1>
     <div class="joinForm">
         <form>
             <div class="form-group">
-                <label for="name" style="font-size: x-large;">이름</label>
+                <label for="name">이름</label>
                 <input type="text" class="form-control" placeholder="이름(실명)을 입력해주세요" id="name">
             </div>
             <div class="form-group">
-                <label for="email" style="font-size: x-large;">이메일</label>
+                <label for="email">이메일</label>
                 <input type="email" class="form-control" placeholder="example@example.com" id="email">
             </div>
             <div class="form-group">
-                <label for="password" style="font-size: x-large;">패스워드</label>
+                <label for="password">패스워드</label>
                 <input type="password" class="form-control" placeholder="5자리 이상 입력해주세요" id="password">
             </div>
 
@@ -31,7 +33,6 @@
         </button>
     </div>
 </div>
-<script src="/js/members/member.js"></script>
 <footer th:replace="/layout/footer.html :: fragment-footer"></footer>
 </body>
 </html>

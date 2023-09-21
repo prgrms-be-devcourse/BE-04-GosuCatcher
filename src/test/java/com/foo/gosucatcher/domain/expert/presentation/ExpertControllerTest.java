@@ -92,7 +92,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 등록 성공")
 	void createExpertSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0,null);
 		given(expertService.create(anyLong(),any(ExpertUpdateRequest.class))).willReturn(expertResponse);
 
 		// when -> then
@@ -156,7 +156,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 ID로 조회 성공")
 	void getExpertByIdSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0,null);
 		given(expertService.findById(1L)).willReturn(expertResponse);
 
 		// when -> then
@@ -191,7 +191,7 @@ class ExpertControllerTest {
 	void updateExpertSuccessTest() throws Exception {
 		// given
 		ExpertUpdateRequest updateRequest = new ExpertUpdateRequest("새로운 업체명", "새로운 위치", 150, "새로운 부가설명");
-		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명", 0.0, 0);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명", 0.0, 0,null);
 
 		given(expertService.update(1L, updateRequest)).willReturn(1L);
 

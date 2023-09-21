@@ -92,6 +92,7 @@ function navigateToAuto(subItemId) {
                 console.error('Fetch 에러:', error);
             });
     } else {
+        window.location.href = '/gosu-catcher/login';
         console.error('AccessToken을 사용할 수 없습니다.');
     }
 }

@@ -4,7 +4,7 @@
     <div th:replace="/layout/header.html :: fragment-header"></div>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <link href="/css/estimates/member-estimate.css" rel="stylesheet">
+    <link href="/css/estimates/estimate.css" rel="stylesheet">
 
 </head>
 <body>
@@ -26,8 +26,6 @@
                                 <input type="hidden" class="form-control" th:value="${subItemId}" id="subItemId"
                                        th:readonly="readonly">
                                 <input type="hidden" class="form-control" th:value="${expertId}" id="expertId"
-                                       th:readonly="readonly">
-                                <input type="hidden" class="form-control" th:value="${memberId}" id="memberId"
                                        th:readonly="readonly">
 
                                 <div class="mb-3">

@@ -88,4 +88,14 @@ public class MemberProfileService {
 		member.getProfileMemberImage().changePathToDefault();
 		memberRepository.save(member);
 	}
+
+	public Long changeMemberRole(Long memberId) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
+		member.changeRole();
+
+		memberRepository.save(member);
+
+		return memberId;
+	}
 }
