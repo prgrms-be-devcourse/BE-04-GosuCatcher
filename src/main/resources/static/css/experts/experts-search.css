@@ -1,0 +1,50 @@
+#serviceModalBody .service-item {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+#locationModalBody .location-item {
+    margin: 10px 0;
+    font-size: 18px;
+}
+
+.custom-btn {
+    background-color: transparent;
+    border: none;
+    color: gray;
+    padding: 10px 15px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.custom-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.expert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.expert-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.expert-rating {
+    display: flex;
+    align-items: center;
+}
+
+.expert-rating i.fa {
+    margin-right: 5px;
+    color: gold;
+}
+
+.expert-description {
+    margin-top: 10px;
+    color: gray;
+}
