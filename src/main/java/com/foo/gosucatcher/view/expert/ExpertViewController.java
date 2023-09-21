@@ -8,10 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/gosu-catcher/experts")
 public class ExpertViewController {
 
-
 	@GetMapping
 	public String home() {
-
 		return "experts/experts";
+	}
+
+	@GetMapping("/info")
+	public String expertInfo(){
+		return "experts/expert-info";
 	}
 }
