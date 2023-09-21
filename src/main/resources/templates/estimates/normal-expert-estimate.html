@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <link href="/css/estimates/estimate.css" rel="stylesheet">
+    <link href="/css/estimates/normal-expert-estimate.css" rel="stylesheet">
+
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+<div class="normal-expert">
+    <nav id="navbar">
+        <div class="profile-fragment">
+            <div class="title">회원 이름</div>
+            <div class="content" id="member-name">회원 이름</div>
+
+            <div class="title">회원 이메일</div>
+            <div class="content" id="member-email">회원 이메일</div>
+
+            <div class="title">회원 휴대폰 번호</div>
+            <div class="content" id="member-phone-number">회원 휴대폰 번호</div>
+            <div class="horizontal-line"></div>
+
+            <div class="title">세부 서비스 이름</div>
+            <div class="content" id="sub-item-name">세부 서비스 이름</div>
+            <div class="horizontal-line"></div>
+
+            <div class="title">서비스 희망 지역</div>
+            <div class="content" id="location">지역</div>
+            <div class="horizontal-line"></div>
+
+            <div class="title">서비스 희망 날짜</div>
+            <div class="content" id="preferredStartDate">서비스 희망 날짜</div>
+            <div class="horizontal-line"></div>
+
+            <div class="title">추가로 알리고 싶은 사항</div>
+            <div class="content" id="detailedDescription">추가로 알리고 싶은 사항</div>
+        </div>
+    </nav>
+
+    <div class="wrap">
+        <div class="estimate-expert">
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+                    <div class="d-flex flex-column flex-shrink-0 p-3">
+                        <div class="input-form">
+                            <br><br>
+                            <div class="d-flex flex-column flex-shrink-0 p-3 text-center"
+                                 style="justify-content: center;">
+                                <h1 class="display-7">견적 보내기</h1>
+                            </div>
+
+                            <br>
+                            <form novalidate>
+                                <input type="hidden" class="form-control" th:value="${memberEstimateId}" id="memberEstimateId"
+                                       th:readonly="readonly">
+
+                                <div class="mb-3" style="display: flex; flex-direction: column;">
+                                    <label for="totalCost" style="font-weight: bold;">총 비용</label>
+                                    <div style="display: flex; align-items: center;">
+                                        <input type="number" id="totalCost" value="10000" step="1000"
+                                               style="width: 50%; padding-left: 10px;"/>
+                                        <span>원</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="activityLocation" style="font-weight: bold;">활동 가능한 지역</label>
+                                    <div>
+                                        <select name="addressRegion" id="addressRegion1" onchange="updateLocation()">
+                                            <option value="">지역 선택</option>
+                                        </select>
+                                        <select name="addressDo" id="addressDo1" onchange="updateLocation()">
+                                            <option value="">도 선택</option>
+                                        </select>
+                                        <select name="addressSiGunGu" id="addressSiGunGu1" onchange="updateLocation()">
+                                            <option value="">시/군/구 선택</option>
+                                        </select>
+                                    </div>
+
+                                    <input type="text" class="form-control" id="activityLocation" th:readonly="readonly"
+                                           style="margin-top:10px; background-color: #E6E6E6;" onfocus="this.blur();"
+                                           tabindex="-1">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="description" style="font-weight: bold;">견적서 설명</label>
+                                    <textarea class="form-control resizable-input" id="description"
+                                              name="description"
+                                              required></textarea>
+                                </div>
+
+                                <hr class="mb-4" style="margin-top: 30px;">
+                                <button id="requestButton" class="btn btn-primary btn-lg btn-block" type="button"
+                                        style="margin-top: 10px; background-color: #0abab5; border-color: #0abab5;">
+                                    등록하기
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<script src="/js/estimates/normal-expert-estimate.js"></script>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>
