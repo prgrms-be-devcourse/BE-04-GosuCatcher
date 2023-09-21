@@ -13,8 +13,8 @@ public class ExpertViewController {
 		return "experts/experts";
 	}
 
-	@GetMapping("/info")
+	@GetMapping("/profile")
 	public String expertInfo(){
-		return "experts/expert-info";
+		return "experts/profile";
 	}
 }

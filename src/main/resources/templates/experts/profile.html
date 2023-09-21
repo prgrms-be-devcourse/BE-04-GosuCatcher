@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <style>
-        #withdrawLink {
-            color: black;
-            text-align: left;
-            display: block;
-        }
-    </style>
 </head>
 <body>
 <div th:replace="/layout/header.html :: fragment-header"></div>
 <div th:replace="/layout/nav.html :: fragment-nav"></div>
-<script src="/js/members/login.js" defer></script>
+<script src="/js/experts/profile.js" defer></script>
 <script>
     $(document).ready(function () {
         loadUserInfo();

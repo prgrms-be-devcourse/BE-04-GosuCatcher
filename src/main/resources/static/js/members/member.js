@@ -56,7 +56,7 @@ let index = {
             if (res.status === 500) {
                 alert("유저 등록에 실패하였습니다!");
             } else {
-                alert("유저 등록 완료!🎉");
+                alert("🎉고수 캐처에 오신 것을 환영합니다🎉");
                 location.href = "/gosu-catcher";
             }
         }).fail(function (error) {
