@@ -18,6 +18,13 @@
                 </li>
             </ul>
 
+            <form class="form-inline my-2 my-lg-0" id="searchForm">
+                <input class="form-control mr-sm-2" type="text" id="searchInput" placeholder="서비스를 입력하세요">
+                <div id="popularKeywords"
+                     style="position: absolute; top: 100%; left: 72.3%; background-color: #fff;border: 1px solid #ccc; max-height: 200px; overflow-y: auto;width: 11%;"></div>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+            </form>
+
             <ul class="navbar-nav" style="display: flex;">
                 <li class="nav-item">
                     <a class="nav-link" href="/user/updateForm" style="color: black;">받은견적</a>
@@ -43,5 +50,6 @@
         </div>
     </nav>
     <br>
+    <script src="/js/search/search.js"></script>
 </header>
 </html>
