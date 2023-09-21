@@ -38,7 +38,9 @@ fetch("http://localhost:8080/api/v1/member-estimates/members", {
         detailButton.textContent = '자세히 보기';
         detailButton.addEventListener('click', () => {
             // 자세한 정보 페이지로 이동하는 코드를 추가합니다.
-            window.location.href = `detailPage.html?quote=${encodeURIComponent(data.title)}`;
+            const queryParamData = data.id;
+            const url = `http://localhost:8080/gosu-catcher/requests/send/details?id=${encodeURIComponent(queryParamData)}`;
+            window.location.href = url;
         });
 
         card.appendChild(title);

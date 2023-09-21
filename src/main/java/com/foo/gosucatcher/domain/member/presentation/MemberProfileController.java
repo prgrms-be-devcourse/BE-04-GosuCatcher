@@ -52,6 +52,14 @@ public class MemberProfileController {
 	}
 
 	@CurrentMemberId
+	@PatchMapping("/role")
+	public ResponseEntity<Long> changeMemberRole(Long memberId) {
+		Long updatedMemberId = memberProfileService.changeMemberRole(memberId);
+
+		return ResponseEntity.ok(updatedMemberId);
+	}
+
+	@CurrentMemberId
 	@PostMapping("/images")
 	public ResponseEntity<ImagesResponse> uploadProfileImage(Long memberId, @RequestParam MultipartFile file) {
 

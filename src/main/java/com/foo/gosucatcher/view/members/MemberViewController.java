@@ -3,9 +3,7 @@ package com.foo.gosucatcher.view.members;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import com.foo.gosucatcher.domain.item.application.MainItemService;
-import com.foo.gosucatcher.domain.item.application.SubItemService;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import lombok.RequiredArgsConstructor;
 
@@ -13,9 +11,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/gosu-catcher")
 public class MemberViewController {
-
-	private final MainItemService mainItemService;
-	private final SubItemService subItemService;
 
 	@GetMapping("/members/my-page")
 	public String my_page() {
@@ -33,8 +28,13 @@ public class MemberViewController {
 	}
 
 	@GetMapping("/requests/send")
-	public String estimate() {
-		return "members/estimate";
+	public String estimates() {
+		return "members/estimates";
+	}
+
+	@GetMapping("/requests/send/details")
+	public String estimatesDetails(@RequestParam Long id) {
+		return "members/estimates-detail";
 	}
 
 	@GetMapping("/recovery/password")

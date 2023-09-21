@@ -163,4 +163,12 @@ public class Member extends BaseEntity implements UserDetails {
 
 		return authorities;
 	}
+
+	public void changeRole() {
+		if (role.equals(Roles.ROLE_USER)) {
+			role = Roles.ROLE_EXPERT;
+		} else if (role.equals(Roles.ROLE_EXPERT)) {
+			role = Roles.ROLE_USER;
+		}
+	}
 }
