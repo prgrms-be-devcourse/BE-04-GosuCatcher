@@ -3,8 +3,6 @@ window.onload = () => {
     fetchBackgroundImage();
     loadImages();
     fetchExpertProfile();
-    // loadSubItems();
-
 };
 
 async function fetchBackgroundImage() {
@@ -30,7 +28,7 @@ async function fetchBackgroundImage() {
 }
 
 async function fetchProfileImage() {
-    const token = localStorage.getItem('accessToken');점
+    const token = localStorage.getItem('accessToken');
 
     const options = {
         method: 'GET',
@@ -90,47 +88,4 @@ function renderImages(filenames) {
         container.appendChild(imageDiv);
 
     });
-}
-
-function fetchBucketStatus(){
-    // const token = localStorage.getItem('accessToken');
-    // const expertId
-    //
-    //
-    // <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v2.png" alt="like--v2"/>
-
-}
-
-async function fetchExpertProfile() {
-    const token = localStorage.getItem('accessToken');
-    var expertId;
-
-    const options = {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + token
-        }
-    };
-
-    const response = await fetch('/api/v1/reviews/experts?id={expertId}', options);
-
-    if (response.ok) {
-        const expert = await response.json();
-            $('#rating').text(expert.rating);
-            $('#reviewCount').text('('+expert.reviewCount + '개 리뷰)');
-            $('#storeName').text(expert.storeName);
-            $('#brief_introduction').text(expert.description);
-            $('#location').text(expert.location + ' / ' + expert.maxTravelDistance +'km 이동 가능');
-
-    } else {
-        alert('Expert 프로필 정보를 불러오는데 실패하였습니다.');
-    }
-}
-
-function fetchReviews(){
-    const token = localStorage.getItem('accessToken');
-
-
-
 }

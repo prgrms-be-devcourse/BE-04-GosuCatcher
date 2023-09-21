@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <title id="profile_title">고수 캐처</title>
     <style>
@@ -29,10 +29,6 @@
             margin-top: -50px;
             border-radius: 20%;
         }
-
-        .nav {
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
@@ -58,23 +54,33 @@
             <div>
                 <div class="info">
                     <h2 class="storeName" id="storeName">
-                        고수님
+                        [[${profile.storeName}]]
                     </h2>
-                    <button type="button" class="btn btn-outline-secondary">
-                        <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png" alt="like--v1"/>
-                    </button>
+                    <br>
+                    <div>
+                    <span th:each="si:${subItems.subItemsResponse()}" class="service" id="service">
+                        <span class="badge rounded-pill bg-light text-dark">[[${si.name}]]</span>
+                    </span>
+                    </div>
 
-                    <p class="service" id="service">
-                        제공 서비스 이름 // subItem 여러
-                    </p>
+                    <img width="30" height="30" src="https://img.icons8.com/puffy/32/experimental-document-puffy.png"
+                         alt="experimental-document-puffy"/>
+
                     <p class="brief_introduction" id="brief_introduction">
-                        합지전문/ 부분도배/LH도배전문/장판가능/숨고페이, 현금영수증,세금계산서 가능(부가세별도)
+                        [[${profile.description}]]
                     </p>
                     <p class="location" id="location">
-                        인천 부평구 / 10km 이동 가능
+                        <img width="30" height="30" src="https://img.icons8.com/ios/50/marker--v1.png"
+                             alt="marker--v1"/>
+                        [[${profile.location}]] / [[${profile.maxTravelDistance}]] km 이동 가능
                     </p>
                 </div>
             </div>
+        </div>
+        <div style="margin: 10px">
+            <button type="button" class="btn btn-outline-secondary">
+                <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png" alt="like--v1"/>
+            </button>
         </div>
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -92,46 +98,42 @@
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade" id="pictures" role="tabpanel" aria-labelledby="photos-tab">
                 <div class="value-font" id="imagesContainer" style="display: flex; gap: 10px;">
-                    <div class="image-item" style="position: relative;">
-                        <img alt="default image" src="/img/dog.jpeg"
-                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;"/>
-                    </div>
+                    <img alt="default image" src=""
+                         style="width: 200px; height: 200px; object-fit: cover; border-radius: 5px;"/>
+
                 </div>
 
             </div>
             <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="review-tab">
                 <img width="47" height="47" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
                      style="float:left;"/>
-                <h3 id="rating" style="float:left; padding:10px"> 5.0 </h3>
-                <div  style="float:left; padding:20px">
-                    <h6 id="reviewCount"> (10개 리뷰) </h6>
+                <h3 id="rating" style="float:left; padding:10px"> [[${profile.rating}]] </h3>
+                <div style="float:left; padding:20px">
+                    <h6 id="reviewCount"> ([[${profile.reviewCount}]]개 리뷰) </h6>
                 </div>
-            </div>
-            <div class="reviews">
-                <ul id="list_container">
-                    <li>
-                        <p id="writer_name">
-                            홍**
-                        </p>
-                        <p id="service_name" style="float:left">
-                            백일상/돌상 대여
-                        </p>
-                        <img width="20" height="20" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
-                             style="float:left;"/>
-                        <div class="review_content" id="review_content"></div>
-                        <p id="date">2023. 09. 21</p>
-                    </li>
-                </ul>
+                <div class="review_contents">
+                    <p th:each="rv:${reviews.reviews}">
+                        <span> [[${rv.writer}]] </span>
+                        <br>
+                    <p>
+                        <span th:each="image:${rv.images()}">
+                              <img th:src=image alt="no image" style="width: 30px;height: 30px"/>
+                        </span>
+                    <p>
+                        <span class="badge rounded-pill bg-light text-dark">[[${rv.subItem}]] </span>
+                        <img width="10" height="10" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
+                        />
+                        <span>  [[${rv.rating}]]</span>
+                        <br>
+                        <span> [[${rv.content}]] </span>
+                        <br>
+                        <span> [[${rv.updatedAt}]] </span>
+                        <br>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-    <!--    <div class="background_image" style="max-height: 160em">-->
-    <!--        <img src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" id="background" alt="background">-->
-    <!--    </div>-->
-
 </div>
 </body>
-<!--<footer>-->
-<!--    <footer th:replace="/layout/footer.html :: fragment-footer"></footer>-->
-<!--</footer>-->
 </html>
