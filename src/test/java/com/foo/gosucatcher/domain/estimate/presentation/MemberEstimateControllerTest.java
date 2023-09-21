@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,10 @@ import com.foo.gosucatcher.domain.estimate.application.dto.request.MemberEstimat
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimateResponse;
 import com.foo.gosucatcher.domain.estimate.application.dto.response.MemberEstimatesResponse;
 import com.foo.gosucatcher.domain.estimate.domain.MemberEstimate;
+import com.foo.gosucatcher.domain.estimate.domain.Status;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.expert.domain.Expert;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.domain.MainItem;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.matching.application.MatchingService;
@@ -54,6 +58,44 @@ class MemberEstimateControllerTest {
 	@MockBean
 	private MatchingService matchingService;
 
+	private Member member;
+	private MainItem mainItem;
+	private SubItem subItem;
+	private MemberEstimate memberEstimate;
+	private Expert expert;
+
+	@BeforeEach
+	void setUp() {
+		member = Member.builder()
+			.name("성이름")
+			.password("abcd11@@")
+			.email("abcd123@abc.com")
+			.phoneNumber("010-0000-0000")
+			.build();
+
+		mainItem = MainItem.builder().name("메인 서비스 이름").description("메인 서비스 설명").build();
+
+		subItem = SubItem.builder().mainItem(mainItem).name("세부 서비스 이름").description("세부 서비스 설명").build();
+
+		memberEstimate = MemberEstimate.builder()
+			.member(member)
+			.subItem(subItem)
+			.location("서울 강남구 개포1동")
+			.preferredStartDate(LocalDateTime.now().plusDays(3))
+			.detailedDescription("추가 내용")
+			.build();
+
+		expert = Expert.builder()
+			.location("서울시 강남구")
+			.rating(4.0)
+			.maxTravelDistance(10)
+			.reviewCount(5)
+			.storeName("업체명")
+			.description("추가 설명입니다")
+			.member(member)
+			.build();
+	}
+
 	@DisplayName("회원 일반 견적 등록 성공 테스트")
 	@Test
 	void createNormal() throws Exception {
@@ -62,12 +104,13 @@ class MemberEstimateControllerTest {
 		Long subItemId = 1L;
 		Long expertId = 1L;
 
+		SubItemResponse subItemResponse = SubItemResponse.from(subItem);
+
 		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
-
+			expertId, subItemResponse, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용", Status.PENDING);
 
 		when(memberEstimateService.createNormal(anyLong(), anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 
@@ -79,9 +122,13 @@ class MemberEstimateControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.subItemResponse.mainItemName").value(subItem.getMainItem().getName()))
+			.andExpect(jsonPath("$.subItemResponse.name").value(subItem.getName()))
+			.andExpect(jsonPath("$.subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"));
+			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.status").value("PENDING"));
+
 	}
 
 	@DisplayName("회원 일반 견적 등록 실패 테스트")
@@ -95,7 +142,7 @@ class MemberEstimateControllerTest {
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			expertId, null, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+			expertId, null, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용", Status.PENDING);
 
 		when(memberEstimateService.createNormal(anyLong(), anyLong(), any(MemberEstimateRequest.class))).thenReturn(memberEstimateResponse);
 
@@ -122,11 +169,13 @@ class MemberEstimateControllerTest {
 		Long subItemId = 1L;
 		Long expertId = 1L;
 
+		SubItemResponse subItemResponse = new SubItemResponse(1L, subItem.getMainItem().getName(), subItem.getName(), subItem.getDescription());
+
 		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용");
+			expertId, subItemResponse, "서울 강남구 개포1동", LocalDateTime.now().plusDays(4), "추가 내용", Status.PROCEEDING);
 
 		ExpertResponse expertResponse = new ExpertResponse(2L, "업체명", "서울 강남구", 10, "expert description", 4.0, 6,null);
 
@@ -149,9 +198,13 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.id").value(1L))
 			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.id").value(memberEstimateResponse.id()))
 			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.memberId").value(memberId))
-			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemResponse.id").value(1L))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemResponse.mainItemName").value(subItemResponse.mainItemName()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemResponse.name").value(subItemResponse.name()))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.subItemResponse.description").value(subItemResponse.description()))
 			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.location").value("서울 강남구 개포1동"))
 			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.messagesResponse[0].chattingRoomResponse.memberEstimateResponse.status").value("PROCEEDING"))
 			.andExpect(jsonPath("$.messagesResponse[0].content").value("고수 견적서 내용입니다."));
 	}
 
@@ -163,11 +216,13 @@ class MemberEstimateControllerTest {
 		Long subItemId = 1L;
 		Long expertId = 1L;
 
+		SubItemResponse subItemResponse = SubItemResponse.from(subItem);
+
 		MemberEstimateRequest memberEstimateRequest = new MemberEstimateRequest(subItemId, " ",
 			LocalDateTime.now().plusDays(3), "추가 내용");
 
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			expertId, subItemId, " ", LocalDateTime.now().plusDays(3), "추가 내용");
+			expertId, subItemResponse, " ", LocalDateTime.now().plusDays(3), "추가 내용", Status.PROCEEDING);
 
 		when(memberEstimateService.createAuto(memberId, memberEstimateRequest)).thenReturn(
 			memberEstimateResponse);
@@ -221,8 +276,12 @@ class MemberEstimateControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberEstimates").isArray())
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.mainItemName").value(subItem.getMainItem().getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.name").value(subItem.getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
+			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.memberEstimates[0].status").value("PENDING"));
 	}
 
 	@DisplayName("회원 별 전체 요청 견적서 조회 성공 테스트")
@@ -262,8 +321,12 @@ class MemberEstimateControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberEstimates").isArray())
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.mainItemName").value(subItem.getMainItem().getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.name").value(subItem.getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
+			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.memberEstimates[0].status").value("PENDING"));
 	}
 
 	@DisplayName("회원 요청 견적서 단건 조회 성공 테스트")
@@ -273,11 +336,12 @@ class MemberEstimateControllerTest {
 		Long memberEstimateId = 1L;
 
 		Long memberId = 1L;
-		Long subItemId = 1L;
 		Long expertId = 1L;
 
+		SubItemResponse subItemResponse = new SubItemResponse(1L, subItem.getMainItem().getName(), subItem.getName(), subItem.getDescription());
+
 		MemberEstimateResponse memberEstimateResponse = new MemberEstimateResponse(1L, memberId,
-			expertId, subItemId, "서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
+			expertId, subItemResponse, "서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용", Status.PROCEEDING);
 
 		when(memberEstimateService.findById(memberEstimateId)).thenReturn(memberEstimateResponse);
 
@@ -288,9 +352,13 @@ class MemberEstimateControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(memberEstimateId))
 			.andExpect(jsonPath("$.memberId").value(memberId))
-			.andExpect(jsonPath("$.subItemId").value(subItemId))
+			.andExpect(jsonPath("$.subItemResponse.id").value(1L))
+			.andExpect(jsonPath("$.subItemResponse.mainItemName").value(subItem.getMainItem().getName()))
+			.andExpect(jsonPath("$.subItemResponse.name").value(subItem.getName()))
+			.andExpect(jsonPath("$.subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"));
+			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.status").value("PROCEEDING"));
 	}
 
 	@DisplayName("회원 요청 견적서 단건 조회 실패 테스트")
@@ -347,8 +415,12 @@ class MemberEstimateControllerTest {
 				.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.memberEstimates").isArray())
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.mainItemName").value(subItem.getMainItem().getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.name").value(subItem.getName()))
+			.andExpect(jsonPath("$.memberEstimates[0].subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.memberEstimates[0].location").value("서울 강남구 개포1동"))
-			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"));
+			.andExpect(jsonPath("$.memberEstimates[0].detailedDescription").value("추가 내용"))
+			.andExpect(jsonPath("$.memberEstimates[0].status").value("PENDING"));
 	}
 
 	@DisplayName("회원 요청 견적서 삭제 성공 테스트")

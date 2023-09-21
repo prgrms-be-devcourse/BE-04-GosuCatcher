@@ -141,7 +141,8 @@ $(document).ready(function () {
 $(document).ready(function () {
     $("#requestButton").click(function () {
         var expertId = $('#expertId').val();
-        var memberId = $('#memberId').val();
+
+        var accessToken = localStorage.getItem('accessToken');
 
         var memberEstimateRequest = {
             subItemId: $("#subItemId").val(),
@@ -174,9 +175,12 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/api/v1/member-estimates/normal/" + expertId + "?memberId=" + memberId,
+            url: "/api/v1/member-estimates/normal/" + expertId,
             contentType: "application/json",
             data: JSON.stringify(memberEstimateRequest),
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            },
             success: function (response) {
                 window.alert("견적이 성공적으로 요청되었습니다.");
                 window.location.href = '/gosu-catcher';

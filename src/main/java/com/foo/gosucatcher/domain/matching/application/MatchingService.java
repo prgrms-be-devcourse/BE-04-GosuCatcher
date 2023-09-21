@@ -27,7 +27,7 @@ public class MatchingService {
 	private final MessageService messageService;
 
 	public MessagesResponse match(MemberEstimateResponse memberEstimateResponse) {
-		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllByConditions(memberEstimateResponse.subItemId(), memberEstimateResponse.location());
+		ExpertAutoEstimatesResponse expertAutoEstimatesResponse = expertEstimateService.findAllByConditions(memberEstimateResponse.subItemResponse().id(), memberEstimateResponse.location());
 
 		Long memberEstimateId = memberEstimateService.updateExpertEstimates(memberEstimateResponse.id(), expertAutoEstimatesResponse.expertAutoEstimateResponses());
 
