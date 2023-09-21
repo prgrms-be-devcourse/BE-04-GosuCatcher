@@ -10,8 +10,14 @@ public class ExpertViewController {
 
 
 	@GetMapping
-	public String home() {
+	public String myPage() {
 
 		return "experts/experts";
+	}
+
+	@GetMapping("/search")
+	public String search() {
+
+		return "experts/experts-search";
 	}
 }
