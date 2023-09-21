@@ -89,3 +89,7 @@ function renderImages(filenames) {
 
     });
 }
+
+function fetchReviews(expertId, serviceName){
+
+}
