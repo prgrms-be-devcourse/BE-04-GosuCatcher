@@ -20,9 +20,7 @@ import com.foo.gosucatcher.global.aop.CurrentExpertId;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member-estimates")
 @RestController
@@ -55,7 +53,6 @@ public class MemberEstimateController {
 	public ResponseEntity<MemberEstimatesResponse> findAll() {
 		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
 
-
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
@@ -64,7 +61,6 @@ public class MemberEstimateController {
 	public ResponseEntity<MemberEstimatesResponse> findAllByMemberId(Long memberId) {
 		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAllByMemberId(memberId);
 
-		log.warn(memberEstimatesResponse.toString());
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
