@@ -70,7 +70,7 @@ class ExpertEstimateControllerTest {
 		expertNormalEstimateCreateRequest =
 			new ExpertNormalEstimateCreateRequest(100, "서울시 강남구", "상세설명을씁니다");
 		expertResponse =
-			new ExpertResponse(1L, "상점이름입니다", "서울시 강남구", 10, "설명입니다여긴", 4.0, 10);
+			new ExpertResponse(1L, "상점이름입니다", "서울시 강남구", 10, "설명입니다여긴", 4.0, 10,null);
 
 		memberEstimateRequest = new MemberEstimateRequest(1L,
 			"서울 강남구 개포1동", LocalDateTime.now().plusDays(3), "추가 내용");
@@ -194,7 +194,7 @@ class ExpertEstimateControllerTest {
 
 		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(1L, 10000, "서울시 강남구", "설명을 작성합니다");
 
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5,null);
 
 		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, 1L, 10000, "서울시 강남구", "설명을 작성합니다");
 
@@ -228,7 +228,7 @@ class ExpertEstimateControllerTest {
 
 		ExpertAutoEstimateCreateRequest expertAutoEstimateCreateRequest = new ExpertAutoEstimateCreateRequest(null, 10000, "서울시 강남구", "설명을 작성합니다");
 
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명", "강남구", 5, "설명을 작성합니다", 4.0, 5,null);
 
 		ExpertAutoEstimateResponse expertAutoEstimateResponse = new ExpertAutoEstimateResponse(1L, expertResponse, null, 10000, "서울시 강남구", "설명을 작성합니다");
 
