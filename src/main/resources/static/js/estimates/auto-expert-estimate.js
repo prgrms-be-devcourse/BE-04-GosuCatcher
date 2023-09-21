@@ -203,7 +203,6 @@ async function loadSubItems() {
         displaySubItems(data.subItemsResponse);
     } catch (error) {
         console.error('서브 아이템 로딩 중 오류 발생:', error);
-        window.location.href = '/gosu-catcher/login';
     }
 }
 
