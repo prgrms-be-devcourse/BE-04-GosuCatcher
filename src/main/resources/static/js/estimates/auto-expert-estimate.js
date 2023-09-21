@@ -170,7 +170,6 @@ $(document).ready(function () {
             success: function (response) {
                 window.alert("바로 견적이 성공적으로 생성되었습니다.");
                 window.location.href = '/gosu-catcher';
-
             },
             error: function (xhr, status, error) {
                 window.alert("바로 견적 생성에 실패했습니다.");
@@ -186,6 +185,11 @@ window.onload = () => {
 async function loadSubItems() {
     try {
         const token = localStorage.getItem('accessToken');
+
+        if (!token) {
+            window.location.href = '/gosu-catcher/login';
+            console.error('로그인 되지 않았습니다.');
+        }
 
         const options = {
             method: 'GET',

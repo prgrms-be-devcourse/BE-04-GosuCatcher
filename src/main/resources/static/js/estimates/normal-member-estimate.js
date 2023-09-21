@@ -1,3 +1,16 @@
+window.onload = () => {
+    checkToken();
+};
+
+async function checkToken() {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+        window.location.href = '/gosu-catcher/login';
+        console.error('로그인 되지 않았습니다.');
+    }
+}
+
 $(function () {
     areaSelectMaker("select[name=addressRegion]");
 });
@@ -143,6 +156,11 @@ $(document).ready(function () {
         var expertId = $('#expertId').val();
 
         var accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            window.location.href = '/gosu-catcher/login';
+            console.error('로그인 되지 않았습니다.');
+        }
 
         var memberEstimateRequest = {
             subItemId: $("#subItemId").val(),
