@@ -28,10 +28,10 @@ public class SecurityConfig {
 	@Bean
 	public WebSecurityCustomizer webSecurityCustomizer() {
 		return web -> web.ignoring()
-			.antMatchers("/h2-console/**")
-			.antMatchers("/gs-chat/**")
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-			.antMatchers("/resources/**");
+			.antMatchers("/css/**", "/img/**", "/js/**")
+			.antMatchers("/h2-console/**")
+			.antMatchers("/gs-chat/**");
 	}
 
 	@Bean
@@ -43,9 +43,11 @@ public class SecurityConfig {
 			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 			.and()
 			.authorizeRequests()
+			.antMatchers("/gosu-catcher", "/gosu-catcher/login", "/gosu-catcher/joinForm").permitAll()
+			.antMatchers("/gosu-catcher/pro/**").hasAnyRole("EXPERT", "ADMIN")
+			.antMatchers("/gosu-catcher/**").hasAnyRole("USER", "ADMIN")
 			.antMatchers("/api/v1/**").permitAll()
 			.antMatchers("/gs-chat/**").permitAll()
-			.antMatchers("/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
