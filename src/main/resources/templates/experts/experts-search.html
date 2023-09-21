@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+
+    <style>
+
+        #serviceModalBody .service-item {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        #locationModalBody .location-item {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .custom-btn {
+            background-color: transparent;
+            border: none;
+            color: gray;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .custom-btn:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<div id="app-body">
+    <div class="container">
+
+        <h1 class="text-left my-4">고수찾기</h1>
+
+        <div class="mb-4">
+            <button class="custom-btn" data-target="#serviceModal" data-toggle="modal" type="button">서비스 <i
+                    class="fa fa-angle-down"></i></button>
+            <button class="custom-btn ml-2" data-target="#locationModal" data-toggle="modal" type="button">지역 <i
+                    class="fa fa-angle-down"></i></button>
+
+            <div class="dropdown float-right">
+                <button aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle pl-0" data-toggle="dropdown"
+                        id="sortDropdown" style="color: black;" type="button">
+                    정렬기준
+                </button>
+                <div aria-labelledby="sortDropdown" class="dropdown-menu">
+                    <a class="dropdown-item" data-sort="rating" href="#">평점순</a>
+                    <a class="dropdown-item" data-sort="reviewCount" href="#">리뷰 많은 순</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="serviceModalLabel" class="modal fade" id="serviceModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceModalLabel">서비스 선택</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="serviceModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div aria-hidden="true" aria-labelledby="locationModalLabel" class="modal fade" id="locationModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">지역 선택</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="locationModalBody">
+                <div class="location-category">서울특별시</div>
+                <div class="location-item" data-value="서울특별시 강남구">강남구</div>
+                <div class="location-item" data-value="서울특별시 강동구">강동구</div>
+                <div class="location-item" data-value="서울특별시 강북구">강북구</div>
+                <div class="location-item" data-value="서울특별시 강서구">강서구</div>
+                <div class="location-item" data-value="서울특별시 관악구">관악구</div>
+                <div class="location-item" data-value="서울특별시 광진구">광진구</div>
+                <div class="location-item" data-value="서울특별시 구로구">구로구</div>
+                <div class="location-item" data-value="서울특별시 금천구">금천구</div>
+                <div class="location-item" data-value="서울특별시 노원구">노원구</div>
+                <div class="location-item" data-value="서울특별시 도봉구">도봉구</div>
+                <div class="location-item" data-value="서울특별시 동대문구">동대문구</div>
+                <div class="location-item" data-value="서울특별시 동작구">동작구</div>
+                <div class="location-item" data-value="서울특별시 마포구">마포구</div>
+                <div class="location-item" data-value="서울특별시 서대문구">서대문구</div>
+                <div class="location-item" data-value="서울특별시 서초구">서초구</div>
+                <div class="location-item" data-value="서울특별시 성동구">성동구</div>
+                <div class="location-item" data-value="서울특별시 성북구">성북구</div>
+                <div class="location-item" data-value="서울특별시 송파구">송파구</div>
+                <div class="location-item" data-value="서울특별시 양천구">양천구</div>
+                <div class="location-item" data-value="서울특별시 영등포구">영등포구</div>
+                <div class="location-item" data-value="서울특별시 용산구">용산구</div>
+                <div class="location-item" data-value="서울특별시 은평구">은평구</div>
+                <div class="location-item" data-value="서울특별시 종로구">종로구</div>
+                <div class="location-item" data-value="서울특별시 중구">중구</div>
+                <div class="location-item" data-value="서울특별시 중랑구">중랑구</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+
+<script src="/js/experts/experts-search.js"></script>
+
+</body>
+</html>

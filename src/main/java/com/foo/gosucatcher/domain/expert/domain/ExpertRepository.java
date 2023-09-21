@@ -20,17 +20,20 @@ public interface ExpertRepository extends JpaRepository<Expert, Long> {
 		LEFT JOIN FETCH e.expertItemList
 		WHERE e.member.id = :memberId
 		""")
-	Optional<Expert> findByMemberIdWithFetchJoin(Long memberId);
+	Optional<Expert> findByMemberIdWithFetchJoin(@Param("memberId") Long memberId);
 
 	List<Expert> findAll();
 
-	@Query("SELECT distinct e FROM Expert e" +
-		   " JOIN FETCH e.expertItemList ei" +
-		   " JOIN FETCH ei.subItem si" +
-		   " WHERE (si.name = :subItem OR :subItem IS NULL)" +
-		   " AND (e.location = :location OR :location IS NULL)")
-	Slice<Expert> findBySubItemAndLocation(String subItem, String location, Pageable pageable);
+	@Query("SELECT e, m.profileMemberImage.filename FROM Expert e JOIN e.member m JOIN FETCH e.expertItemList ei JOIN FETCH ei.subItem si WHERE (si.name = :subItem OR :subItem IS NULL) AND (e.location = :location OR :location IS NULL)")
+	Slice<Object[]> findBySubItemAndLocationWithProfileImage(@Param("subItem") String subItem, @Param("location") String location, Pageable pageable);
+	
+  @Query("SELECT distinct e FROM Expert e" +
+		" JOIN FETCH e.expertItemList ei" +
+		" JOIN FETCH ei.subItem si" +
+		" WHERE (si.name = :subItem OR :subItem IS NULL)" +
+		" AND (e.location = :location OR :location IS NULL)")
+	Slice<Expert> findBySubItemAndLocation(@Param("subItem") String subItem, @Param("location") String location, Pageable pageable);
 
-	@Query("SELECT e FROM Expert e JOIN FETCH e.expertItemList ei JOIN FETCH ei.subItem WHERE e.id = :id")
-	Optional<Expert> findExpertWithSubItemsById(@Param("id") Long id);
+	@Query("SELECT e FROM Expert e JOIN FETCH e.expertItemList ei JOIN FETCH ei.subItem WHERE e.id = :expertId")
+	Optional<Expert> findExpertWithSubItemsById(@Param("expertId") Long expertId);
 }

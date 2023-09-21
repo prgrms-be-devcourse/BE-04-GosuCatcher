@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <style>
+        h2 {
+            text-align: center;
+            margin-left: 20px;
+        }
+
+        .section {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px; /* 섹션 간 여백 조정 */
+        }
+
+        .item {
+            display: inline-block;
+            width: 16.66%;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            justify-content: center;
+
+        }
+    </style>
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<img src="/img/banner.png" alt="Banner Image" style="max-width: 100%; height: auto; margin-bottom: 6rem">
+<div class="container">
+    <div class="section">
+        <div class="item" th:each="item : ${mainItems.mainItemsResponse()}">
+            <a th:href="@{/gosu-catcher/items(mainItemName=${item.name()})}">
+                <div th:text="${item.name()}" style="font-weight: bold"></div>
+            </a>
+        </div>
+    </div>
+    <div class="section" style="margin-top: 7rem">
+        <h2>인기 서비스</h2>
+        <div class="card-container">
+            <div th:each="subItems : ${sutItemsResponse.subItemsResponse()}" style="width: 30%;"> <!-- 카드 너비 조정 -->
+                <div class="card" style="width: 18rem; align-content: center; margin-left: 1.5rem">
+                    <img src="/img/item_image.jpg" class="card-img-top" alt="rrr">
+                    <div class="card-body">
+                        <a href="#" th:onclick="'navigateToAuto(' + ${subItems.id()} + '); return false;'">
+                            <p class="card-text" th:text="${subItems.name()}"></p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/members/member.js"></script>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

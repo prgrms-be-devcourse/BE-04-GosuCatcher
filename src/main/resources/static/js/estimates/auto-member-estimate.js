@@ -1,3 +1,16 @@
+window.onload = () => {
+    checkToken();
+};
+
+async function checkToken() {
+    const token = localStorage.getItem('accessToken');
+
+    if (!token) {
+        window.location.href = '/gosu-catcher/login';
+        console.error('로그인 되지 않았습니다.');
+    }
+}
+
 $(function () {
     areaSelectMaker("select[name=addressRegion]");
 });
@@ -140,8 +153,12 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $("#requestButton").click(function () {
-        var expertId = $('#expertId').val();
-        var memberId = $('#memberId').val();
+        var accessToken = localStorage.getItem('accessToken');
+
+        if (!accessToken) {
+            window.location.href = '/gosu-catcher/login';
+            console.error('로그인 되지 않았습니다.');
+        }
 
         var memberEstimateRequest = {
             subItemId: $("#subItemId").val(),
@@ -174,9 +191,12 @@ $(document).ready(function () {
 
         $.ajax({
             type: "POST",
-            url: "/api/v1/member-estimates/auto?memberId=" + memberId,
+            url: "/api/v1/member-estimates/auto",
             contentType: "application/json",
             data: JSON.stringify(memberEstimateRequest),
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            },
             success: function (response) {
                 window.alert("견적이 성공적으로 요청되었습니다.");
                 window.location.href = '/gosu-catcher';

@@ -65,4 +65,36 @@ let index = {
     },
 }
 
+function getAccessToken() {
+    return localStorage.getItem('accessToken');
+}
+
+function navigateToAuto(subItemId) {
+    const accessToken = getAccessToken();
+
+    if (accessToken) {
+        const headers = new Headers({
+            'Authorization': `Bearer ${accessToken}`,
+        });
+
+        fetch(`/gosu-catcher/hire/auto/${subItemId}`, {
+            method: 'GET',
+            headers: headers,
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = response.url;
+                } else {
+                    console.error('에러:', response.status);
+                }
+            })
+            .catch(error => {
+                console.error('Fetch 에러:', error);
+            });
+    } else {
+        window.location.href = '/gosu-catcher/login';
+        console.error('AccessToken을 사용할 수 없습니다.');
+    }
+}
+
 index.init();

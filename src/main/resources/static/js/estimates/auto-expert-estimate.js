@@ -1,16 +1,3 @@
-window.onload = () => {
-    checkToken();
-};
-
-async function checkToken() {
-    const token = localStorage.getItem('accessToken');
-
-    if (!token) {
-        window.location.href = '/gosu-catcher/login';
-        console.error('로그인 되지 않았습니다.');
-    }
-}
-
 $(function () {
     areaSelectMaker("select[name=addressRegion]");
 });
@@ -107,7 +94,7 @@ function updateLocation() {
     var siGunGuElement = document.getElementById("addressSiGunGu1");
     var selectedSiGunGu = siGunGuElement.options[siGunGuElement.selectedIndex].text;
 
-    var locationInput = document.getElementById("location");
+    var locationInput = document.getElementById("activityLocation");
 
     if (region === "") {
         doElement.disabled = true;
@@ -130,19 +117,6 @@ function updateLocation() {
     locationInput.value = combinedLocation.trim();
 }
 
-var today = new Date();
-
-var year = today.getFullYear();
-var month = ('0' + (today.getMonth() + 1)).slice(-2);
-var day = ('0' + today.getDate()).slice(-2);
-
-var dateString = year + '-' + month + '-' + day;
-
-var dateControl = document.querySelector('input[type="date"]');
-dateControl.value = dateString;
-console.log(dateControl.value);
-console.log(dateControl.valueAsNumber);
-
 // textarea 요소의 값이 변경될 때 이벤트를 감지하여 크기를 조절
 $(document).ready(function () {
     $('.resizable-input').on('input', function () {
@@ -151,62 +125,100 @@ $(document).ready(function () {
     });
 });
 
+
 $(document).ready(function () {
     $("#requestButton").click(function () {
-        var expertId = $('#expertId').val();
-
-        var accessToken = localStorage.getItem('accessToken');
-
-        if (!accessToken) {
-            window.location.href = '/gosu-catcher/login';
-            console.error('로그인 되지 않았습니다.');
-        }
-
-        var memberEstimateRequest = {
+        var expertEstimateRequest = {
             subItemId: $("#subItemId").val(),
-            location: $("#location").val(),
-            preferredStartDate: $("#preferredStartDate").val() + "T00:00:00",
-            detailedDescription: $("#detailedDescription").val()
+            totalCost: $("#totalCost").val(),
+            activityLocation: $("#activityLocation").val(),
+            description: $("#description").val()
         };
 
-        if (memberEstimateRequest.location.includes('선택') || memberEstimateRequest.location === '') {
-            alert("서비스 희망 지역을 선택해주세요.");
+        if (expertEstimateRequest.subItemId.includes('서비스 선택') || expertEstimateRequest.subItemId === '') {
+            alert("서비스를 선택해주세요.");
             return;
         }
 
-        var preferredStartDate = new Date(memberEstimateRequest.preferredStartDate);
-
-        // Get today's date
-        var today = new Date();
-        today.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0
-
-        // Check if preferredStartDate is earlier than or equal to today's date
-        if (preferredStartDate <= today) {
-            alert("서비스 희망 날짜를 오늘 이후로 설정해주세요.");
+        if (expertEstimateRequest.totalCost <= 0) {
+            alert("총 비용은 0원보다 커야 합니다.");
             return;
         }
 
-        if (memberEstimateRequest.detailedDescription.length > 500) {
-            alert("추가로 알리고 싶은 사항은 500자 이하여야 합니다.");
+        if (expertEstimateRequest.activityLocation.includes('선택') || expertEstimateRequest.activityLocation === '') {
+            alert("활동 가능한 지역을 선택해주세요.");
             return;
         }
+
+        if (expertEstimateRequest.description.length < 6) {
+            alert("견적서 설명은 6자 이상이어야 합니다.");
+            return;
+        }
+
+        var accessToken = localStorage.getItem("accessToken");
+
+        var headers = {
+            "Authorization": "Bearer " + accessToken
+        };
 
         $.ajax({
             type: "POST",
-            url: "/api/v1/member-estimates/normal/" + expertId,
+            url: "/api/v1/expert-estimates/auto",
+            headers: headers,
             contentType: "application/json",
-            data: JSON.stringify(memberEstimateRequest),
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
-            },
+            data: JSON.stringify(expertEstimateRequest),
             success: function (response) {
-                window.alert("견적이 성공적으로 요청되었습니다.");
+                window.alert("바로 견적이 성공적으로 생성되었습니다.");
                 window.location.href = '/gosu-catcher';
-
             },
             error: function (xhr, status, error) {
-                window.alert("견적 요청에 실패했습니다.");
+                window.alert("바로 견적 생성에 실패했습니다.");
             }
         });
     });
 });
+
+window.onload = () => {
+    loadSubItems();
+};
+
+async function loadSubItems() {
+    try {
+        const token = localStorage.getItem('accessToken');
+
+        if (!token) {
+            window.location.href = '/gosu-catcher/login';
+            console.error('로그인 되지 않았습니다.');
+        }
+
+        const options = {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        };
+
+        const response = await fetch("/api/v1/experts/sub-items", options);
+        const data = await response.json();
+        displaySubItems(data.subItemsResponse);
+    } catch (error) {
+        console.error('서브 아이템 로딩 중 오류 발생:', error);
+    }
+}
+
+function displaySubItems(subItemsResponse) {
+    const subItemsSelect = document.getElementById('subItemId'); // select 엘리먼트 가져오기
+    subItemsSelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.text = '서비스 선택';
+    subItemsSelect.appendChild(defaultOption);
+
+    subItemsResponse.forEach((subItem) => {
+        const option = document.createElement('option');
+        option.value = subItem.id;
+        option.text = subItem.name;
+        subItemsSelect.appendChild(option);
+    });
+}

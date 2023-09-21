@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberViewController {
 
 	@GetMapping("/members/my-page")
-	public String my_page() {
+	public String myPage() {
 		return "members/my-page";
 	}
 
