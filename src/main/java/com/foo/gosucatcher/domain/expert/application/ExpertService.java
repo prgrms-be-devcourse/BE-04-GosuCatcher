@@ -34,6 +34,7 @@ import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.item.domain.SubItem;
 import com.foo.gosucatcher.domain.item.domain.SubItemRepository;
+import com.foo.gosucatcher.domain.member.application.MemberProfileService;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -52,6 +53,7 @@ public class ExpertService {
 	private final ExpertItemRepository expertItemRepository;
 	private final ImageService imageService;
 	private final ExpertImageRepository expertImageRepository;
+	private final MemberProfileService memberProfileService;
 
 	public ExpertResponse create(long expertId, ExpertUpdateRequest request) {
 		Expert existingExpert = expertRepository.findById(expertId)
@@ -166,10 +168,29 @@ public class ExpertService {
 
 	@Transactional(readOnly = true)
 	public SlicedExpertsResponse findExperts(String subItem, String location, Pageable pageable) {
-		Slice<Expert> expertsSlice = expertRepository.findBySubItemAndLocation(subItem, location, pageable);
+		Slice<Object[]> results = expertRepository.findBySubItemAndLocationWithProfileImage(subItem, location, pageable);
 
-		return SlicedExpertsResponse.from(expertsSlice);
+		List<ExpertResponse> expertResponses = results.stream()
+			.map(result -> {
+				Expert expert = (Expert) result[0];
+				String filename = (String) result[1];
+
+				return new ExpertResponse(
+					expert.getId(),
+					expert.getStoreName(),
+					expert.getLocation(),
+					expert.getMaxTravelDistance(),
+					expert.getDescription(),
+					expert.getRating(),
+					expert.getReviewCount(),
+					filename
+				);
+			})
+			.toList();
+
+		return new SlicedExpertsResponse(expertResponses, results.hasNext());
 	}
+
 
 	public ImagesResponse uploadImage(Long expertId, ImageUploadRequest request) {
 
