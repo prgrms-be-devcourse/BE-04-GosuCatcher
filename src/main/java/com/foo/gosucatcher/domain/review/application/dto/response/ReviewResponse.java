@@ -32,7 +32,7 @@ public record ReviewResponse(
 	// 		reply.put("id", review.getReply().getId().toString());
 	// 		reply.put("content", review.getReply().getContent());
 	// 		reply.put("createdAt", review.getReply().getCreatedAt().toString());
-	// 		reply.put("UpdatedAt", review.getReply().getUpdatedAt().toString());
+	// 		reply.put("updatedAt", review.getReply().getUpdatedAt().toString());
 	// 	}
 	//
 	// 	return new ReviewResponse(review.getId(), review.getExpert().getId(), review.getWriter().getId(),
@@ -48,7 +48,7 @@ public record ReviewResponse(
 			reply.put("id", review.getReply().getId().toString());
 			reply.put("content", review.getReply().getContent());
 			reply.put("createdAt", review.getReply().getCreatedAt().toString());
-			reply.put("UpdatedAt", review.getReply().getUpdatedAt().toString());
+			reply.put("updatedAt", review.getReply().getUpdatedAt().toString());
 		}
 
 		List<String> reviewImages = List.of();

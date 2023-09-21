@@ -92,8 +92,18 @@ function renderImages(filenames) {
     });
 }
 
+function fetchBucketStatus(){
+    // const token = localStorage.getItem('accessToken');
+    // const expertId
+    //
+    //
+    // <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v2.png" alt="like--v2"/>
+
+}
+
 async function fetchExpertProfile() {
     const token = localStorage.getItem('accessToken');
+    var expertId;
 
     const options = {
         method: 'GET',
@@ -103,7 +113,7 @@ async function fetchExpertProfile() {
         }
     };
 
-    const response = await fetch('/api/v1/experts', options);
+    const response = await fetch('/api/v1/reviews/experts?id={expertId}', options);
 
     if (response.ok) {
         const expert = await response.json();
