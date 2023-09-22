@@ -14,8 +14,10 @@ import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailAut
 import com.foo.gosucatcher.domain.member.application.dto.response.MemberEmailSendResponse;
 import com.foo.gosucatcher.domain.member.domain.MemberEmailRequest;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "이메일 인증 Controller", description = "인증관련 이메일 발송, 증명 API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/members/auth/email")
@@ -24,7 +26,8 @@ public class MemberEmailAuthController {
 	private final MemberEmailAuthService memberEmailAuthService;
 
 	@PostMapping
-	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(@RequestBody @Validated MemberEmailRequest memberEmailRequest) {
+	public ResponseEntity<MemberEmailSendResponse> sendAuthEmail(
+		@RequestBody @Validated MemberEmailRequest memberEmailRequest) {
 		memberEmailAuthService.checkDuplicatedEmail(memberEmailRequest);
 		MemberEmailSendResponse authenticateResponse = memberEmailAuthService.sendAuthEmail(memberEmailRequest);
 
