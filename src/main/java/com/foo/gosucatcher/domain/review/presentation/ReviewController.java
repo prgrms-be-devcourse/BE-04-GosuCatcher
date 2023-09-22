@@ -40,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/reviews")
 
-@Tag(name = "리뷰", description = "리뷰 API")
+@Tag(name = "ReviewController", description = "리뷰 API")
 public class ReviewController {
 
 	private static final int DEFAULT_PAGING_SIZE = 3;
