@@ -1,3 +1,12 @@
+$(document).ready(function () {
+    loadUserInfo();
+    loadUserImage();
+    $('#withdrawLink').on('click', function (e) {
+        e.preventDefault(); // 기본 동작(링크 이동)을 막음
+        deleteMember();
+    });
+});
+
 function modifyUserInfo() {
     const token = 'bearer ' + localStorage.getItem('accessToken');
 
@@ -103,6 +112,7 @@ function deleteMember() {
             'Authorization': token,
         },
         success: function () {
+            alert('완료되었습니다.')
             window.location.href = '/gosu-catcher';
         },
         error: function () {
@@ -133,7 +143,7 @@ function uploadProfileImage() {
 
         },
         error: function (xhr, status, error) {
-            alert("가입에 실패했습니다." + error);
+            alert("이미지 등록에 실패했습니다." + error);
         }
     });
 }

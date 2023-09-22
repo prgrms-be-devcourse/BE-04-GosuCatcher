@@ -168,12 +168,16 @@ public class ExpertService {
 
 	@Transactional(readOnly = true)
 	public SlicedExpertsResponse findExperts(String subItem, String location, Pageable pageable) {
-		Slice<Object[]> results = expertRepository.findBySubItemAndLocationWithProfileImage(subItem, location, pageable);
+		Slice<Long> expertIdsSlice = expertRepository.findExpertIdsBySubItemAndLocation(subItem, location, pageable);
+
+		List<Long> expertIds = expertIdsSlice.getContent();
+
+		List<Object[]> results = expertRepository.findExpertsWithProfileImageByIds(expertIds);
 
 		List<ExpertResponse> expertResponses = results.stream()
 			.map(result -> {
-				Expert expert = (Expert) result[0];
-				String filename = (String) result[1];
+				Expert expert = (Expert)result[0];
+				String filename = (String)result[1];
 
 				return new ExpertResponse(
 					expert.getId(),
@@ -188,9 +192,8 @@ public class ExpertService {
 			})
 			.toList();
 
-		return new SlicedExpertsResponse(expertResponses, results.hasNext());
+		return new SlicedExpertsResponse(expertResponses, expertIdsSlice.hasNext());
 	}
-
 
 	public ImagesResponse uploadImage(Long expertId, ImageUploadRequest request) {
 

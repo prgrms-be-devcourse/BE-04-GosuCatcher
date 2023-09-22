@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         // 네비게이션 메뉴 엘리먼트를 가져옴
         const loginLink = document.querySelector(".nav-link[href='/gosu-catcher/login']");
         const joinLink = document.querySelector(".nav-link[href='/gosu-catcher/joinForm']");
-        const myInfoLink = document.querySelector(".nav-link[href='/user/joinForm']");
+        const myInfoLink = document.querySelector(".nav-link[href='/gosu-catcher/joinForm']");
 
         // 로그인 및 회원가입 버튼을 삭제하고 로그아웃 버튼을 만듦
         if (isMemberLogin) {

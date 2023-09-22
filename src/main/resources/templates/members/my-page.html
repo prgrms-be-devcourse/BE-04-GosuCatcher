@@ -8,7 +8,6 @@
             display: block;
         }
     </style>
-    <title>Gosu Catcher</title>
 </head>
 <body>
 <div th:replace="/layout/header.html :: fragment-header"></div>
@@ -25,7 +24,7 @@
     });
 </script>
 
-<div class="container d-flex justify-content-center" style="max-width: 750px;">
+<div class="container d-flex justify-content-center" style="position:relative; max-width: 750px;">
     <div class="col ">
         <h2>계정 설정</h2>
 
@@ -163,8 +162,8 @@
         </div>
     </div>
 </div>
-<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
-<script>
-</script>
 </body>
+<footer>
+    <footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</footer>
 </html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <script src="/js/chat/chat.js"></script>
+    <script>
+        $(document).ready(function () {
+            getChatRooms();
+        });
+    </script>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 6rem;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+<h1>채팅방 목록</h1>
+<div class="container d-flex justify-content-center" style="max-width: 750px;">
+
+    <div id="chatRoomsContainer">
+    </div>
+</div>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>
