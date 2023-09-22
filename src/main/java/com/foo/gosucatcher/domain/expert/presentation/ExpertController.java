@@ -32,8 +32,12 @@ import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.global.aop.CurrentExpertId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "고수 관련 Controller", description = "고수 관리 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/experts")
@@ -43,14 +47,24 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@PostMapping
-	public ResponseEntity<ExpertResponse> create(Long expertId, @Validated @RequestBody ExpertUpdateRequest request) {
+	@Operation(summary = "고수 생성", description = "고수 계정을 생성합니다.")
+	public ResponseEntity<ExpertResponse> create(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "고수 생성 요청", required = true)
+		@Validated @RequestBody ExpertUpdateRequest request) {
+
 		ExpertResponse expertResponse = expertService.create(expertId, request);
 		return ResponseEntity.ok(expertResponse);
 	}
 
 	@CurrentExpertId
 	@GetMapping
-	public ResponseEntity<ExpertResponse> findOne(Long expertId) {
+	@Operation(summary = "고수 조회", description = "고수 계정을 조회합니다.")
+	public ResponseEntity<ExpertResponse> findOne(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId) {
 
 		ExpertResponse expert = expertService.findById(expertId);
 
@@ -59,7 +73,12 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@PatchMapping
-	public ResponseEntity<Long> update(Long expertId,
+	@Operation(summary = "고수 업데이트", description = "고수 계정을 업데이트합니다.")
+	public ResponseEntity<Long> update(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "고수 업데이트 요청", required = true)
 		@Validated @RequestBody ExpertUpdateRequest request) {
 		Long updatedExpertId = expertService.update(expertId, request);
 
@@ -68,7 +87,10 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@DeleteMapping
-	public ResponseEntity<Void> delete(Long expertId) {
+	@Operation(summary = "고수 삭제", description = "고수 계정을 삭제합니다.")
+	public ResponseEntity<Void> delete(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId) {
 		expertService.delete(expertId);
 
 		return ResponseEntity.ok(null);
@@ -76,7 +98,13 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@PostMapping("/sub-items")
-	public ResponseEntity<Long> addSubItem(Long expertId, @RequestBody ExpertSubItemRequest request) {
+	@Operation(summary = "고수 제공 서비스 추가", description = "고수 계정 내 제공 서비스를 추가합니다.")
+	public ResponseEntity<Long> addSubItem(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "고수 제공 서비스 추가 요청", required = true)
+		@RequestBody ExpertSubItemRequest request) {
 		Long id = expertService.addSubItem(expertId, request);
 
 		return ResponseEntity.ok(id);
@@ -84,7 +112,13 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@DeleteMapping("/sub-items")
-	public ResponseEntity<Object> removeItem(Long expertId, @RequestBody ExpertSubItemRequest request) {
+	@Operation(summary = "고수 제공 서비스 삭제", description = "고수 계정 내 제공 서비스를 삭제합니다.")
+	public ResponseEntity<Object> removeItem(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "고수 제공 서비스 삭제 요청", required = true)
+		@RequestBody ExpertSubItemRequest request) {
 		expertService.removeSubItem(expertId, request);
 
 		return ResponseEntity.noContent()
@@ -93,7 +127,10 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@GetMapping("/sub-items")
-	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(Long expertId) {
+	@Operation(summary = "고수 제공 서비스 조회", description = "고수 계정 내 제공 서비스를 조회합니다.")
+	public ResponseEntity<SubItemsResponse> getSubItemsByExpertId(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId) {
 		SubItemsResponse response = expertService.getSubItemsByExpertId(expertId);
 
 		return ResponseEntity.ok(response);
@@ -101,7 +138,13 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@PostMapping("/images")
-	public ResponseEntity<ImagesResponse> uploadImage(Long expertId, MultipartFile file) throws IOException {
+	@Operation(summary = "고수 사진 업로드", description = "고수 계정 내 사진을 업로드합니다.")
+	public ResponseEntity<ImagesResponse> uploadImage(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "고수 사진", required = true)
+		MultipartFile file) throws IOException {
 		ImageUploadRequest request = new ImageUploadRequest(List.of(file));
 		ImagesResponse response = expertService.uploadImage(expertId, request);
 
@@ -110,7 +153,13 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@DeleteMapping("/images/{filename}")
-	public ResponseEntity<String> deleteImage(Long expertId, @PathVariable String filename) {
+	@Operation(summary = "고수 사진 삭제", description = "고수 계정 내 사진을 삭제합니다.")
+	public ResponseEntity<String> deleteImage(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId,
+
+		@Parameter(description = "filename", required = true)
+		@PathVariable String filename) {
 		expertService.deleteImage(expertId, filename);
 
 		return ResponseEntity.ok(null);
@@ -118,16 +167,25 @@ public class ExpertController {
 
 	@CurrentExpertId
 	@GetMapping("/images")
-	public ResponseEntity<ImageResponse> getAllImages(Long expertId) {
+	@Operation(summary = "고수 사진 전체 조회", description = "고수 계정 내 사진을 모두 조회합니다.")
+	public ResponseEntity<ImageResponse> getAllImages(
+		@Parameter(description = "고수 ID", required = true, example = "1")
+		Long expertId) {
 		ImageResponse response = expertService.getAllImages(expertId);
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/search")
+	@Operation(summary = "고수 찾기", description = "조건에 맞는 고수들을 찾습니다.")
 	public ResponseEntity<SlicedExpertsResponse> searchExperts(
+		@Parameter(description = "서비스 이름", example = "영어 회화")
 		@RequestParam(required = false) String subItem,
+
+		@Parameter(description = "지역", example = "서울특별시 강남구")
 		@RequestParam(required = false) String location,
+
+		@Parameter(description = "정렬 방식", example = "rating,desc")
 		@PageableDefault(sort = {"reviewCount"}, direction = Sort.Direction.DESC) Pageable pageable) {
 		SortType.validateSortColumns(pageable.getSort());
 
