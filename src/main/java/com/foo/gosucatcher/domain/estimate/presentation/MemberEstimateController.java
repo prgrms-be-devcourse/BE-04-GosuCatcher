@@ -68,7 +68,7 @@ public class MemberEstimateController {
 		return ResponseEntity.ok(messagesResponse);
 	}
 
-	@Operation(summary = "모든 회원 견적 요청서 조회", description = "모든 회원 바로 견적 요청서를 조회합니다.", tags = {"MemberEstimateController"})
+	@Operation(summary = "모든 회원 견적 요청서 목록 조회", description = "모든 회원 바로 견적 요청서 목록을 조회합니다.", tags = {"MemberEstimateController"})
 	@GetMapping
 	public ResponseEntity<MemberEstimatesResponse> findAll() {
 		MemberEstimatesResponse memberEstimatesResponse = memberEstimateService.findAll();
@@ -76,7 +76,7 @@ public class MemberEstimateController {
 		return ResponseEntity.ok(memberEstimatesResponse);
 	}
 
-	@Operation(summary = "회원 ID로 회원 견적 요청서 조회", description = "회원 ID로 회원 견적 요청서를 조회합니다.", tags = {"MemberEstimateController"})
+	@Operation(summary = "회원 ID로 회원 견적 요청서 목록 조회", description = "회원 ID로 회원 견적 요청서 목록을 조회합니다.", tags = {"MemberEstimateController"})
 	@GetMapping("/members")
 	@CurrentMemberId
 	public ResponseEntity<MemberEstimatesResponse> findAllByMemberId(
@@ -97,7 +97,7 @@ public class MemberEstimateController {
 		return ResponseEntity.ok(memberEstimateResponse);
 	}
 
-	@Operation(summary = "고수 ID로 대기중인 일반 견적 요청서 조회", description = "고수 ID로 대기중인 일반 견적 요청서를 조회합니다.", tags = {"MemberEstimateController"})
+	@Operation(summary = "고수 ID로 대기중인 일반 견적 요청서 목록 조회", description = "고수 ID로 대기중인 일반 견적 요청서 목록을 조회합니다.", tags = {"MemberEstimateController"})
 	@GetMapping("/normal")
 	@CurrentExpertId
 	public ResponseEntity<MemberEstimatesResponse> findAllPendingNormalByExpertId(
