@@ -118,7 +118,6 @@ class ReviewControllerTest {
 				.andDo(document(
 					"review-success",
 					preprocessResponse(prettyPrint()),
-					// requestHeaders(headerWithName("Authorization").description("jwt 토큰 값")),
 					pathParameters(parameterWithName("expertId").description("전문가 ID")),
 					responseFields(
 						fieldWithPath(".id").type(JsonFieldType.NUMBER).description("생성된 리뷰의 아이디"),
