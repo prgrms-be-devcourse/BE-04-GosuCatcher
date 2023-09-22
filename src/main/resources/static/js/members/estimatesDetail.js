@@ -1,3 +1,43 @@
+// 모달 열기
+function openModal(expertData) {
+    const modal = document.getElementById('myModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalContent = document.getElementById('modalContent');
+    modalTitle.textContent = expertData.memberEstimate.subItemResponse.name;
+    modalContent.innerHTML
+        = `
+        <h3>${expertData.expert.storeName}</h3>
+        <p>평점: ${expertData.expert.rating}</p>
+        <p>위치: ${expertData.expert.location}</p>
+        <p>경력사항: ${expertData.expert.description}</p>
+        <h3>견적</h3>
+        <p>예상금액: ${expertData.totalCost}원</p>
+        <h3>견적 설명</h3>
+        <p>${expertData.description}</p>
+        `;
+
+    modal.style.display = 'block';
+}
+
+// 모달 닫기
+function closeModal() {
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'none';
+}
+
+// 닫기 버튼과 모달 외부 클릭 시 모달 닫기
+const closeButtons = document.querySelectorAll('.close');
+closeButtons.forEach(button => {
+    button.addEventListener('click', closeModal);
+});
+
+window.addEventListener('click', (event) => {
+    const modal = document.getElementById('myModal');
+    if (event.target === modal) {
+        closeModal();
+    }
+});
+
 const urlParams = new URLSearchParams(window.location.search);
 const receivedId = urlParams.get('id');
 const receivedPreferredDate = urlParams.get('date');
@@ -5,12 +45,17 @@ const receivedSubItemId = urlParams.get('subItemId');
 
 const accessToken = localStorage.getItem("accessToken");
 
-fetch(`http://localhost:8080/api/v1/sub-items/${receivedSubItemId}`, {
-    method: "GET",
-    headers: {
-        "Authorization": `Bearer ${accessToken}`
-    },
-}).then(response => {
+fetch(`
+    http://localhost:8080/api/v1/sub-items/${receivedSubItemId}`, {
+        method: "GET",
+        headers:
+            {
+                "Authorization":
+                    `Bearer ${accessToken}`
+            }
+        ,
+    }
+).then(response => {
     if (!response.ok) {
         throw new Error('견적 데이터를 불러오는 도중 오류가 발생했습니다.');
     }
@@ -101,6 +146,9 @@ function createExpertEstimateCard(expertData) {
             const quoteButton = document.createElement('button');
             quoteButton.classList.add('quote-button');
             quoteButton.textContent = '견적서 보기';
+            quoteButton.addEventListener('click', () => {
+                openModal(expertData);
+            })
 
             const chatButton = document.createElement('button');
             chatButton.classList.add('chat-button');
@@ -117,6 +165,7 @@ function createExpertEstimateCard(expertData) {
     return userCard;
 }
 
+// 요청받은 고수의 이미지를 가져와야 함 지금은 사용자 이미지 가져옴
 async function fetchExpertImageData() {
     return new Promise(async (resolve, reject) => {
         try {
