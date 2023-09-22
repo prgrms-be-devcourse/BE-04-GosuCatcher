@@ -45,15 +45,12 @@ const receivedSubItemId = urlParams.get('subItemId');
 
 const accessToken = localStorage.getItem("accessToken");
 
-fetch(`
-    http://localhost:8080/api/v1/sub-items/${receivedSubItemId}`, {
+fetch(`http://localhost:8080/api/v1/sub-items/${receivedSubItemId}`, {
         method: "GET",
         headers:
             {
-                "Authorization":
-                    `Bearer ${accessToken}`
-            }
-        ,
+                "Authorization": `Bearer ${accessToken}`
+            },
     }
 ).then(response => {
     if (!response.ok) {
@@ -114,7 +111,7 @@ function createExpertEstimateCard(expertData) {
     fetchExpertImageData()
         .then(result => {
             const profileImage = document.createElement('img');
-            profileImage.src = result;
+            profileImage.src = 'https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png';
             profileImage.alt = '프로필 사진';
 
             const userDetails = document.createElement('div');
@@ -165,7 +162,6 @@ function createExpertEstimateCard(expertData) {
     return userCard;
 }
 
-// 요청받은 고수의 이미지를 가져와야 함 지금은 사용자 이미지 가져옴
 async function fetchExpertImageData() {
     return new Promise(async (resolve, reject) => {
         try {
