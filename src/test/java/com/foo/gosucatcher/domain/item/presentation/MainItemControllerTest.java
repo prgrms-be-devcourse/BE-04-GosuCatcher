@@ -4,6 +4,14 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -17,8 +25,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -33,6 +43,7 @@ import com.foo.gosucatcher.global.error.exception.BusinessException;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(value = {MainItemController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@AutoConfigureRestDocs
 class MainItemControllerTest {
 
 	@Autowired
@@ -62,7 +73,18 @@ class MainItemControllerTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.name").value("알바"))
 			.andExpect(jsonPath("$.description").value("설명을적습니다."))
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-create",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명")),
+				responseFields(
+					fieldWithPath("id").type(NUMBER).description("메인 서비스ID"),
+					fieldWithPath("name").type(STRING).description("메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명"))
+			));
 	}
 
 	@Test
