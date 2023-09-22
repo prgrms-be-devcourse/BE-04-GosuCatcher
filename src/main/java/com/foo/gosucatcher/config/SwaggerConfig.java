@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import lombok.RequiredArgsConstructor;
 
-// SwaggerConfig.java
 @OpenAPIDefinition(
 	info = @Info(title = "Gosu Catcher API 명세서",
 		description = "에프팀의 고수 캐처 API 명세서",
