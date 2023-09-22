@@ -6,8 +6,6 @@ import static org.mockito.BDDMockito.doThrow;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
-import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
@@ -39,6 +37,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -98,7 +97,7 @@ class ReviewControllerTest {
 			MockMultipartFile request = new MockMultipartFile("reviewCreateRequest", "reviewCreateRequest",
 				"application/json",
 				objectMapper.writeValueAsString(reviewCreateRequest).getBytes());
-			mockMvc.perform(MockMvcRequestBuilders
+			mockMvc.perform(RestDocumentationRequestBuilders
 					.multipart("/api/v1/reviews/{expertId}", expertId)
 					.file(file)
 					.file(request)
@@ -119,7 +118,7 @@ class ReviewControllerTest {
 				.andDo(document(
 					"review-success",
 					preprocessResponse(prettyPrint()),
-					requestHeaders(headerWithName("Authorization").description("jwt 토큰 값")),
+					// requestHeaders(headerWithName("Authorization").description("jwt 토큰 값")),
 					pathParameters(parameterWithName("expertId").description("전문가 ID")),
 					responseFields(
 						fieldWithPath(".id").type(JsonFieldType.NUMBER).description("생성된 리뷰의 아이디"),
@@ -130,6 +129,9 @@ class ReviewControllerTest {
 						fieldWithPath(".content").type(JsonFieldType.STRING).description("작성된 리뷰 본문"),
 						fieldWithPath(".replyExisted").type(JsonFieldType.BOOLEAN).description("해당 댓글에 달린 답글의 여부"),
 						fieldWithPath(".reply").type(JsonFieldType.OBJECT).description("답글"),
+						fieldWithPath(".reply.content").type(JsonFieldType.STRING).description("리뷰에 대한 답글 본문"),
+						fieldWithPath(".reply.expert").type(JsonFieldType.STRING).description("답글의 대상이 된 전문가"),
+						fieldWithPath(".reply.updatedAt").type(JsonFieldType.STRING).description("답글 업데이트 일자"),
 						fieldWithPath(".images").type(JsonFieldType.ARRAY).description("리뷰에 포함된 사진 url 목록"),
 						fieldWithPath(".updatedAt").type(JsonFieldType.STRING).description("업데이트 일자")
 					)));;
