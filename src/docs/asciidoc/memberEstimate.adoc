@@ -1,0 +1,44 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+
+= REST Docs 메인 서비스 API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+[[User-API]]
+
+== MemberEstimate API
+
+=== 회원 일반 견적서 등록
+
+==== /api/v1/member-estimates/normal/{expertId}
+
+.Request
+include::{snippets}/create-normal-estimate/http-request.adoc[]
+
+include::{snippets}/create-normal-estimate/request-fields.adoc[]
+
+.Response
+include::{snippets}/create-normal-estimate/http-response.adoc[]
+
+include::{snippets}/create-normal-estimate/response-fields.adoc[]
+
+
+=== 회원 일반 견적서 등록 실패 - 유효하지 않은 세부 서비스 ID
+
+==== /api/v1/member-estimates/normal/{expertId}
+
+.Request
+include::{snippets}/create-normal-estimate-fail-invalid-subItemId/http-request.adoc[]
+
+include::{snippets}/create-normal-estimate-fail-invalid-subItemId/request-fields.adoc[]
+
+.Response
+include::{snippets}/create-normal-estimate-fail-invalid-subItemId/http-response.adoc[]
+
+include::{snippets}/create-normal-estimate-fail-invalid-subItemId/response-fields.adoc[]

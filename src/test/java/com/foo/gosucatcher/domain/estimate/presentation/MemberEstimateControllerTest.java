@@ -5,6 +5,17 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
+import static org.springframework.restdocs.payload.JsonFieldType.NULL;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,9 +27,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -44,6 +58,7 @@ import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.EntityNotFoundException;
 
 @WebMvcTest(value = {MemberEstimateController.class}, excludeAutoConfiguration = {SecurityAutoConfiguration.class})
+@AutoConfigureRestDocs
 class MemberEstimateControllerTest {
 
 	@Autowired
@@ -116,7 +131,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON)
@@ -127,8 +142,33 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.subItemResponse.description").value(subItem.getDescription()))
 			.andExpect(jsonPath("$.location").value("서울 강남구 개포1동"))
 			.andExpect(jsonPath("$.detailedDescription").value("추가 내용"))
-			.andExpect(jsonPath("$.status").value("PENDING"));
-
+			.andExpect(jsonPath("$.status").value("PENDING"))
+			.andDo(document("create-normal-estimate",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("expertId").description("고수 ID")
+				),
+				requestFields(
+					fieldWithPath("subItemId").type(NUMBER).description("세부 서비스 ID"),
+					fieldWithPath("location").type(STRING).description("서비스 희망 지역"),
+					fieldWithPath("preferredStartDate").type(STRING).description("서비스 희망 날짜"),
+					fieldWithPath("detailedDescription").type(STRING).description("상세 설명")
+				),
+				responseFields(
+					fieldWithPath("id").type(NUMBER).description("고객 일반 견적서 ID"),
+					fieldWithPath("memberId").type(NUMBER).description("견적을 요청한 회원 ID"),
+					fieldWithPath("expertId").type(NUMBER).description("고수 ID"),
+					fieldWithPath("subItemResponse.id").type(NULL).description("세부 서비스 ID"),
+					fieldWithPath("subItemResponse.mainItemName").type(STRING).description("메인 서비스 ID"),
+					fieldWithPath("subItemResponse.name").type(STRING).description("세부 서비스 이름"),
+					fieldWithPath("subItemResponse.description").type(STRING).description("세부 서비스 설명"),
+					fieldWithPath("location").type(STRING).description("서비스 희망 지역"),
+					fieldWithPath("detailedDescription").type(STRING).description("상세 설명"),
+					fieldWithPath("status").type(STRING).description("견적서 요청 상태"),
+					fieldWithPath("preferredStartDate").type(STRING).description("서비스 희망 날짜")
+				)
+			));
 	}
 
 	@DisplayName("회원 일반 견적 등록 실패 테스트")
@@ -148,7 +188,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
+		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/member-estimates/normal/{expertId}", expertId)
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
@@ -158,7 +198,28 @@ class MemberEstimateControllerTest {
 			.andExpect(jsonPath("$.errors[0].field").value("subItemId"))
 			.andExpect(jsonPath("$.errors[0].value").value(""))
 			.andExpect(jsonPath("$.errors[0].reason").value("세부 서비스 id를 등록해주세요."))
-			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."));
+			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
+			.andDo(document("create-normal-estimate-fail-invalid-subItemId",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("expertId").description("고수 ID")
+				),
+				requestFields(
+					fieldWithPath("subItemId").type(NULL).description("세부 서비스 ID"),
+					fieldWithPath("location").type(STRING).description("서비스 희망 지역"),
+					fieldWithPath("preferredStartDate").type(STRING).description("서비스 희망 날짜"),
+					fieldWithPath("detailedDescription").type(STRING).description("상세 설명")
+				),
+				responseFields(
+					fieldWithPath("code").type(STRING).description("에러 코드"),
+					fieldWithPath("errors[0].field").type(STRING).description("에러 필드"),
+					fieldWithPath("errors[0].value").type(STRING).description("에러 값"),
+					fieldWithPath("errors[0].reason").type(STRING).description("에러 원인"),
+					fieldWithPath("message").type(STRING).description("에러 메시지"),
+					fieldWithPath("timestamp").type(STRING).description("에러 시간")
+				)
+			));
 	}
 
 	@DisplayName("회원 바로 견적 등록 성공 테스트")
