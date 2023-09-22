@@ -33,14 +33,12 @@ import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/reviews")
 
-@Tag(name = "ReviewController", description = "리뷰 API")
 public class ReviewController {
 
 	private static final int DEFAULT_PAGING_SIZE = 3;

@@ -37,7 +37,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "고수 관련 Controller", description = "고수 관리 API")
+@Tag(name = "ExpertController", description = "고수 관리 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/experts")
