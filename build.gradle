@@ -69,6 +69,7 @@ dependencies {
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 
     testImplementation 'org.springframework.security:spring-security-test'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
 }
 test {
     outputs.dir snippetsDir

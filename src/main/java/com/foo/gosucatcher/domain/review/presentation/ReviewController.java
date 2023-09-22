@@ -31,6 +31,8 @@ import com.foo.gosucatcher.domain.review.application.dto.response.ReviewResponse
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -44,11 +46,21 @@ public class ReviewController {
 
 	@PostMapping("/{expertId}")
 	@CurrentMemberId
+	@Operation(summary = "리뷰 생성 요청", description = "리뷰가 추가됩니다.", tags = {"Review Controller"})
 	public ResponseEntity<ReviewResponse> create(
+		@Parameter(description = "서비스 제공 고수 ID", required = true, example = "1")
 		@PathVariable Long expertId,
+
+		@Parameter(description = "세부서비스 ID", example = "1")
 		@RequestParam Long subItemId,
+
+		@Parameter(description = "리뷰 요청 정보", required = true)
 		@Validated @RequestPart ReviewCreateRequest reviewCreateRequest,
+
+		@Parameter(description = "리뷰에 첨부한 이미지")
 		@RequestPart(required = false) List<MultipartFile> imageFiles,
+
+		@Parameter(description = "작성자 ID", required = true, example = "1")
 		Long memberId
 	) {
 		ImageUploadRequest imageUploadRequest = new ImageUploadRequest(imageFiles);
