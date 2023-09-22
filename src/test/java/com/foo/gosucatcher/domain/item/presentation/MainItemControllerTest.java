@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.item.presentation;
 
+import static com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes.ARRAY;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -12,8 +13,9 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,6 +30,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -106,7 +109,19 @@ class MainItemControllerTest {
 			.andExpect(jsonPath("$.code").value("MI002"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("메인 서비스 이름이 중복될 수 없습니다."))
-			.andDo(print());
+			.andDo(document("mainItem-create-fail-duplicated-name",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("중복된 메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명")),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
 	}
 
 	@Test
@@ -126,7 +141,23 @@ class MainItemControllerTest {
 			.andExpect(jsonPath("$.errors[0].value").value(" "))
 			.andExpect(jsonPath("$.errors[0].reason").value("서비스명은 필수 입력 입니다."))
 			.andExpect(jsonPath("$.message").value("잘못된 값을 입력하셨습니다."))
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-create-fail-invalid-value",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("중복된 메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명")),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록").optional(),
+					fieldWithPath("errors[].field").type(STRING).description("오류 필드"),
+					fieldWithPath("errors[].value").type(STRING).description("오류 값"),
+					fieldWithPath("errors[].reason").type(STRING).description("오류 이유"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
 	}
 
 	@Test
@@ -144,7 +175,15 @@ class MainItemControllerTest {
 			.andExpect(jsonPath("$.mainItemsResponse[0].id").value(1L))
 			.andExpect(jsonPath("$.mainItemsResponse[0].name").value("알바"))
 			.andExpect(jsonPath("$.mainItemsResponse[0].description").value("설명"))
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-find-all",
+				preprocessResponse(prettyPrint()),
+				responseFields(
+					fieldWithPath("mainItemsResponse[].id").type(NUMBER).description("메인 서비스 ID"),
+					fieldWithPath("mainItemsResponse[].name").type(STRING).description("메인 서비스 이름"),
+					fieldWithPath("mainItemsResponse[].description").type(STRING).description("설명")
+				)));
+		;
 	}
 
 	@Test
@@ -156,13 +195,23 @@ class MainItemControllerTest {
 		given(mainItemService.findById(anyLong())).willReturn(mainItemResponse);
 
 		//when -> then
-		mockMvc.perform(get("/api/v1/main-items/{id}", mainItemResponse.id())
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/main-items/{id}", mainItemResponse.id())
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.id").value(1L))
 			.andExpect(jsonPath("$.name").value("알바"))
 			.andExpect(jsonPath("$.description").value("내용"))
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-get-one-by-id",
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("id").description("메인 서비스id")),
+				responseFields(
+					fieldWithPath("id").type(NUMBER).description("메인 서비스id"),
+					fieldWithPath("name").type(STRING).description("메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명")
+				)));
+		;
 	}
 
 	@Test
@@ -175,14 +224,27 @@ class MainItemControllerTest {
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
 		//when -> then
-		mockMvc.perform(get("/api/v1/main-items/{id}", invalidId)
+		mockMvc.perform(RestDocumentationRequestBuilders.get("/api/v1/main-items/{id}", invalidId)
 				.contentType(APPLICATION_JSON))
 			.andExpect(status().isNotFound())
 			.andExpect(jsonPath("$.timestamp").isNotEmpty())
 			.andExpect(jsonPath("$.code").value("MI001"))
 			.andExpect(jsonPath("$.errors").isEmpty())
 			.andExpect(jsonPath("$.message").value("메인 서비스를 찾을 수 없습니다."))
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-get-one-by-id-fail-not-found",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("id").description("메인 서비스id")),
+				responseFields(
+					fieldWithPath("timestamp").type(STRING).description("예외 시간"),
+					fieldWithPath("code").type(STRING).description("오류 코드"),
+					fieldWithPath("errors").type(ARRAY).description("오류 목록"),
+					fieldWithPath("message").type(STRING).description("오류 메시지")
+				)
+			));
+		;
 	}
 
 	@Test
@@ -193,13 +255,26 @@ class MainItemControllerTest {
 		MainItemUpdateRequest mainItemUpdateRequest = new MainItemUpdateRequest("레슨", "내용변경입니다.");
 		MainItemResponse mainItemResponse = new MainItemResponse(1L, "레슨", "내용변경입니다.");
 		given(mainItemService.update(anyLong(), any()))
-			.willReturn(mainItemResponse.id());
+			.willReturn(mainItemResponse);
 
 		//when -> then
-		mockMvc.perform(patch("/api/v1/main-items/{id}", 1L, mainItemUpdateRequest)
+		mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/main-items/{id}", 1L, mainItemUpdateRequest)
 				.contentType(APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(mainItemUpdateRequest)))
 			.andExpect(status().isOk())
-			.andDo(print());
+			.andDo(print())
+			.andDo(document("mainItem-update",
+				Preprocessors.preprocessRequest(prettyPrint()),
+				preprocessResponse(prettyPrint()),
+				pathParameters(
+					parameterWithName("id").description("메인 서비스id")),
+				requestFields(
+					fieldWithPath("name").type(STRING).description("변경할 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("변경할 설명")),
+				responseFields(
+					fieldWithPath("id").type(NUMBER).description("메인 서비스 ID"),
+					fieldWithPath("name").type(STRING).description("메인 서비스 이름"),
+					fieldWithPath("description").type(STRING).description("설명"))
+			));
 	}
 }
