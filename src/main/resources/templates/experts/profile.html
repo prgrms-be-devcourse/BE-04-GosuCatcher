@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title id="profile_title">[[${profile.storeName}]]</title>
+    <link rel="stylesheet" type="text/css" href="/css/experts/profile.css"/>
+</head>
+<body>
+<div th:replace="/layout/header.html :: fragment-header"></div>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+<script src="/js/experts/profile.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+        crossorigin="anonymous"></script>
+<div id="app-body">
+    <div class="row">
+        <img class="background" src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" id="background"
+             alt="background">
+    </div>
+    <div class="container">
+        <div class="thumbnail">
+            <img class="profile-pic" src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png"
+                 id="profile-pic"
+                 alt="profile image">
+        </div>
+        <div class="details">
+            <div>
+                <div class="info">
+                    <h2 class="storeName" id="storeName">
+                        [[${profile.storeName}]]
+                    </h2>
+                    <br>
+                    <div>
+                    <span th:each="si:${subItems.subItemsResponse()}" class="service" id="service">
+                        <span class="badge rounded-pill bg-light text-dark">[[${si.name}]]</span>
+                    </span>
+                    </div>
+
+                    <img width="30" height="30" src="https://img.icons8.com/puffy/32/experimental-document-puffy.png"
+                         alt="experimental-document-puffy"/>
+
+                    <p class="brief_introduction" id="brief_introduction">
+                        [[${profile.description}]]
+                    </p>
+                    <p class="location" id="location">
+                        <img width="30" height="30" src="https://img.icons8.com/ios/50/marker--v1.png"
+                             alt="marker--v1"/>
+                        [[${profile.location}]] / [[${profile.maxTravelDistance}]] km 이동 가능
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div style="margin: 10px">
+            <button type="button" class="btn btn-outline-secondary">
+                <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png" alt="like--v1"/>
+            </button>
+        </div>
+
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="photos-tab" data-bs-toggle="tab" data-bs-target="#pictures" type="button"
+                        role="tab" aria-controls="profile" aria-selected="false">사진/동영상
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="review-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button"
+                        role="tab" aria-controls="contact" aria-selected="false">리뷰
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade" id="pictures" role="tabpanel" aria-labelledby="photos-tab">
+                <div class="value-font" id="imagesContainer" style="display: flex; gap: 10px;">
+                    <img alt="default image" src=""
+                         style="width: 200px; height: 200px; object-fit: cover; border-radius: 5px;"/>
+
+                </div>
+
+            </div>
+            <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="review-tab">
+                <div>
+                    <img width="47" height="47" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
+                         style="float:left;"/>
+                    <h3 id="rating" style="float:left; padding:10px"> [[${profile.rating}]] </h3>
+                    <div style="float:left; padding:20px">
+                        <h6 id="reviewCount"> ([[${profile.reviewCount}]]개 리뷰) </h6>
+                    </div>
+                    <div class="dropdown float-right" style="text-align: right">
+                        <button aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle pl-0"
+                                data-toggle="dropdown"
+                                id="sortDropdown" style="color: black;" type="button">
+                            정렬기준
+                        </button>
+                        <div aria-labelledby="sortDropdown" class="dropdown-menu">
+                            <a class="dropdown-item" data-sort="rating" href="#">최신순</a>
+                            <a class="dropdown-item" data-sort="reviewCount" href="#">별점 높은 순</a>
+                            <a class="dropdown-item" data-sort="reviewCount" href="#">별점 낮은 순</a>
+                        </div>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <br>
+                </div>
+                <div class="review_contents">
+                    <div class="service_review_options">
+                        <button type="button" class="btn btn-outline-secondary"
+                                onclick="fetchReviews([[${profile.id}]],[[${si.name}]])">전체
+                        </button>
+                        <span th:each="si:${subItems.subItemsResponse()}" class="service_options" id="service_options">
+                            <button type="button" class="btn btn-outline-secondary"
+                                    onclick="fetchReviews([[${profile.id}]],[[${si.name}]])">[[${si.name}]]</button>
+                        </span>
+                    </div>
+                    <p id="review" th:each="rv:${reviews.reviews}">
+                        <span style="text-decoration-thickness: 2px"> [[${rv.writer}]] </span>
+                        <br>
+                        <span th:each="image:${rv.images}">
+                          <img th:src="${image}" alt="no image" style="width: 100px;height: 100px"
+                               th:marginwidth="5px"/>
+                        </span>
+                        <br>
+                        <span class="badge rounded-pill bg-light text-dark">[[${rv.subItem}]] </span>
+                        <img width="10" height="10" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
+                        />
+                        <span id="review_rating">  [[${rv.rating}]]</span>
+                        <br>
+                        <span id="review_content"> [[${rv.content}]] </span>
+                        <br>
+                        <span id="review_updatedAt"> [[${rv.updatedAt}]] </span>
+                        <br>
+                    <p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
