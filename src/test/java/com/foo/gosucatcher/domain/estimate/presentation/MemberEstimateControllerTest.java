@@ -248,7 +248,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/member-estimates/auto")
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto")
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
@@ -290,7 +290,7 @@ class MemberEstimateControllerTest {
 
 		//when
 		//then
-		mockMvc.perform(RestDocumentationRequestBuilders.post("/api/v1/member-estimates/auto")
+		mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/member-estimates/auto")
 				.content(objectMapper.writeValueAsString(memberEstimateRequest))
 				.param("memberId", String.valueOf(memberId))
 				.contentType(MediaType.APPLICATION_JSON))
