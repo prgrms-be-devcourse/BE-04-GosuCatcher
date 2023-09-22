@@ -48,6 +48,8 @@ public class SecurityConfig {
 			.antMatchers("/**").permitAll()
 			.anyRequest().authenticated()
 			.and()
+			.anonymous().authorities("ROLE_ANONYMOUS")
+			.and()
 			.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
