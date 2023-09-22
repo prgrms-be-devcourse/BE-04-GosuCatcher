@@ -24,7 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "MemberEstimateController", description = "일반 견적 요청서, 바로 견적서 조회/생성/삭제 API")
+@Tag(name = "MemberEstimateController", description = "일반 견적 요청서, 바로 견적 요청서 조회/생성/삭제 API")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/member-estimates")
 @RestController
