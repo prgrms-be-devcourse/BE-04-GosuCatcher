@@ -14,8 +14,12 @@ import com.foo.gosucatcher.domain.member.application.dto.response.SmsAuthRespons
 import com.foo.gosucatcher.domain.member.application.dto.response.SmsSendResponse;
 import com.foo.gosucatcher.global.aop.CurrentMemberId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "MemberSmsAuthController", description = "SMS 전송 및 인증")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/members/auth/sms")
@@ -25,8 +29,14 @@ public class MemberSmsAuthController {
 
 	@CurrentMemberId
 	@PostMapping
-	public ResponseEntity<SmsSendResponse> sendAuthSms(Long memberId,
-		@RequestBody @Validated SmsSendRequest smsSendRequest) {
+	@Operation(summary = "SMS를 전송", description = "인증번호 SMS를 전송합니다.")
+	public ResponseEntity<SmsSendResponse> sendAuthSms(
+		@Parameter(description = "토큰에서 가져온 멤버ID", required = true)
+		Long memberId,
+		@RequestBody @Validated
+		@Parameter(description = "SMS 전송에 필요한 요청 정보", required = true)
+		SmsSendRequest smsSendRequest
+	) {
 		SmsSendResponse smsAuthResponse = memberSmsService.sendSms(memberId, smsSendRequest);
 
 		return ResponseEntity.ok(smsAuthResponse);
@@ -34,7 +44,12 @@ public class MemberSmsAuthController {
 
 	@CurrentMemberId
 	@PostMapping("/validation")
-	public ResponseEntity<SmsAuthResponse> authenticateSms(@RequestBody @Validated SmsAuthRequest smsAuthRequest) {
+	@Operation(summary = "SMS 번호인증", description = "SMS로 전송된 번호를 인증 합니다.")
+	public ResponseEntity<SmsAuthResponse> authenticateSms(
+		@RequestBody @Validated
+		@Parameter(description = "SMS인증 완료에 필요한 정보", required = true)
+		SmsAuthRequest smsAuthRequest
+	) {
 		SmsAuthResponse smsAuthResponse = memberSmsService.authenticateSms(smsAuthRequest);
 
 		return ResponseEntity.ok(smsAuthResponse);

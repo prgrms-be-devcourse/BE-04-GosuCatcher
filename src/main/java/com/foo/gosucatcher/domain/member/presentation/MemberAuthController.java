@@ -29,7 +29,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "회원 관련 Controller",
+@Tag(name = "MemberAuthController",
 	description = "회원가입, 로그인, 로그아웃, 회원탈퇴, 비밀번호 찾기, 토큰재발급 API")
 @RequiredArgsConstructor
 @RestController
