@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "메인 서비스 관련 Controller", description = "메인 서비스 등록,조회,수정,삭제")
+@Tag(name = "MainItemController", description = "메인 서비스 등록,조회,수정,삭제")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/main-items")
@@ -30,7 +30,7 @@ public class MainItemController {
 
 	private final MainItemService mainItemService;
 
-	@Operation(summary = "메인 서비스 등록", description = "메인 서비스가 추가됩니다.")
+	@Operation(summary = "메인 서비스 등록", description = "메인 서비스가 추가 됩니다.")
 	@PostMapping
 	public ResponseEntity<MainItemResponse> create(@Parameter(description = "서비스 등록 요청 정보", required = true) @Validated @RequestBody MainItemCreateRequest request) {
 		MainItemResponse mainItemResponse = mainItemService.create(request);
