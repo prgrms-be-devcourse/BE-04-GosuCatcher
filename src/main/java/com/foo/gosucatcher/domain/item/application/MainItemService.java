@@ -50,7 +50,7 @@ public class MainItemService {
         return MainItemsResponse.from(mainItemList);
     }
 
-    public Long update(Long id, MainItemUpdateRequest request) {
+    public MainItemResponse update(Long id, MainItemUpdateRequest request) {
         MainItem foundMainItem = mainItemRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException(ErrorCode.NOT_FOUND_MAIN_ITEM));
 
@@ -59,7 +59,7 @@ public class MainItemService {
         MainItem mainItem = MainItemUpdateRequest.toMainItem(request);
         foundMainItem.update(mainItem);
 
-        return foundMainItem.getId();
+        return MainItemResponse.from(foundMainItem);
     }
 
     public void delete(Long id) {
