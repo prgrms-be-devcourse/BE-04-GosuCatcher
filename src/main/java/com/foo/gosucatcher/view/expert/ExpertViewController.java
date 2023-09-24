@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.expert.application.dto.response.ExpertResponse;
+import com.foo.gosucatcher.domain.image.application.dto.response.ImageResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
+import com.foo.gosucatcher.domain.member.application.MemberProfileService;
 import com.foo.gosucatcher.domain.review.application.ReviewService;
 import com.foo.gosucatcher.domain.review.application.dto.response.ReviewsResponse;
 
@@ -24,6 +26,7 @@ public class ExpertViewController {
 
 	private final ReviewService reviewService;
 	private final ExpertService expertService;
+	private final MemberProfileService memberProfileService;
 
 	@GetMapping
 	public String myPage() {
@@ -44,12 +47,12 @@ public class ExpertViewController {
 		ReviewsResponse response = reviewService.findAllByExpertIdAndSubItem(expertId, null, pageable);
 		ExpertResponse expertResponse = expertService.findById(expertId);
 		SubItemsResponse subItems = expertService.getSubItemsByExpertId(expertId);
+		ImageResponse images = expertService.getAllImages(expertId);
 
 		model.addAttribute("reviews", response);
 		model.addAttribute("profile", expertResponse);
 		model.addAttribute("subItems", subItems);
-
-
+		model.addAttribute("expertImages", images);
 
 		return "experts/profile";
 	}

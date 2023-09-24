@@ -1,8 +1,9 @@
 window.onload = () => {
-    fetchProfileImage();
-    fetchBackgroundImage();
-    loadImages();
-    fetchExpertProfile();
+    // fetchProfileImage();
+    // fetchBackgroundImage();
+    // loadImages();
+    renderImages();
+    // fetchExpertProfile();
 };
 
 async function fetchBackgroundImage() {

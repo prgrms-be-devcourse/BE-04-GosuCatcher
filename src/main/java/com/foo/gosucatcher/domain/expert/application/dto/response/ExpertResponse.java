@@ -22,7 +22,7 @@ public record ExpertResponse(
 			expert.getDescription(),
 			expert.getRating(),
 			expert.getReviewCount(),
-			null
+			expert.getMember().getProfileMemberImage().getFilename()
 		);
 	}
 }

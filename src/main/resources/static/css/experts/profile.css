@@ -1,5 +1,5 @@
 .row {
-    height: 75px;
+    height: 150px;
 }
 
 .container {
@@ -25,6 +25,28 @@
     border-radius: 20%;
 }
 
-.service_review_options{
-    margin:10px
+.service_review_options {
+    margin: 10px
+}
+
+.introduction {
+    margin-left: 5px
+}
+
+.value-font {
+    position: relative;
+    margin-right: 10px;
+    float: left
+}
+
+.expert_images {
+    position: relative;
+    border-radius: 5px;
+    width: 200px;
+    height: 200px;
+    object-fit: cover
+}
+
+.review{
+    margin-left: 5px;
 }

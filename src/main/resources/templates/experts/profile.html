@@ -13,34 +13,32 @@
         crossorigin="anonymous"></script>
 <div id="app-body">
     <div class="row">
-        <img class="background" src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png" id="background"
-             alt="background">
+        <img class="background" th:src="${profile.filename()}" id="background" alt="background">
     </div>
     <div class="container">
         <div class="thumbnail">
-            <img class="profile-pic" src="https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png"
-                 id="profile-pic"
-                 alt="profile image">
+            <img class="profile-pic" id="profile-pic" alt="profile pic" th:src="${profile.filename()}">
         </div>
         <div class="details">
             <div>
                 <div class="info">
                     <h2 class="storeName" id="storeName">
                         [[${profile.storeName}]]
+                        <button type="button" class="btn btn-outline-secondary">
+                            <img width="40" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png"
+                                 alt="like--v1"/>
+                        </button>
                     </h2>
-                    <br>
                     <div>
                     <span th:each="si:${subItems.subItemsResponse()}" class="service" id="service">
                         <span class="badge rounded-pill bg-light text-dark">[[${si.name}]]</span>
                     </span>
                     </div>
-
-                    <img width="30" height="30" src="https://img.icons8.com/puffy/32/experimental-document-puffy.png"
-                         alt="experimental-document-puffy"/>
-
-                    <p class="brief_introduction" id="brief_introduction">
-                        [[${profile.description}]]
-                    </p>
+                    <div class="introduction">
+                        <p class="brief_introduction" id="brief_introduction">
+                            [[${profile.description}]]
+                        </p>
+                    </div>
                     <p class="location" id="location">
                         <img width="30" height="30" src="https://img.icons8.com/ios/50/marker--v1.png"
                              alt="marker--v1"/>
@@ -49,11 +47,7 @@
                 </div>
             </div>
         </div>
-        <div style="margin: 10px">
-            <button type="button" class="btn btn-outline-secondary">
-                <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png" alt="like--v1"/>
-            </button>
-        </div>
+
 
         <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item" role="presentation">
@@ -69,12 +63,11 @@
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade" id="pictures" role="tabpanel" aria-labelledby="photos-tab">
-                <div class="value-font" id="imagesContainer" style="display: flex; gap: 10px;">
-                    <img alt="default image" src=""
-                         style="width: 200px; height: 200px; object-fit: cover; border-radius: 5px;"/>
-
+                <div th:each="expertImage:${expertImages.filenames()}">
+                    <div class="value-font" id="imagesContainer">
+                        <img th:src="${expertImage}" alt="images" class="expert_images">
+                    </div>
                 </div>
-
             </div>
             <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="review-tab">
                 <div>
@@ -99,7 +92,6 @@
                     <br>
                     <br>
                     <br>
-                    <br>
                 </div>
                 <div class="review_contents">
                     <div class="service_review_options">
@@ -111,24 +103,26 @@
                                     onclick="fetchReviews([[${profile.id}]],[[${si.name}]])">[[${si.name}]]</button>
                         </span>
                     </div>
-                    <p id="review" th:each="rv:${reviews.reviews}">
-                        <span style="text-decoration-thickness: 2px"> [[${rv.writer}]] </span>
-                        <br>
-                        <span th:each="image:${rv.images}">
-                          <img th:src="${image}" alt="no image" style="width: 100px;height: 100px"
-                               th:marginwidth="5px"/>
-                        </span>
-                        <br>
-                        <span class="badge rounded-pill bg-light text-dark">[[${rv.subItem}]] </span>
-                        <img width="10" height="10" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"
-                        />
-                        <span id="review_rating">  [[${rv.rating}]]</span>
-                        <br>
-                        <span id="review_content"> [[${rv.content}]] </span>
-                        <br>
-                        <span id="review_updatedAt"> [[${rv.updatedAt}]] </span>
-                        <br>
-                    <p>
+                    <div>
+                        <p id="review" class="review" th:each="rv:${reviews.reviews}">
+                            <span style="font-weight: bold">
+                                    [[${rv.writer}]]
+                            </span>
+                            <span th:each="image:${rv.images}">
+                              <img th:src="${image}" alt="no image" style="width: 100px;height: 100px"
+                                   th:marginwidth="5px"/>
+                            </span>
+                            <br>
+                            <span class="badge rounded-pill bg-light text-dark">[[${rv.subItem}]] </span>
+                            <img width="10" height="10" src="https://img.icons8.com/3d-fluency/94/star.png" alt="star"/>
+                            <span id="review_rating">  [[${rv.rating}]]</span>
+                            <br>
+                            <span id="review_content"> [[${rv.content}]] </span>
+                            <br>
+                            <span id="review_updatedAt"> [[${rv.updatedAt}]] </span>
+                            <br>
+                        <p>
+                    </div>
                 </div>
             </div>
         </div>

@@ -16,7 +16,7 @@ async function fetchProfileImage() {
         const imageUrl = data.filenames[0];
         document.getElementById('profile-pic').style.backgroundImage = `url(${imageUrl})`;
     } else {
-        alert('프로필 이미지를 불러오는데 실패하였습니다.');
+        document.getElementById('profile-pic').style.backgroundImage = `url('https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/default.png')`;
     }
 }
 
@@ -43,7 +43,7 @@ async function fetchExpertProfile() {
         document.getElementById('maxTravelDistance').innerText = expert.maxTravelDistance + 'km';
 
     } else {
-        alert('Expert 프로필 정보를 불러오는데 실패하였습니다.');
+        alert('고수 정보를 등록해 주세요');
     }
 }
 
@@ -127,7 +127,7 @@ async function loadSubItems() {
         const data = await response.json();
         displaySubItems(data.subItemsResponse);
     } catch (error) {
-        console.error('서브 아이템 로딩 중 오류 발생:', error);
+        console.error('제공 서비스 로딩 중 오류 발생:', error);
     }
 }
 
@@ -174,10 +174,10 @@ async function removeSubItem(subItemName) {
         if (response.status === 204) {
             loadSubItems();
         } else {
-            console.error('서브 아이템 삭제 중 오류 발생:', await response.text());
+            console.error('제공 서비스 삭제 중 오류 발생:', await response.text());
         }
     } catch (error) {
-        console.error('서브 아이템 삭제 중 오류 발생:', error);
+        console.error('제공 서비스 삭제 중 오류 발생:', error);
     }
 }
 
@@ -247,11 +247,11 @@ async function addSubItemToExpert() {
     });
 
     if (response.ok) {
-        alert('서브 아이템이 성공적으로 추가되었습니다.');
+        alert('서비스가 성공적으로 등록되었습니다.');
         loadSubItems();
         modal.style.display = "none";
     } else {
-        alert('서브 아이템 추가에 실패하였습니다.');
+        alert('서비스 등록에 실패하였습니다.');
     }
 }
 
@@ -286,7 +286,7 @@ async function fetchExpertEditProfile() {
         document.getElementById('maxTravelDistanceInput').value = expert.maxTravelDistance;
         document.getElementById('descriptionInput').value = expert.description;
     } else {
-        alert('Expert 프로필 정보를 불러오는데 실패하였습니다.');
+        alert('고수 프로필 정보를 불러오는데 실패하였습니다.');
     }
 }
 
