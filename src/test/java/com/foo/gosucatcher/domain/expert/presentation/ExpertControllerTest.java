@@ -1,5 +1,6 @@
 package com.foo.gosucatcher.domain.expert.presentation;
 
+import static com.foo.gosucatcher.domain.member.domain.Roles.ROLE_USER;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -48,6 +49,7 @@ import com.foo.gosucatcher.domain.image.application.dto.response.ImagesResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 import com.foo.gosucatcher.domain.member.domain.Member;
+import com.foo.gosucatcher.domain.member.domain.MemberImage;
 import com.foo.gosucatcher.domain.member.domain.MemberRepository;
 import com.foo.gosucatcher.global.error.ErrorCode;
 import com.foo.gosucatcher.global.error.exception.BusinessException;
@@ -92,8 +94,8 @@ class ExpertControllerTest {
 	@DisplayName("고수 등록 성공")
 	void createExpertSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0,null);
-		given(expertService.create(anyLong(),any(ExpertUpdateRequest.class))).willReturn(expertResponse);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0, null);
+		given(expertService.create(anyLong(), any(ExpertUpdateRequest.class))).willReturn(expertResponse);
 
 		// when -> then
 		mockMvc.perform(
@@ -108,12 +110,11 @@ class ExpertControllerTest {
 			.andDo(print());
 	}
 
-
 	@Test
 	@DisplayName("고수 등록 실패: 존재하지 않는 회원 ID")
 	void createExpertFailTest_notFoundMember() throws Exception {
 		// given
-		given(expertService.create(anyLong(),any(ExpertUpdateRequest.class)))
+		given(expertService.create(anyLong(), any(ExpertUpdateRequest.class)))
 			.willThrow(new EntityNotFoundException(ErrorCode.NOT_FOUND_MEMBER));
 		ExpertCreateRequest request = new ExpertCreateRequest("업체명1", "위치1", 100, "부가설명1");
 
@@ -136,7 +137,7 @@ class ExpertControllerTest {
 		// given
 		ExpertCreateRequest duplicatedExpertCreateRequest = new ExpertCreateRequest("업체명1", "위치1", 100, "부가설명1");
 
-		given(expertService.create(anyLong(),any(ExpertUpdateRequest.class)))
+		given(expertService.create(anyLong(), any(ExpertUpdateRequest.class)))
 			.willThrow(new EntityNotFoundException(ErrorCode.DUPLICATED_EXPERT_STORENAME));
 
 		// when -> then
@@ -156,7 +157,7 @@ class ExpertControllerTest {
 	@DisplayName("고수 ID로 조회 성공")
 	void getExpertByIdSuccessTest() throws Exception {
 		// given
-		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0,null);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "업체명1", "위치1", 100, "부가설명1", 0.0, 0, null);
 		given(expertService.findById(1L)).willReturn(expertResponse);
 
 		// when -> then
@@ -191,7 +192,7 @@ class ExpertControllerTest {
 	void updateExpertSuccessTest() throws Exception {
 		// given
 		ExpertUpdateRequest updateRequest = new ExpertUpdateRequest("새로운 업체명", "새로운 위치", 150, "새로운 부가설명");
-		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명", 0.0, 0,null);
+		ExpertResponse expertResponse = new ExpertResponse(1L, "새로운 업체명", "새로운 위치", 150, "새로운 부가설명", 0.0, 0, null);
 
 		given(expertService.update(1L, updateRequest)).willReturn(1L);
 
@@ -412,8 +413,11 @@ class ExpertControllerTest {
 	@Test
 	@DisplayName("고수찾기 성공")
 	void searchExpertsSuccessTest() throws Exception {
+
 		// given
-		List<Expert> expertList = List.of(new Expert(member, "업체명1", "위치1", 100, "부가설명1", 0.0, 0));
+		MemberImage memberImage = new MemberImage("filename.jpg");
+		Member memberEx = new Member("이름", "이메일", "비밀번호", "010-1234-5678", ROLE_USER, memberImage);
+		List<Expert> expertList = List.of(new Expert(memberEx, "업체명1", "위치1", 100, "부가설명1", 0.0, 0));
 		SlicedExpertsResponse slicedExpertsResponse = SlicedExpertsResponse.from(new SliceImpl<>(expertList));
 		given(expertService.findExperts(any(), any(), any())).willReturn(slicedExpertsResponse);
 
