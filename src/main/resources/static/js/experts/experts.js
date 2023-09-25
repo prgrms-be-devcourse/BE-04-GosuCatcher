@@ -457,3 +457,11 @@ function uploadExpertImage() {
         alert('이미지 업로드 중 오류가 발생했습니다.');
     });
 }
+
+function redirectToAutoQuote() {
+    window.location.href = "/gosu-catcher/auto-quote";
+}
+
+function redirectToRequestedList() {
+    window.location.href = "/gosu-catcher/expert-requested";
+}

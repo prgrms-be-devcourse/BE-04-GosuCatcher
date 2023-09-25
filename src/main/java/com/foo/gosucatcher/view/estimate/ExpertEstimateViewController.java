@@ -22,4 +22,10 @@ public class ExpertEstimateViewController {
 
 		return "estimates/normal-expert-estimate";
 	}
+
+	@GetMapping("/expert-requested")
+	public String getNormals() {
+
+		return "estimates/expert-requested-estimates";
+	}
 }

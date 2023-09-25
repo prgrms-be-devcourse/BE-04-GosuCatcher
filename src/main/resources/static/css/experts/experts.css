@@ -137,3 +137,8 @@ h2 {
     text-decoration: none;
     cursor: pointer;
 }
+
+.button-container {
+    display: flex; /* Use flexbox to make the spans display in a row */
+    justify-content: space-between; /* Distribute the spans evenly along the horizontal axis */
+}
