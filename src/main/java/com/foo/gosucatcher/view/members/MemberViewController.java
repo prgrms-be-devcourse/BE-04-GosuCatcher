@@ -27,16 +27,6 @@ public class MemberViewController {
 		return "members/login";
 	}
 
-	@GetMapping("/requests/send")
-	public String estimates() {
-		return "members/estimates";
-	}
-
-	@GetMapping("/requests/send/details")
-	public String estimatesDetails(@RequestParam Long id, @RequestParam String date) {
-		return "members/estimates-detail";
-	}
-
 	@GetMapping("/recovery/password")
 	public String recoveryPassword() {
 		return "members/recoveryPassword";

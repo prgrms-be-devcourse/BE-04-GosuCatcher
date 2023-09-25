@@ -42,4 +42,14 @@ public class MemberEstimateViewController {
 		model.addAttribute("subItemName", subItemName);
 		return "estimates/auto-member-estimate";
 	}
+
+	@GetMapping("/requests/send")
+	public String estimates() {
+		return "estimates/member-requested-estimates";
+	}
+
+	@GetMapping("/requests/send/details")
+	public String estimatesDetails(@RequestParam Long id, @RequestParam String date) {
+		return "estimates/member-requested-estimates-detail";
+	}
 }

@@ -58,7 +58,7 @@ fetch("http://localhost:8080/api/v1/member-estimates/members", {
             const preferredDate = formattedDate;
             const subItemId = data.subItemResponse.id;
             const url =
-                `http://localhost:8080/gosu-catcher/requests/send/details?id=${encodeURIComponent(expertEstimateId)}&date=${encodeURIComponent(preferredDate)}&subItemId=${encodeURIComponent(subItemId)}`;
+                `http://localhost:8080/gosu-catcher/hire/requests/send/details?id=${encodeURIComponent(expertEstimateId)}&date=${encodeURIComponent(preferredDate)}&subItemId=${encodeURIComponent(subItemId)}`;
 
             window.location.href = url;
         });
