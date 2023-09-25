@@ -23,10 +23,16 @@
                         <br>
                         <form novalidate>
                             <div style="margin-bottom: 15px;">
-                                <input type="hidden" class="form-control" th:value="${subItemId}" id="subItemId"
-                                       th:readonly="readonly">
                                 <input type="hidden" class="form-control" th:value="${expertId}" id="expertId"
                                        th:readonly="readonly">
+
+                                <div class="mb-3" style="display: flex; flex-direction: column;">
+                                    <label for="subItemId">제공할 서비스</label>
+                                    <select id="subItemId" name="subItem" style="width: 50%;">
+                                        <option value="">서비스 선택</option>
+                                        <option th:each="subItem : ${subItems}" th:value="${subItem.id()}" th:text="${subItem.name()}"></option>
+                                    </select>
+                                </div>
 
                                 <div class="mb-3">
                                     <label for="location" style="font-weight: bold;">서비스 희망 지역</label>

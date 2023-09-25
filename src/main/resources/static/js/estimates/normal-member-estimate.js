@@ -169,6 +169,11 @@ $(document).ready(function () {
             detailedDescription: $("#detailedDescription").val()
         };
 
+        if (memberEstimateRequest.subItemId.includes('서비스 선택') || memberEstimateRequest.subItemId === '') {
+            alert("서비스를 선택해주세요.");
+            return;
+        }
+
         if (memberEstimateRequest.location.includes('선택') || memberEstimateRequest.location === '') {
             alert("서비스 희망 지역을 선택해주세요.");
             return;

@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.foo.gosucatcher.domain.expert.application.ExpertService;
 import com.foo.gosucatcher.domain.item.application.SubItemService;
 import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemResponse;
+import com.foo.gosucatcher.domain.item.application.dto.response.sub.SubItemsResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,10 +20,14 @@ import lombok.RequiredArgsConstructor;
 public class MemberEstimateViewController {
 
 	private final SubItemService subItemService;
+	private final ExpertService expertService;
 
 	@GetMapping("/normal")
 	public String createNormal(@RequestParam Long expertId, Model model) {
 		model.addAttribute("expertId", expertId);
+
+		SubItemsResponse subItemsResponse = expertService.getSubItemsByExpertId(expertId);
+		model.addAttribute("subItems", subItemsResponse.subItemsResponse());
 
 		return "estimates/normal-member-estimate";
 	}
