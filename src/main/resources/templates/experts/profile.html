@@ -31,6 +31,15 @@
                             <img width="30" height="30" src="https://img.icons8.com/pastel-glyph/64/like--v1.png"
                                  alt="like--v1"/>
                         </button>
+
+                        <button type="button" class="btn btn-outline-secondary">
+                            <img width="30" height="30" src="https://img.icons8.com/ios/50/send--v1.png"
+                                 alt="send--v1"/>
+                            <a th:href="@{/gosu-catcher/hire/normal(expertId=${profile.id})}"
+                               style="text-decoration: none;text-decoration-color: black">
+                                견적요청
+                            </a>
+                        </button>
                     </h2>
                     <div>
                     <span th:each="si:${subItems.subItemsResponse()}" class="service" id="service">

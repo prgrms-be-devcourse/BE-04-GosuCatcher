@@ -19,9 +19,8 @@ public class MemberEstimateViewController {
 
 	private final SubItemService subItemService;
 
-	@GetMapping("/normal/{subItemId}")
-	public String createNormal(@PathVariable Long subItemId, @RequestParam Long expertId, Model model) {
-		model.addAttribute("subItemId", subItemId);
+	@GetMapping("/normal")
+	public String createNormal(@RequestParam Long expertId, Model model) {
 		model.addAttribute("expertId", expertId);
 
 		return "estimates/normal-member-estimate";
