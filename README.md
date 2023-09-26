@@ -39,12 +39,16 @@
 <img src="https://img.shields.io/badge/Jira-0052CC?style=flat-square&logo=Jirasoftware&logoColor=white&style=flat"/></a>
 <img src="https://img.shields.io/badge/Miro-050038?style=flat-square&logo=miro&logoColor=white&style=flat"/></a>
 
+## 아키텍처
+![Gosu-Catcher-Architecture](https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/18512d1b-1b27-44a7-a989-91cc80c9e365)
+
+## ERD 설계
+<img width="1240" alt="스크린샷 2023-09-25 오후 2 30 40" src="https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/ed86e563-3c96-4695-b892-d72f60807b44">
+
 ## 기능 정의
 [기능 정의 WIKI 문서](https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/wiki/%EA%B8%B0%EB%8A%A5-%EC%A0%95%EC%9D%98)
 ## API 설계 문서
 [API 설계 문서 노션](https://www.notion.so/backend-devcourse/API-bc4f2926a0834d549aa323cc79894be9)
-## ERD 설계
-<img width="1240" alt="스크린샷 2023-09-25 오후 2 30 40" src="https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/ed86e563-3c96-4695-b892-d72f60807b44">
 
 ## Git Flow
 ![git-flow](https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/67eec367-661a-4648-8dc9-2ecd86402e1f)
