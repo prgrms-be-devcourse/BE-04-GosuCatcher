@@ -2,9 +2,9 @@ name: Gosu-Catcher CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ main ]
+    branches: [ "develop" ]
 
 env:
   S3_BUCKET_NAME: gosu-catcher-deploy
@@ -19,7 +19,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '17'
-        distribution: 'adopt'
+        distribution: 'temurin'
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -34,3 +34,34 @@ jobs:
         ./gradlew -version
         ./gradlew build
       shell: bash
+      
+    - name: Make zip file
+      run: zip -r ./gosu-catcher.zip .
+      shell: bash
+
+    - name: Make Directory
+      run: mkdir -p deploy
+
+    - name: Copy Jar
+      run: cp ./build/libs/*.jar ./deploy
+
+    - name: Make zip file
+      run: zip -r ./gosu_catcher.zip ./deploy
+      shell: bash
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Upload to S3
+      run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://gosu-catcher-deploy/
+
+    - name: deploy with AWS codeDeploy
+      run: aws deploy create-deployment
+        --application-name githubaction-test
+        --deployment-config-name CodeDeployDefault.OneAtATime
+        --deployment-group-name githubaction-test-group
+        --s3-location bucket=github-action-codedeploy-s3,bundleType=tgz,key=archive/drcloud.tar.gz
