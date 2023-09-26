@@ -32,8 +32,8 @@ jobs:
       - name: Copy Jar
         run: cp ./build/libs/*.jar ./deploy
 
-      - name: Copy appspec.yml
-        run: cp appspec.yml ./deploy
+      - name: Copy AppSpec.yml
+        run: cp AppSpec.yml ./deploy
 
       - name: Copy script
         run: cp ./scripts/*.sh ./deploy
