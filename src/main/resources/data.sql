@@ -1,23 +1,3 @@
--- members
-INSERT INTO members (name, password, email, phone_number, is_deleted, role, refresh_token)
-VALUES ('John Doe', 'password123', 'john.doe@exampdle.com', '+12345678940', false, 'ROLE_USER', 'refreshToken123'),
-       ('Jane Smith', 'password456', 'jane.smith@exafmple.com', '+98765432210', false, 'ROLE_USER', 'refreshToken456'),
-       ('Bob Brown', 'bobpass', 'bob.brown@exampdle.com', '+44455566266', false, 'ROLE_USER', 'refreshToken789'),
-       ('Charlie Green', 'charliepass', 'charalie.green@examdple.com', '010-1212-1211', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@exampdle.com', '010-1212-1222', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@examdple.com', '010-1212-1213', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@dexamdple.com', '010-1212-1214', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@examplae.com', '010-1212-1215', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@exadmpdle.com', '010-1212-1216', false, 'ROLE_USER',
-        'refreshToken1011'),
-       ('Charlie Green', 'charliepass', 'charlie.green@eaxampdle.com', '010-1212-1217', false, 'ROLE_USER',
-        'refreshToken1011');
-
 -- main_items
 INSERT INTO main_items (name, description, is_deleted)
 VALUES ('청소', '집안 청소 서비스로, 창문 청소, 마루 청소, 방 청소, 정리정돈 등을 제공합니다.', false),
@@ -90,79 +70,37 @@ VALUES (1, '화장실 청소', '화장실을 청소하는 서비스입니다. �
        (9, '오디오 녹음', '오디오 녹음 서비스를 제공합니다. 음성 녹음 및 오디오 프로덕션을 지원합니다.', false),
        (9, '영상 편집', '영상 편집 서비스를 제공합니다. 영상 편집 및 후속 처리 작업을 수행합니다.', false);
 
+-- members
+INSERT INTO members (name, password, email, phone_number, filename, is_deleted, role, refresh_token)
+VALUES ('에프푸', '$2a$10$aTX3.YyGqC2Lxv0Rwy77FeDn7s8ffHbn6gj4Ty1Wg741WO/P9RvQa', 'f@gmail.com', '+12345678940',
+        'https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/23/09/25/e783445c-7920-4a6b-86ae-cfd22a45ef16', false,
+        'ROLE_USER',
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJHb3N1Q2F0Y2hlciIsIm1lbWJlcklkIjoxLCJtZW1iZXJFbWFpbCI6ImZAZ21haWwuY29tIiwiZXhwZXJ0SWQiOjEsImlhdCI6MTY5NTU2OTI5MywiaXNzIjoiR29zdUNhdGNoZXItc2VydmVyIiwiZXhwIjoxNjk4MTYxMjkzfQ.7uzvsZ40A0EBCM8nqf7YbZsYbqZCBZqK7zrUYottqbI'),
+       ('스펜서', '$2a$10$KuBah9e6cH3U7rgjXQRf/.dNQLfR4JVHGmbyzuVcW4SmfZhg2zxC6', 'spencer@gmail.com', '+12345678940',
+        'https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/23/09/25/b86cfd5d-10f2-4e89-8997-907b20995345', false,
+        'ROLE_USER',
+        'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJHb3N1Q2F0Y2hlciIsIm1lbWJlcklkIjoyLCJtZW1iZXJFbWFpbCI6InNwZW5jZXJAZ21haWwuY29tIiwiZXhwZXJ0SWQiOjIsImlhdCI6MTY5NTU3MDE0OSwiaXNzIjoiR29zdUNhdGNoZXItc2VydmVyIiwiZXhwIjoxNjk4MTYyMTQ5fQ.N-s1_0cYegjyJ_r8c1V0jzE3REcSzj6oVKn3xnBZDTE');
+
 -- experts
 INSERT INTO experts (member_id, store_name, location, max_travel_distance, description, is_auto, rating, review_count,
                      is_deleted)
-VALUES (1, 'Store A', 'Location A', 10, 'Description for Store A', false, 0.0, 0, false),
-       (2, 'Store B', 'Location B', 15, 'Description for Store B', true, 0.0, 0, false),
-       (3, 'Store C', 'Location C', 8, 'Description for Store C', false, 0.0, 0, false),
-       (4, 'Store D', 'Location D', 12, 'Description for Store D', true, 0.0, 0, false),
-       (5, 'Store E', 'Location E', 20, 'Description for Store E', false, 0.0, 0, false),
-       (6, 'Store F', 'Location F', 7, 'Description for Store F', true, 0.0, 0, false),
-       (7, 'Store G', 'Location G', 9, 'Description for Store G', false, 0.0, 0, false),
-       (8, 'Store H', 'Location H', 18, 'Description for Store H', true, 0.0, 0, false),
-       (9, 'Store I', 'Location I', 14, 'Description for Store I', false, 0.0, 0, false),
-       (10, 'Store J', 'Location J', 6, 'Description for Store J', true, 0.0, 0, false);
+VALUES (1, '에프의 코딩학원', '서울특별시 강남구', 100, '내 성장의 눈높이에 맞춘 전문적인 교육을 경험할 수 있는 시간
+개발자 커리어는 에프와 유료로 시작하세요.', false, 5.0, 1, false),
+       (2, '데브코스', '서울특별시 강남구', 10, '웰컴투 데브코스', false, 4.0, 0, false);
 
--- member_estimates
-INSERT INTO member_estimates (member_id, sub_item_id, location, preferred_start_date, detailed_description,
-                              is_closed)
-VALUES (1, 1, 'Location A', '2023-09-10 10:00:00', 'Description for Request 1', false),
-       (2, 2, 'Location B', '2023-09-15 14:30:00', 'Description for Request 2', true),
-       (3, 3, 'Location C', '2023-09-20 08:45:00', 'Description for Request 3', false),
-       (4, 4, 'Location D', '2023-09-25 16:00:00', 'Description for Request 4', true),
-       (5, 5, 'Location E', '2023-09-30 11:20:00', 'Description for Request 5', false),
-       (6, 6, 'Location F', '2023-10-05 09:30:00', 'Description for Request 6', true),
-       (7, 7, 'Location G', '2023-10-10 13:15:00', 'Description for Request 7', false),
-       (8, 8, 'Location H', '2023-10-15 15:45:00', 'Description for Request 8', true),
-       (9, 9, 'Location I', '2023-10-20 12:10:00', 'Description for Request 9', false),
-       (10, 10, 'Location J', '2023-10-25 07:55:00', 'Description for Request 10', true);
+-- expert_images
+INSERT INTO expert_images(filename, expert_id)
+VALUES ('https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/23/09/25/596cad97-551e-45fa-9bac-949dd688a958', 1),
+       ('https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/23/09/25/70e8e607-f3a6-491a-9840-57e52aeda46c', 1),
+       ('https://gosu-catcher.s3.ap-northeast-2.amazonaws.com/23/09/25/8fea975d-20b9-4e1a-8087-9e69dab26f0a', 2);
 
--- buckets
-INSERT INTO buckets (expert_id, member_id, is_deleted)
-VALUES (1, 2, false),
-       (2, 3, false),
-       (3, 4, false),
-       (4, 5, false),
-       (5, 6, false),
-       (6, 7, false),
-       (7, 8, false),
-       (8, 9, false),
-       (9, 10, false),
-       (10, 1, false);
-
--- expert_estimates
-INSERT INTO expert_estimates (expert_id, member_estimate_id, sub_item_id, total_cost, activity_location,
-                              description, is_deleted)
-VALUES (1, 1, 1, 100, '서울특별시 강남구', 'Description for Estimate 1', false),
-       (2, 2, 1, 150, '서울특별시 강남구', 'Description for Estimate 2', false),
-       (3, 3, 1, 80, '서울특별시 도봉구', 'Description for Estimate 3', false),
-       (4, 4, 1, 120, '서울특별시 강서구', 'Description for Estimate 4', false),
-       (5, 5, 2, 200, '서울특별시 성동구', 'Description for Estimate 5', false),
-       (6, 6, 2, 70, '서울특별시 동작구', 'Description for Estimate 6', false),
-       (7, 7, 3, 90, '서울특별시 동작구', 'Description for Estimate 7', false),
-       (8, 8, 4, 180, '서울특별시 동작구', 'Description for Estimate 8', false),
-       (9, 9, 5, 140, '서울특별시 관악구', 'Description for Estimate 9', false),
-       (10, 10, 4, 60, '서울특별시 관악구', 'Description for Estimate 10', false);
-
--- expertItem (mapping table)
-INSERT INTO expert_items (expert_id, sub_item_id)
-VALUES (1, 1),
-       (1, 3),
-       (2, 1),
-       (3, 7),
-       (4, 9),
-       (6, 1);
+-- expert_items
+INSERT INTO expert_items(expert_id, sub_item_id)
+VALUES (1, 20),
+       (1, 21),
+       (1, 22),
+       (2, 23);
 
 -- reviews
-INSERT INTO reviews (expert_id, member_id, sub_item_id, content, rating, is_deleted)
-VALUES (1, 2, 1, 'Review for Expert 1', 4, false),
-       (2, 3, 2, 'Review for Expert 2', 5, true),
-       (3, 4, 3, 'Review for Expert 3', 3, false),
-       (4, 5, 4, 'Review for Expert 4', 4, true),
-       (5, 6, 5, 'Review for Expert 5', 2, false),
-       (6, 7, 6, 'Review for Expert 6', 5, true),
-       (7, 8, 7, 'Review for Expert 7', 4, false),
-       (8, 9, 8, 'Review for Expert 8', 3, true),
-       (9, 10, 9, 'Review for Expert 9', 5, false),
-       (10, 1, 10, 'Review for Expert 10', 4, true);
+INSERT INTO reviews(expert_id, writer_id, sub_item_id, reply_id, content, rating, is_deleted)
+VALUES (1, 2, 20, null, '아주 좋아요~~!', 5.0, false);
