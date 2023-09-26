@@ -53,6 +53,9 @@ jobs:
         run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://$S3_BUCKET_NAME/
 
       - name: Deploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: | 
           aws create-deployment deploy \ 
           --application-name gosu-catcher \
