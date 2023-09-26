@@ -40,7 +40,8 @@
 <img src="https://img.shields.io/badge/Miro-050038?style=flat-square&logo=miro&logoColor=white&style=flat"/></a>
 
 ## 아키텍처
-![Gosu-Catcher-Architecture](https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/18512d1b-1b27-44a7-a989-91cc80c9e365)
+![Gosu-Catcher-Architecture](https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/71485411/0bc815fa-97df-4b2a-9459-87d5b46f2faf)
+
 
 ## ERD 설계
 <img width="1240" alt="스크린샷 2023-09-25 오후 2 30 40" src="https://github.com/prgrms-be-devcourse/BE-04-GosuCatcher/assets/97447334/ed86e563-3c96-4695-b892-d72f60807b44">
