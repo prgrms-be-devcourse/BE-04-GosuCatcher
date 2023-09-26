@@ -20,30 +20,23 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      shell: bash
-
-    - name: (Release) Get current date
-      id: date
-      run: echo "::set-output name=date::$(date+'%Y/%m/%d')"
-
+    
     - name: Build with Gradle
-      run: |
-        ./gradlew -version
-        ./gradlew build
-      shell: bash
+      run: ./gradlew clean build
       
-    - name: Make zip file
-      run: zip -r ./gosu-catcher.zip .
-      shell: bash
-
     - name: Make Directory
       run: mkdir -p deploy
-
+        
     - name: Copy Jar
       run: cp ./build/libs/*.jar ./deploy
+      
+    - name: Copy appspec.yml
+      run: cp appspec.yml ./deploy
+
+    - name: Copy script
+      run: cp ./scripts/*.sh ./deploy
 
     - name: Make zip file
       run: zip -r ./gosu_catcher.zip ./deploy
@@ -57,11 +50,16 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://gosu-catcher-deploy/
+      run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://$S3_BUCKET_NAME/
 
-    - name: deploy with AWS codeDeploy
-      run: aws deploy create-deployment
-        --application-name githubaction-test
-        --deployment-config-name CodeDeployDefault.OneAtATime
-        --deployment-group-name githubaction-test-group
-        --s3-location bucket=github-action-codedeploy-s3,bundleType=tgz,key=archive/drcloud.tar.gz
+    - name: Deploy
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: |
+        aws deploy create-deployment \
+        --application-name gosu-catcher \
+        --deployment-group-name gosu-catcher-deployment-group \
+        --file-exists-behavior OVERWRITE \
+        --s3-location bucket=gosu-catcher-deploy,bundleType=zip,key=gosu_catcher.zip \ 
+        --region ap-northeast-2
