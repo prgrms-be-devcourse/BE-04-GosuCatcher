@@ -2,9 +2,9 @@ name: Gosu-Catcher CI/CD
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "develop/" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "develop/" ]
 
 env:
   S3_BUCKET_NAME: gosu-catcher-deploy
@@ -50,7 +50,7 @@ jobs:
         aws-region: ap-northeast-2
 
     - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://$S3_BUCKET_NAME/
+      run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://gosu-catcher-deploy/
 
     - name: Deploy
       env:
