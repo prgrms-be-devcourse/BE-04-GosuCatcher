@@ -57,7 +57,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: aws deploy create-deployment
-          --application-name gosu-catcher \
-          --deployment-group-name gosu-catcher-deployment-group \
-          --s3-location bucket=gosu-catcher-deploy,bundleType=zip,key=gosu_catcher.zip \ 
+          --application-name gosu-catcher
+          --deployment-group-name gosu-catcher-deployment-group
+          --s3-location bucket=gosu-catcher-deploy,bundleType=zip,key=gosu_catcher.zip 
           --file-exists-behavior OVERWRITE
