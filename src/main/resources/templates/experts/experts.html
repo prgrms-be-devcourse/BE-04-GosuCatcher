@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link href="/css/experts/experts.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<div id="app-body">
+    <div class="container">
+        <div class="row no-gutters">
+            <div class="profile-section">
+                <div class="my-profile-head" style="display: flex; align-items: center;">
+                    <div class="thumb-container" style="position: relative;">
+                        <div class="thumb">
+                            <div class="user-profile-picture profile-pic" id="profile-pic"></div>
+                            <button data-target="#profileImageModal" data-toggle="modal"
+                                    style="position: absolute; right: 40px; bottom: 10px; border: none; background-color: rgba(255,255,255,0.7); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-pencil" style="font-size: 24px;"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="info">
+                        <ul class="overview">
+                            <li class="item">
+                                <div class="point" id="rating">2</div>
+                                <div class="label">리뷰 평점</div>
+                            </li>
+                            <li class="item">
+                                <div class="point" id="reviewCount">10</div>
+                                <div class="label">리뷰수</div>
+                            </li>
+                        </ul>
+                        <span class="btn dashboard-btn btn-outline-primary" onclick="openEditModal()">프로필 수정</span>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span class="key-font">이름</span>
+                            <span class="value-font" id="storeName">철수</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span class="key-font">한줄소개</span>
+                            <span class="value-font" id="description">안녕하세요!</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span class="key-font">활동 지역</span>
+                            <span class="value-font" id="location">서울시 강남구</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span ; class="key-font">이동 가능 거리</span>
+                            <span class="value-font" id="maxTravelDistance">5km</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span class="key-font">제공 서비스</span>
+                            <div class="value-font" id="sub-items">영어 과외</div>
+                        </div>
+                        <span class="button-font" id="add-sub-items">추가</span>
+                    </div>
+                </div>
+
+                <div class="my-profile-body"
+                     style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; flex-direction: column; align-items: start;">
+                            <span class="key-font">사진</span>
+                            <div class="value-font" id="imagesContainer" style="display: flex; gap: 10px;">
+                                <div class="image-item" style="position: relative;">
+                                    <img alt="default image" src="/img/white.png"
+                                         style="width: 100px; height: 100px; object-fit: cover; border-radius: 5px;"/>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="button-font" onclick="openImageUploadModal()">추가</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-hidden="true" aria-labelledby="profileImageModalLabel" class="modal fade" id="profileImageModal"
+         role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog modal-md modal-dialog-centered modal-select-profile-image" style="max-width: 150%;">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h5 class="modal-title">프로필 사진 등록</h5>
+                </header>
+                <div class="modal-body">
+                    <div class="custom-file b-form-file file mb-2" id="__BVID__773__BV_file_outer_">
+                        <input accept="jpg,jpeg,png,gif,bmp,jpeg2000,heic" class="custom-file-input" id="__BVID__773"
+                               style="z-index: -5;" type="file">
+                        <label class="custom-file-label" data-browse="Browse" for="__BVID__773">
+                            <span class="d-block form-file-text" style="pointer-events: none;"></span>
+                        </label>
+                    </div>
+
+                    <button class="btn file-input btn-outline-custom btn-block" onclick="uploadProfileImage()"
+                            type="button">사진 등록하기
+                    </button>
+                    <button class="btn btn-outline-custom btn-block" onclick="setDefaultProfileImage()" type="button">
+                        기본 이미지로 변경
+                    </button>
+                    <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal" type="button">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal" id="myModal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p style="color: #00c7ae;">서비스 아이템 선택:</p>
+        <select id="subItemSelect" style="margin-bottom: 20px;">
+        </select>
+        <button onclick="addSubItemToExpert()" style="background-color: white; color: #00c7ae; border: none;">추가하기
+        </button>
+    </div>
+</div>
+
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <span class="close" onclick="closeEditModal()">&times;</span>
+        <p style="color: #00c7ae;">프로필 수정 | 첫 고수 전환 시 아래 사항들을 모두 기입해주세요!</p>
+
+        <label for="storeName">업체명:</label>
+        <input id="storeNameInput" type="text">
+
+        <label for="city">도시:</label>
+        <select id="citySelect">
+        </select>
+
+        <label for="district">구/군:</label>
+        <select id="districtSelect">
+        </select>
+
+        <label for="maxTravelDistance">이동 가능 거리(km):</label>
+        <input id="maxTravelDistanceInput" type="number">
+
+        <label for="description">부가 설명:</label>
+        <textarea id="descriptionInput"></textarea>
+
+        <button onclick="submitEdit()" style="margin-top: 20px; background-color: white; color: #00c7ae; border: none;">
+            수정하기
+        </button>
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="imageUploadModalLabel" class="modal fade" id="imageUploadModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog modal-md modal-dialog-centered modal-select-image" style="max-width: 150%;">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h5 class="modal-title">이미지 등록</h5>
+            </header>
+            <div class="modal-body">
+                <div class="custom-file b-form-file file mb-2" id="__BVID__774__BV_file_outer_">
+                    <input accept="jpg,jpeg,png,gif,bmp,jpeg2000,heic" class="custom-file-input" id="__BVID__774"
+                           style="z-index: -5;" type="file">
+                    <label class="custom-file-label" data-browse="Browse" for="__BVID__774">
+                        <span class="d-block form-file-text" style="pointer-events: none;"></span>
+                    </label>
+                </div>
+                <button class="btn file-input btn-outline-custom btn-block" onclick="uploadExpertImage()" type="button">
+                    사진 등록하기
+                </button>
+                <button class="btn btn-cancel btn-secondary btn-sm btn-block" data-dismiss="modal" type="button">닫기
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+
+<script src="/js/experts/experts.js"></script>
+
+</body>
+</html>

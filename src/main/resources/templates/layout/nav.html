@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<header th:fragment="fragment-nav">
+    <nav class="navbar navbar-expand-md" style="background-color: #ffffff;">
+        <a class="navbar-brand" href="/gosu-catcher" style="color: #0abab5; font-weight: bold">Gosu Catcher</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapsibleNavbar">
+
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/category" style="color: black;">견적요청</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/experts/search" style="color: black;">고수찾기</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/auto-quote" style="color: black;">바로 견적</a>
+                </li>
+            </ul>
+
+            <form class="form-inline my-2 my-lg-0" id="searchForm" autocomplete="off">
+                <input class="form-control mr-sm-2" type="text" id="searchInput" placeholder="서비스를 입력하세요">
+                <div id="popularKeywords"
+                     style="position: absolute; top: 100%; left: 72.3%; background-color: #fff;border: 1px solid #ccc; max-height: 200px; overflow-y: auto;width: 11%;"></div>
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
+            </form>
+
+            <ul class="navbar-nav" style="display: flex;">
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/requests/send" style="color: black;">받은견적</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/chats" style="color: black;">채팅</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/members/my-page" style="color: black;">내정보</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/gosu-catcher/experts" style="color: black;">고수 전환</a>
+                </li>
+            </ul>
+
+            <div sec:authorize="isAnonymous()">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/gosu-catcher/login" style="color: black;">로그인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/gosu-catcher/joinForm" style="color: black;">회원가입</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <br>
+    <script src="/js/search/search.js"></script>
+</header>
+</html>

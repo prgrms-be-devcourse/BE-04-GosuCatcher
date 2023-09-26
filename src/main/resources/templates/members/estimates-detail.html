@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link rel="stylesheet" href="/css/members/estimates-detail-style.css">
+    <script src="/js/members/estimatesDetail.js" defer></script>
+</head>
+<body>
+<header th:replace="/layout/nav.html :: fragment-nav"></header>
+<main>
+    <div class="centered-container">
+        <div>
+            <h2 class="sub-item-name"></h2>
+            <p class="date">요청 날짜<span class="preferred-date"></span></p>
+        </div>
+        <div id="userCards" class="user-cards"></div>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span> <!-- 모달 닫기 버튼 -->
+            <h1 id="modalTitle"></h1>
+            <p id="modalContent"></p>
+        </div>
+    </div>
+</main>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <style>
+        h1 {
+            text-align: center;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 6rem;
+        }
+
+        .section {
+            width: 100%;
+            text-align: center;
+        }
+
+        .recommend {
+            text-align: center;
+            padding-left: 5.5rem;
+            margin-top: 6rem;
+        }
+
+        .card {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 10px;
+            padding: 10px;
+            width: 200px;
+            display: inline-block;
+            box-shadow: 0px 0px 5px #888888;
+            background-color: #fff;
+        }
+
+        .card-content {
+            text-align: center;
+        }
+
+        .card-container {
+            white-space: nowrap;
+            overflow-x: auto;
+        }
+
+        .card-content {
+            text-align: center;
+        }
+
+        .item {
+            display: inline-block;
+            width: 16.66%;
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<img src="/img/banner2.webp" alt="Banner Image" style="max-width: 100%; height: auto; margin-bottom: 3rem">
+<h1><span th:text="${mainItemName}"></span></h1>
+<div class="container">
+    <div class="section">
+        <div class="item" th:each="mainItem : ${mainItems.mainItemsResponse()}">
+            <a th:href="@{/gosu-catcher/items(mainItemName=${mainItem.name()})}">
+                <div th:text="${mainItem.name()}" style="font-weight: bold"></div>
+            </a>
+        </div>
+    </div>
+
+    <img src="/img/banner3.webp" alt="Banner Image" style="max-width: 100%; height: auto; margin-top: 3rem">
+    <div class="section">
+        <h2 class="h2">인기 서비스</h2>
+        <div class="card-container" style="white-space: nowrap; overflow-x: auto;">
+            <div th:each="subItem : ${subItems.subItemSlicesResponse()}" style="display: inline-block;">
+                <div class="card" style="width: 18rem;">
+                    <img src="/img/workman.avif" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <a href="#" th:onclick="'navigateToAuto(' + ${subItem.id()} + '); return false;'">
+                            <p class="card-text" th:text="${subItem.name()}"></span></p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="section">
+        <h2 class="h2">모든 서비스</h2>
+        <div th:each="subItem : ${subItems.subItemSlicesResponse()}">
+            <a href="#" th:onclick="'navigateToAuto(' + ${subItem.id()} + '); return false;'">
+                <span th:text="${subItem.name()}"></span>
+            </a>
+        </div>
+    </div>
+</div>
+<br>
+<script src="/js/members/member.js"></script>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

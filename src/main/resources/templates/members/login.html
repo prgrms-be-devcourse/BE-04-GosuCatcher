@@ -1,0 +1,35 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link rel=stylesheet href="/css/common/common-form-style.css">
+    <link rel=stylesheet href="/css/members/login-style.css">
+    <script src="/js/members/login.js" defer></script>
+</head>
+<body>
+<header th:replace="/layout/nav.html :: fragment-nav"></header>
+<main>
+    <div class="wrap">
+        <div class="login-form">
+            <h1>로그인</h1>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="email">이메일</label>
+                    <input type="email" class="form-control" placeholder="example@example.com" id="email" name="email">
+                </div>
+                <div class="form-group">
+                    <label for="password">비밀번호</label>
+                    <input type="password" class="form-control" placeholder="5자리 이상 입력해주세요" id="password" name="password">
+                </div>
+                <button id="btn-join" class="btn align-self-center">이메일 로그인</button>
+            </form>
+            <div class="links">
+                <a href="/gosu-catcher/recovery/password">비밀번호 찾기</a>
+                <a href="/gosu-catcher/joinForm">회원가입</a>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+</body>
+</html>

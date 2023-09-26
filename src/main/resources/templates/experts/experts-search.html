@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <div th:replace="/layout/header.html :: fragment-header"></div>
+    <link href="/css/experts/experts-search.css" rel="stylesheet">
+
+</head>
+<body>
+<div th:replace="/layout/nav.html :: fragment-nav"></div>
+
+<div id="app-body">
+    <div class="container">
+
+        <h1 class="text-left my-4">고수찾기</h1>
+
+        <div class="mb-4">
+            <button class="custom-btn" data-target="#serviceModal" data-toggle="modal" type="button">서비스 <i
+                    class="fa fa-angle-down"></i></button>
+            <button class="custom-btn ml-2" data-target="#locationModal" data-toggle="modal" type="button">지역 <i
+                    class="fa fa-angle-down"></i></button>
+
+            <div class="dropdown float-right">
+                <button aria-expanded="false" aria-haspopup="true" class="btn btn-link dropdown-toggle pl-0"
+                        data-toggle="dropdown"
+                        id="sortDropdown" style="color: black;" type="button">
+                    정렬기준
+                </button>
+                <div aria-labelledby="sortDropdown" class="dropdown-menu">
+                    <a class="dropdown-item" data-sort="rating" href="#">평점순</a>
+                    <a class="dropdown-item" data-sort="reviewCount" href="#">리뷰 많은 순</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="experts-list"></div>
+
+    </div>
+</div>
+
+<div aria-hidden="true" aria-labelledby="serviceModalLabel" class="modal fade" id="serviceModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="serviceModalLabel">서비스 선택</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="serviceModalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div aria-hidden="true" aria-labelledby="locationModalLabel" class="modal fade" id="locationModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="locationModalLabel">지역 선택</h5>
+                <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" id="locationModalBody">
+                <select id="citySelect">
+                    <option disabled selected value="">시 선택</option>
+                    <option value="서울특별시">서울특별시</option>
+                    <option value="경기도">경기도</option>
+                    <option value="인천광역시">인천광역시</option>
+                    <option value="강원도">강원도</option>
+                    <option value="충청북도">충청북도</option>
+                    <option value="충청남도">충청남도</option>
+                    <option value="대전광역시">대전광역시</option>
+                    <option value="세종특별자치시">세종특별자치시</option>
+                    <option value="전라북도">전라북도</option>
+                    <option value="전라남도">전라남도</option>
+                    <option value="광주광역시">광주광역시</option>
+                    <option value="경상북도">경상북도</option>
+                    <option value="경상남도">경상남도</option>
+                    <option value="부산광역시">부산광역시</option>
+                    <option value="대구광역시">대구광역시</option>
+                    <option value="울산광역시">울산광역시</option>
+                    <option value="제주특별자치도">제주특별자치도</option>
+                </select>
+
+                <select id="districtSelect">
+                    <option disabled selected value="">구 선택</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="/layout/footer.html :: fragment-footer"></footer>
+
+<script src="/js/experts/experts-search.js"></script>
+
+</body>
+</html>

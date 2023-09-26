@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### YAML ###
+application-db.yml
+application-aws.yml
+
+### MAC OS ###
+**/.DS_Store

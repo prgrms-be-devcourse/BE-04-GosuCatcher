@@ -1,1 +1,47 @@
+server:
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
+spring:
+  jwt:
+    accessTokenSecretKey: DEV_COURSE_TEAM_F_PROJECT_GOSU_CATCHER_DUMMY_ACCESS_TOKEN_SECRET
+    refreshTokenSecretKey: DEV_COURSE_TEAM_F_PROJECT_GOSU_CATCHER_DUMMY_REFRESH_TOKEN_SECRET
+    accessTokenExpiredTime: 1
+    refreshTokenExpiredTime: 30
+  config:
+    import:
+      - classpath:application-aws.yml
+      - classpath:application-db.yml
+      - classpath:application-mail.yml
+
+secret:
+  coolsms:
+    apiKey: DUMMY_KEY
+    apiSecret: DUMMY_SECRET
+    fromNumber: DUMMY_PHONE_NUMBER
+    domain: https://api.coolsms.co.kr
+    expirationTime: 600
+
+auth:
+  senderEmail: DUMMY_EMAIL_ADDRESS
+  expirationTime: 300
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order:        DESC
+    operationsSorter:
+          method
+    disable-swagger-default-url: true
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /api/v1/**
