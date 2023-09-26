@@ -53,8 +53,7 @@ jobs:
         run: aws s3 cp --region ap-northeast-2 ./gosu_catcher.zip s3://$S3_BUCKET_NAME/
 
       - name: Deploy
-        run: |
-          aws deploy create-deployment \
+        run: aws deploy create-deployment \
           --application-name gosu-catcher \
           --deployment-group-name gosu-catcher-deployment-group \
           --file-exists-behavior OVERWRITE \
